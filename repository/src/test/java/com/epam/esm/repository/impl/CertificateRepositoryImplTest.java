@@ -38,7 +38,7 @@ class CertificateRepositoryImplTest {
 
     String tagName = "tag1";
     String certificateName = "name1";
-    String certificateDescription = "Description1";
+    String certificateDescription = "description1";
 
     @BeforeEach
     void setUp() {
@@ -164,13 +164,13 @@ class CertificateRepositoryImplTest {
 
     @Test
     void createTest() {
-        Optional<Certificate> certificateById = certificate.findById(3);
+        Optional<Certificate> certificateById = certificate.findById(5);
 
         assertEquals(certificateById, Optional.empty());
 
         certificate.create(giftCertificate);
 
-        certificateById = certificate.findById(3);
+        certificateById = certificate.findById(5);
 
         assertEquals(certificateById, Optional.of(giftCertificate));
     }
