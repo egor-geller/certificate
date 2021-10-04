@@ -1,5 +1,7 @@
 package com.epam.esm.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.Objects;
@@ -11,7 +13,15 @@ public class Certificate {
     private String description;
     private Double price;
     private Duration duration;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING,
+            pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX",
+            timezone = "UTC")
     private ZonedDateTime createDate;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING,
+            pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX",
+            timezone = "UTC")
     private ZonedDateTime lastUpdateDate;
 
     public long getId() {
