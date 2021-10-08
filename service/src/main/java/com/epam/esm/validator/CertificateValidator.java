@@ -1,0 +1,70 @@
+package com.epam.esm.validator;
+
+import com.epam.esm.dto.CertificateDto;
+import com.epam.esm.entity.Certificate;
+import org.springframework.stereotype.Component;
+
+import java.math.BigDecimal;
+import java.time.Duration;
+import java.util.Arrays;
+import java.util.List;
+import java.util.regex.Pattern;
+
+@Component
+public class CertificateValidator {
+
+    public CertificateValidator() {
+    }
+
+    private static final String NAME_REGEX = "[a-zA-Z0-9.,'?!\"]{5,30}";
+    private static final String DESCRIPTION_REGEX = "[a-zA-Z0-9.,'?!\"]{5,100}";
+
+    public boolean isCertificateValid(Certificate certificate) {
+        String name = certificate.getName();
+        String description = certificate.getDescription();
+        BigDecimal price = certificate.getPrice();
+        Duration duration = certificate.getDuration();
+
+        boolean areParamsEmpty = areParamsEmpty(name, description, String.valueOf(price), String.valueOf(duration));
+
+        return isValidName(name) && isValidDescription(description)
+                && isValidPrice(price) && isValidDuration(duration) && areParamsEmpty;
+    }
+
+    public boolean isCertificateDtoValid(CertificateDto certificate) {
+        String name = certificate.getName();
+        String description = certificate.getDescription();
+        BigDecimal price = certificate.getPrice();
+        Duration duration = certificate.getDuration();
+        List<String> tagList = certificate.getTagList();
+
+        boolean areParamsEmpty = areParamsEmpty(name, description, String.valueOf(price), String.valueOf(duration));
+
+        return isValidName(name) && isValidDescription(description) && isValidPrice(price)
+                && isValidDuration(duration) && areParamsEmpty && isTagListValid(tagList);
+    }
+
+    public boolean areParamsEmpty(String... params) {
+        return Arrays.stream(params).allMatch(String::isEmpty);
+    }
+
+    private boolean isTagListValid(List<String> tagList) {
+        return tagList.stream().allMatch(tagName -> Pattern.matches(NAME_REGEX, tagName));
+    }
+
+    private boolean isValidName(String name) {
+        return Pattern.matches(NAME_REGEX, name);
+    }
+
+    private boolean isValidDescription(String description) {
+        return Pattern.matches(DESCRIPTION_REGEX, description);
+    }
+
+    private boolean isValidPrice(BigDecimal price) {
+        return price.compareTo(BigDecimal.ZERO) > 0;
+    }
+
+    private boolean isValidDuration(Duration duration) {
+        return duration.toDays() > 0;
+    }
+}
