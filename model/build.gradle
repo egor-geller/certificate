@@ -1,5 +1,0 @@
-dependencies {
-    implementation group: 'mysql', name: 'mysql-connector-java', version: mysqlConnectorVersion
-    implementation group: 'org.springframework', name: 'spring-beans', version: springVersion
-
-}

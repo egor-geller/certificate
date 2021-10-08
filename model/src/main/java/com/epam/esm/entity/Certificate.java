@@ -2,6 +2,7 @@ package com.epam.esm.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.Objects;
@@ -11,7 +12,7 @@ public class Certificate {
     private long id;
     private String name;
     private String description;
-    private Double price;
+    private BigDecimal price;
     private Duration duration;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING,
@@ -48,11 +49,11 @@ public class Certificate {
         this.description = description;
     }
 
-    public Double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(Double price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 

@@ -3,59 +3,71 @@ package com.epam.esm.service.impl;
 import com.epam.esm.dto.CertificateDto;
 import com.epam.esm.dto.mapper.CertificateMapper;
 import com.epam.esm.entity.Certificate;
-import com.epam.esm.entity.Tag;
-import com.epam.esm.exception.EntityException;
-import com.epam.esm.repository.CertificateRepository;
-import com.epam.esm.repository.SortType;
-import com.epam.esm.repository.TagRepository;
+import com.epam.esm.exception.EntityAlreadyExistsException;
+import com.epam.esm.exception.EntityNotFoundException;
+import com.epam.esm.exception.InvalidEntityException;
+import com.epam.esm.repository.SearchCriteria;
+import com.epam.esm.repository.repositoryinterfaces.CertificateRepository;
+import com.epam.esm.repository.repositoryinterfaces.TagRepository;
 import com.epam.esm.service.CertificateService;
+import com.epam.esm.validator.CertificateValidator;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
+@Service
 public class CertificateServiceImpl implements CertificateService {
 
     private final CertificateRepository certificateRepository;
     private final TagRepository tagRepository;
+    private CertificateMapper certificateMapper;
+    private CertificateValidator certificateValidator;
 
     public CertificateServiceImpl(CertificateRepository certificateRepository, TagRepository tagRepository) {
         this.certificateRepository = certificateRepository;
         this.tagRepository = tagRepository;
     }
 
-    @Override
-    public List<CertificateDto> findCertificateByService(String tagName, String certificateName
-            , String certificateDescription, SortType sortByName, SortType sortByCreateDate) {
+    @Autowired
+    public void setCertificateValidator(CertificateValidator certificateValidator) {
+        this.certificateValidator = certificateValidator;
+    }
 
-        if (tagName.isEmpty() && certificateName.isEmpty() && certificateDescription.isEmpty()
-                && sortByName == null && sortByCreateDate == null) {
-            throw new EntityException("There are no parameters to find a certificate");
+    @Autowired
+    public void setCertificateMapper(CertificateMapper certificateMapper) {
+        this.certificateMapper = certificateMapper;
+    }
+
+    @Override
+    public List<CertificateDto> findCertificateByCriteriaService(SearchCriteria searchCriteria) {
+
+        if (certificateValidator.areParamsEmpty(searchCriteria.getTagName(), searchCriteria.getCertificateName()
+                , searchCriteria.getCertificateDescription(), searchCriteria.getSortByName().toString(),
+                searchCriteria.getSortByCreateDate().toString())) {
+            throw new InvalidEntityException("All parameters are empty");
         }
 
-        return certificateRepository.find(tagName, certificateName
-                        , certificateDescription, sortByName, sortByCreateDate).stream()
-                .map(certificate -> {
-                    long certificateId = certificate.getId();
-                    List<Tag> tagList = tagRepository.findByCertificateId(certificateId);
-                    return CertificateMapper.toCertificateDto(certificate, tagList);
-                }).collect(Collectors.toList());
+        List<Certificate> certificateList = certificateRepository.find(searchCriteria);
 
+        return certificateMapper.changeListOfCertificatesToDto(certificateList, tagRepository);
     }
 
     @Override
     public CertificateDto findCertificateByIdService(long id) {
         if (id < 1) {
-            throw new EntityException("There is no entity by this id: " + id);
+            throw new InvalidEntityException("The id isn't correctly written: " + id);
         }
-        return CertificateMapper.toCertificateDto(certificateRepository.findById(id)
-                .orElseThrow(() -> new EntityException("There is no entity by this id: " + id)), List.of());
+
+        return certificateMapper.changeCertificateToDto(certificateRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("There is no entity by this id: " + id)), List.of());
     }
 
     @Override
     public boolean attachTagToCertificateService(long certificateId, long tagId) {
         if (certificateId < 1 || tagId < 1) {
-            return false;
+            throw new InvalidEntityException("Both id's not been written correctly: " + certificateId + ", " + tagId);
         }
         return certificateRepository.attachTag(certificateId, tagId);
     }
@@ -63,7 +75,7 @@ public class CertificateServiceImpl implements CertificateService {
     @Override
     public boolean detachTagFromCertificateService(long certificateId, long tagId) {
         if (certificateId < 1 || tagId < 1) {
-            return false;
+            throw new InvalidEntityException("Both id's not been written correctly: " + certificateId + ", " + tagId);
         }
         return certificateRepository.detachTag(certificateId, tagId);
     }
@@ -71,13 +83,13 @@ public class CertificateServiceImpl implements CertificateService {
     @Override
     public void createCertificateService(CertificateDto certificate) {
         if (certificate == null) {
-            throw new EntityException("Certificate is null");
+            throw new InvalidEntityException("Certificate is null");
         }
 
-        Certificate fromCertificateDto = CertificateMapper.fromCertificateDto(certificate);
+        Certificate fromCertificateDto = certificateMapper.changeCertificateFromDto(certificate);
         Optional<Certificate> byId = certificateRepository.findById(fromCertificateDto.getId());
         if (byId.isPresent()) {
-            throw new EntityException("Certificate is already exits");
+            throw new EntityAlreadyExistsException("Certificate is already exits");
         }
 
         certificateRepository.create(fromCertificateDto);
@@ -85,11 +97,11 @@ public class CertificateServiceImpl implements CertificateService {
 
     @Override
     public boolean updateCertificateService(CertificateDto certificate) {
-        if (certificate == null) {
-            return false;
+        if (certificate == null || !certificateValidator.isCertificateDtoValid(certificate)) {
+            throw new InvalidEntityException("Certificate is null");
         }
 
-        Certificate fromCertificateDto = CertificateMapper.fromCertificateDto(certificate);
+        Certificate fromCertificateDto = certificateMapper.changeCertificateFromDto(certificate);
 
         return certificateRepository.update(fromCertificateDto);
     }
@@ -97,7 +109,7 @@ public class CertificateServiceImpl implements CertificateService {
     @Override
     public boolean deleteCertificateService(long id) {
         if (id < 1) {
-            return false;
+            throw new InvalidEntityException("Id is not written correctly " + id);
         }
         return certificateRepository.delete(id);
     }

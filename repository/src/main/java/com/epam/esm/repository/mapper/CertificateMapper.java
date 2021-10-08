@@ -20,7 +20,7 @@ public class CertificateMapper implements RowMapper<Certificate> {
         certificate.setId(rs.getLong("id"));
         certificate.setName(rs.getString("name"));
         certificate.setDescription(rs.getString("description"));
-        certificate.setPrice(rs.getDouble("price"));
+        certificate.setPrice(rs.getBigDecimal("price"));
         certificate.setDuration(Duration.ofDays(rs.getInt("duration")));
         certificate.setCreateDate(rs.getTimestamp("create_date").toInstant().atZone(UTC));
         certificate.setLastUpdateDate(rs.getTimestamp("last_update_date").toInstant().atZone(UTC));

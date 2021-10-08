@@ -1,23 +1,12 @@
 allprojects {
     apply plugin: "java"
 
-    group 'org.epam'
-    version '1.0'
-
     repositories {
         mavenCentral()
     }
 
+    //TODO: check which dependencies are not used in other modules
     dependencies {
-        testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: junitVersion
-        testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: junitVersion
-        testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: junitVersion
-
-        implementation group: 'org.springframework', name: 'spring-core', version: springVersion
-        implementation group: 'org.springframework', name: 'spring-context', version: springVersion
-        implementation group: 'org.springframework', name: 'spring-web', version: springVersion
-        implementation group: 'org.springframework', name: 'spring-webmvc', version: springVersion
-        implementation group: 'org.springframework', name: 'spring-jdbc', version: springVersion
         implementation group: 'org.springframework', name: 'spring-tx', version: springVersion
         testImplementation group: 'org.springframework', name: 'spring-test', version: springVersion
 

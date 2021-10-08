@@ -1,16 +1,19 @@
 package com.epam.esm.dto;
 
+import com.epam.esm.entity.Certificate;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.List;
 
 public class CertificateDto {
 
+    private Long id;
     private String name;
     private String description;
-    private Double price;
+    private BigDecimal price;
     private Duration duration;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING,
@@ -25,15 +28,24 @@ public class CertificateDto {
 
     private List<String> tagList;
 
-    public CertificateDto(String name, String description, Double price, Duration duration,
-                          ZonedDateTime createDate, ZonedDateTime lastUpdateDate, List<String> tagList) {
-        this.name = name;
-        this.description = description;
-        this.price = price;
-        this.duration = duration;
-        this.createDate = createDate;
-        this.lastUpdateDate = lastUpdateDate;
+    public CertificateDto(){}
+
+    public CertificateDto(Certificate certificate, List<String> tagList) {
+        this.name = certificate.getName();
+        this.description = certificate.getDescription();
+        this.price = certificate.getPrice();
+        this.duration = certificate.getDuration();
+        this.createDate = certificate.getCreateDate();
+        this.lastUpdateDate = certificate.getLastUpdateDate();
         this.tagList = tagList;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -52,11 +64,11 @@ public class CertificateDto {
         this.description = description;
     }
 
-    public Double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(Double price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 
@@ -90,5 +102,18 @@ public class CertificateDto {
 
     public void setTagList(List<String> tagList) {
         this.tagList = tagList;
+    }
+
+    @Override
+    public String toString() {
+        return "CertificateDto{" +
+                "name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", price=" + price +
+                ", duration=" + duration +
+                ", createDate=" + createDate +
+                ", lastUpdateDate=" + lastUpdateDate +
+                ", tagList=" + tagList +
+                '}';
     }
 }

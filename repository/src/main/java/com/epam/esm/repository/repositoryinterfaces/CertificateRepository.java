@@ -1,34 +1,25 @@
-package com.epam.esm.service;
+package com.epam.esm.repository.repositoryinterfaces;
 
-import com.epam.esm.dto.CertificateDto;
 import com.epam.esm.entity.Certificate;
 import com.epam.esm.repository.SearchCriteria;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Interface that provides functionality for manipulating {@link Certificate} entity.
  *
  * @author Geller Egor
  */
-public interface CertificateService {
+public interface CertificateRepository extends BaseRepository<Certificate> {
+
     /**
      * Retrieve certificates according to specified parameters. All parameters are optional
      * and can be used in conjunction, if they are not present, all certificates will be retrieved
      *
-     * @param searchCriteria {@link SearchCriteria} class for searching by specific parameter
+     * @param searchCriteria {@link SearchCriteria} entity for searching by specific parameter
      * @return list of {@link Certificate}
      */
-    List<CertificateDto> findCertificateByCriteriaService(SearchCriteria searchCriteria);
-
-    /**
-     * Find certificate by its id
-     *
-     * @param id certificate id
-     * @return {@link Optional} of {@link Certificate} entity.
-     */
-    CertificateDto findCertificateByIdService(long id);
+    List<Certificate> find(SearchCriteria searchCriteria);
 
     /**
      * Attach tag to existing certificate.
@@ -37,7 +28,7 @@ public interface CertificateService {
      * @param tagId         tag id
      * @return {@code true} if {@link Certificate} was attached, otherwise {@code false}
      */
-    boolean attachTagToCertificateService(long certificateId, long tagId);
+    boolean attachTag(long certificateId, long tagId);
 
     /**
      * Detach tag from existing certificate.
@@ -46,14 +37,7 @@ public interface CertificateService {
      * @param tagId         tag id
      * @return {@code true} if {@link Certificate} was detached, otherwise {@code false}
      */
-    boolean detachTagFromCertificateService(long certificateId, long tagId);
-
-    /**
-     * Create a new certificate.
-     *
-     * @param certificate {@link Certificate} instance
-     */
-    void createCertificateService(CertificateDto certificate);
+    boolean detachTag(long certificateId, long tagId);
 
     /**
      * Update an existing certificate.
@@ -61,13 +45,5 @@ public interface CertificateService {
      * @param certificate {@link Certificate} entity.
      * @return {@code true} if {@link Certificate} was updated, otherwise {@code false}
      */
-    boolean updateCertificateService(CertificateDto certificate);
-
-    /**
-     * Delete an existing certificate.
-     *
-     * @param id certificate id
-     * @return {@code true} if {@link Certificate} was deleted, otherwise {@code false}
-     */
-    boolean deleteCertificateService(long id);
+    boolean update(Certificate certificate);
 }

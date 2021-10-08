@@ -1,8 +1,13 @@
 package com.epam.esm.repository.impl;
 
 import com.epam.esm.entity.Certificate;
-import com.epam.esm.repository.CertificateRepository;
-import com.epam.esm.repository.SortType;
+import com.epam.esm.exception.DataException;
+import com.epam.esm.repository.SearchCriteria;
+import com.epam.esm.repository.repositoryinterfaces.CertificateRepository;
+import com.epam.esm.repository.builder.QueryBuilder;
+import com.epam.esm.repository.builder.SortType;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -10,133 +15,90 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import static com.epam.esm.repository.builder.CertificateQueries.*;
+import static com.epam.esm.repository.Parameters.*;
 
 @Repository
 public class CertificateRepositoryImpl implements CertificateRepository {
 
-    private static final String ID_PARAMETER = "id";
-    private static final String NAME_PARAMETER = "name";
-    private static final String DESCRIPTION_PARAMETER = "description";
-    private static final String PRICE_PARAMETER = "price";
-    private static final String DURATION_PARAMETER = "duration";
-    private static final String CREATE_DATE_PARAMETER = "create_date";
-    private static final String LAST_UPDATE_PARAMETER = "last_update_date";
-    private static final String TAG_ID_PARAMETER = "tag_id";
-    private static final String TAG_NAME_PARAMETER = "tag_name";
-    private static final String GIFT_CERTIFICATE_ID_PARAMETER = "gift_certificate_id";
-
-    private static final String SELECT_ALL_CERTIFICATES = """
-            SELECT cert.id, cert.name, description, price, duration, create_date, last_update_date
-            FROM gift_certificate AS cert
-            LEFT OUTER JOIN gift_certificate_has_tag gcht
-            ON cert.id = gcht.gift_certificate_id
-            LEFT OUTER JOIN tag
-            ON gcht.tag_id = tag.id
-            %s;
-            """;
-
-    private static final String SELECT_CERTIFICATE_BY_ID = """
-            SELECT ID, NAME, DESCRIPTION, PRICE, DURATION, CREATE_DATE, LAST_UPDATE_DATE FROM gift_certificate
-            WHERE id = :id;
-            """;
-
-    private static final String INSERT_TAG_TO_CERTIFICATE = """
-            INSERT INTO gift_certificate_has_tag (gift_certificate_id, tag_id)
-            VALUES (:id, :tag_id);
-            """;
-
-    private static final String DELETE_TAG_FROM_CERTIFICATE = """
-            DELETE FROM gift_certificate_has_tag
-            WHERE gift_certificate_id = :gift_certificate_id AND tag_id = :tag_id;
-            """;
-
-    private static final String INSERT_CERTIFICATE = """
-            INSERT INTO gift_certificate (name, description, price, duration, create_date, last_update_date)
-            VALUES (:name, :description, :price, :duration, :create_date, :last_update_date)
-            """;
-
-    private static final String UPDATE_CERTIFICATE = """
-            UPDATE gift_certificate
-            SET name = :name, description = :description, price = :price, duration = :duration, last_update_date = :last_update_date
-            WHERE id = :id;
-            """;
-
-    private static final String DELETE_CERTIFICATE = """
-            DELETE FROM gift_certificate
-            WHERE id = :id;
-            """;
-
     private final RowMapper<Certificate> rowMapper;
-    private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+    private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+    private QueryBuilder queryBuilder;
 
-    public CertificateRepositoryImpl(DataSource dataSource, RowMapper<Certificate> rowMapper) {
-        this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
+    public CertificateRepositoryImpl(RowMapper<Certificate> rowMapper) {
         this.rowMapper = rowMapper;
     }
 
+    @Autowired //Should be public?
+    public void setDataSource(DataSource dataSource) {
+        this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
+    }
+
+    @Autowired
+    public void setQueryBuilder(QueryBuilder queryBuilder) {
+        this.queryBuilder = queryBuilder;
+    }
+
     @Override
-    public List<Certificate> find(String tagName, String certificateName, String certificateDescription
-            , SortType sortByName, SortType sortByCreateDate) {
+    public List<Certificate> find(SearchCriteria searchCriteria) {
 
         MapSqlParameterSource parameters = new MapSqlParameterSource();
-        List<String> findBy = new ArrayList<>();
-        List<String> orderBy = new ArrayList<>();
+        List<String> whereClauseFindByParameters = new ArrayList<>();
+        List<String> orderByAscDesc = new ArrayList<>();
 
-        if (!tagName.isEmpty()) {
-            findBy.add("tag.name = :" + TAG_NAME_PARAMETER);
-            parameters.addValue(TAG_NAME_PARAMETER, tagName);
-        }
+        queryBuilder.nameOfATag(whereClauseFindByParameters, parameters, searchCriteria.getTagName());
+        queryBuilder.nameOfCertificate(whereClauseFindByParameters, parameters, searchCriteria.getCertificateName());
+        queryBuilder.descriptionOfCertificate(whereClauseFindByParameters, parameters, searchCriteria.getCertificateDescription());
+        queryBuilder.sortByCertificateName(orderByAscDesc, searchCriteria.getSortByName());
+        queryBuilder.sortByCertificateCreationDate(orderByAscDesc, searchCriteria.getSortByCreateDate());
 
-        if (!certificateName.isEmpty()) {
-            findBy.add("gift_certificate.name = :" + NAME_PARAMETER);
-            parameters.addValue(NAME_PARAMETER, certificateName);
-        }
-
-        if (!certificateDescription.isEmpty()) {
-            findBy.add("gift_certificate.description = :" + DESCRIPTION_PARAMETER);
-            parameters.addValue(DESCRIPTION_PARAMETER, certificateDescription);
-        }
-
-        if (sortByName != null) {
-            orderBy.add("gift_certificate.name " + sortByName.name());
-        }
-
-        if (sortByCreateDate != null) {
-            orderBy.add("gift_certificate.create_date " + sortByCreateDate.name());
-        }
-
-        String sqlBuilder = sqlBuild(findBy, orderBy);
-
-        String finishedQuery = String.format(SELECT_ALL_CERTIFICATES, sqlBuilder);
+        String finishedQuery = queryBuilder.sqlBuild(whereClauseFindByParameters, orderByAscDesc, SELECT_ALL_CERTIFICATES);
 
         return namedParameterJdbcTemplate.query(finishedQuery, parameters, rowMapper);
     }
 
     @Override
-    public Optional<Certificate> findById(long id) {
+    public Optional<Certificate> findById(Long id) {
         SqlParameterSource parameterSource = new MapSqlParameterSource().addValue(ID_PARAMETER, id);
         List<Certificate> certificates = namedParameterJdbcTemplate.query(SELECT_CERTIFICATE_BY_ID, parameterSource, rowMapper);
 
-        return Optional.ofNullable(certificates.size() == 1 ? certificates.get(0) : null);
+        return certificates.stream().findFirst();
     }
 
     @Override
     public boolean attachTag(long certificateId, long tagId) {
+        int update;
         SqlParameterSource parameterSource = new MapSqlParameterSource()
                 .addValue(GIFT_CERTIFICATE_ID_PARAMETER, certificateId)
                 .addValue(TAG_ID_PARAMETER, tagId);
 
-        return namedParameterJdbcTemplate.update(INSERT_TAG_TO_CERTIFICATE, parameterSource) > 0;
+        try {
+            update = namedParameterJdbcTemplate.update(INSERT_TAG_TO_CERTIFICATE, parameterSource);
+        } catch (DataAccessException e) {
+            throw new DataException("There is a problem to attach: Tag id - " +
+                    tagId + ", Certificate id - " + certificateId, e);
+        }
+        return update > 0;
     }
 
     @Override
     public boolean detachTag(long certificateId, long tagId) {
+        int update;
         SqlParameterSource parameterSource = new MapSqlParameterSource()
                 .addValue(GIFT_CERTIFICATE_ID_PARAMETER, certificateId)
                 .addValue(TAG_ID_PARAMETER, tagId);
 
-        return namedParameterJdbcTemplate.update(DELETE_TAG_FROM_CERTIFICATE, parameterSource) > 0;
+        try {
+            update = namedParameterJdbcTemplate.update(DELETE_TAG_FROM_CERTIFICATE, parameterSource);
+        } catch (DataAccessException e) {
+            throw new DataException("There is a problem to delete: Tag id - " +
+                    tagId + ", Certificate id - " + certificateId, e);
+        }
+        return update > 0;
     }
 
     @Override
@@ -166,46 +128,9 @@ public class CertificateRepositoryImpl implements CertificateRepository {
     }
 
     @Override
-    public boolean delete(long id) {
+    public boolean delete(Long id) {
         SqlParameterSource parameterSource = new MapSqlParameterSource().addValue(ID_PARAMETER, id);
 
         return namedParameterJdbcTemplate.update(DELETE_CERTIFICATE, parameterSource) > 0;
-    }
-
-    private String sqlBuild(List<String> where, List<String> order) {
-        StringBuilder whereSql = new StringBuilder();
-        StringBuilder orderSql = new StringBuilder();
-
-        if (!where.isEmpty()) {
-            whereSql = new StringBuilder("WHERE ");
-        }
-
-        if (!order.isEmpty()) {
-            orderSql = new StringBuilder("ORDER BY ");
-        }
-
-        Iterator<String> itr = where.iterator();
-
-        while (itr.hasNext()) {
-            String findBy = itr.next();
-            whereSql.append(findBy);
-
-            if (itr.hasNext()) {
-                whereSql.append(" AND ");
-            }
-        }
-
-        itr = order.iterator();
-
-        while (itr.hasNext()) {
-            String orderBy = itr.next();
-            orderSql.append(orderBy);
-
-            if (itr.hasNext()) {
-                orderSql.append(", ");
-            }
-        }
-
-        return whereSql.append(orderSql).toString();
     }
 }
