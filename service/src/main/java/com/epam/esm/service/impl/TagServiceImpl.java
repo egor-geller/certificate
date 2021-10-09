@@ -20,14 +20,10 @@ import java.util.stream.Collectors;
 public class TagServiceImpl implements TagService {
 
     private final TagRepository tagRepository;
-    private TagValidator tagValidator;
+    private final TagValidator tagValidator;
 
-    public TagServiceImpl(TagRepository tagRepository) {
+    public TagServiceImpl(TagRepository tagRepository, @Autowired TagValidator tagValidator) {
         this.tagRepository = tagRepository;
-    }
-
-    @Autowired
-    public void setTagValidator(TagValidator tagValidator) {
         this.tagValidator = tagValidator;
     }
 
@@ -49,7 +45,7 @@ public class TagServiceImpl implements TagService {
     public TagDto findTagByNameService(String tagName) {
         boolean tagValid = tagValidator.isTagValid(tagName);
         if (!tagValid) {
-            throw  new InvalidEntityException("Tag name is not valid " + tagName);
+            throw new InvalidEntityException("Tag name is not valid " + tagName);
         }
 
         Tag tag = tagRepository.findByName(tagName)

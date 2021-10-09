@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 @Component
 public class CertificateMapper {
 
-    public CertificateMapper() {
+    private CertificateMapper() {
     }
 
     public List<CertificateDto> changeListOfCertificatesToDto(List<Certificate> certificates, TagRepository tagRepository) {

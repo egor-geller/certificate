@@ -26,20 +26,14 @@ import static com.epam.esm.repository.Parameters.*;
 public class CertificateRepositoryImpl implements CertificateRepository {
 
     private final RowMapper<Certificate> rowMapper;
-    private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
-    private QueryBuilder queryBuilder;
+    private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+    private final QueryBuilder queryBuilder;
 
-    public CertificateRepositoryImpl(RowMapper<Certificate> rowMapper) {
+    public CertificateRepositoryImpl(RowMapper<Certificate> rowMapper,
+                                     @Autowired DataSource dataSource,
+                                     @Autowired QueryBuilder queryBuilder) {
         this.rowMapper = rowMapper;
-    }
-
-    @Autowired //Should be public?
-    public void setDataSource(DataSource dataSource) {
         this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-    }
-
-    @Autowired
-    public void setQueryBuilder(QueryBuilder queryBuilder) {
         this.queryBuilder = queryBuilder;
     }
 

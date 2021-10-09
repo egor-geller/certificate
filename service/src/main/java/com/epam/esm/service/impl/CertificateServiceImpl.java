@@ -22,22 +22,17 @@ public class CertificateServiceImpl implements CertificateService {
 
     private final CertificateRepository certificateRepository;
     private final TagRepository tagRepository;
-    private CertificateMapper certificateMapper;
-    private CertificateValidator certificateValidator;
+    private final CertificateMapper certificateMapper;
+    private final CertificateValidator certificateValidator;
 
-    public CertificateServiceImpl(CertificateRepository certificateRepository, TagRepository tagRepository) {
+    public CertificateServiceImpl(CertificateRepository certificateRepository,
+                                  TagRepository tagRepository,
+                                  @Autowired CertificateMapper certificateMapper,
+                                  @Autowired CertificateValidator certificateValidator) {
         this.certificateRepository = certificateRepository;
         this.tagRepository = tagRepository;
-    }
-
-    @Autowired
-    public void setCertificateValidator(CertificateValidator certificateValidator) {
-        this.certificateValidator = certificateValidator;
-    }
-
-    @Autowired
-    public void setCertificateMapper(CertificateMapper certificateMapper) {
         this.certificateMapper = certificateMapper;
+        this.certificateValidator = certificateValidator;
     }
 
     @Override
