@@ -16,7 +16,7 @@ import java.nio.charset.StandardCharsets;
 @ComponentScan("com.epam.esm")
 @EnableWebMvc
 public class WebConfig extends AcceptHeaderLocaleResolver implements WebMvcConfigurer {
-    private static final String ERROR_BUNDLE_PATH = "i18n/error_message";
+    private static final String ERROR_BUNDLE_PATH = "i18n/errors";
 
     @Bean
     public ResourceBundleMessageSource messageSource() {
