@@ -3,6 +3,7 @@ package com.epam.esm.controller;
 import com.epam.esm.exception.EntityAlreadyExistsException;
 import com.epam.esm.exception.EntityNotFoundException;
 import com.epam.esm.exception.InvalidEntityException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.http.HttpHeaders;
@@ -19,7 +20,7 @@ import java.util.Locale;
 import java.util.Map;
 
 @RestControllerAdvice
-public class WebExceptionHandler extends ResponseEntityExceptionHandler {
+public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 
     private static final String ERROR_MESSAGE = "errorMessage";
     private static final String RESOURCE_NOT_FOUND_MESSAGE = "resource_not_found";
@@ -30,7 +31,8 @@ public class WebExceptionHandler extends ResponseEntityExceptionHandler {
 
     private final ResourceBundleMessageSource bundleMessageSource;
 
-    public WebExceptionHandler(ResourceBundleMessageSource bundleMessageSource) {
+    @Autowired
+    public CustomExceptionHandler(ResourceBundleMessageSource bundleMessageSource) {
         this.bundleMessageSource = bundleMessageSource;
     }
 
