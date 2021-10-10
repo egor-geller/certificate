@@ -72,7 +72,7 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public boolean deleteTagService(Long id) {
-        if (id == null) {
+        if (id == null || id < 1) {
             throw new InvalidEntityException("Id cannot be null");
         }
         return tagRepository.delete(id);

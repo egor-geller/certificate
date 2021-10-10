@@ -2,6 +2,9 @@ package com.epam.esm.service;
 
 import com.epam.esm.dto.CertificateDto;
 import com.epam.esm.entity.Certificate;
+import com.epam.esm.exception.EntityAlreadyExistsException;
+import com.epam.esm.exception.EntityNotFoundException;
+import com.epam.esm.exception.InvalidEntityException;
 import com.epam.esm.repository.SearchCriteria;
 
 import java.util.List;
@@ -27,6 +30,8 @@ public interface CertificateService {
      *
      * @param id certificate id
      * @return {@link Optional} of {@link Certificate} entity.
+     * @throws EntityNotFoundException when there is no such entity
+     * @throws InvalidEntityException  when id is not correctly written
      */
     CertificateDto findCertificateByIdService(long id);
 
@@ -36,6 +41,7 @@ public interface CertificateService {
      * @param certificateId certificate id
      * @param tagId         tag id
      * @return {@code true} if {@link Certificate} was attached, otherwise {@code false}
+     * @throws InvalidEntityException when id is not correctly written
      */
     boolean attachTagToCertificateService(long certificateId, long tagId);
 
@@ -45,6 +51,7 @@ public interface CertificateService {
      * @param certificateId certificate id
      * @param tagId         tag id
      * @return {@code true} if {@link Certificate} was detached, otherwise {@code false}
+     * @throws InvalidEntityException when id is not correctly written
      */
     boolean detachTagFromCertificateService(long certificateId, long tagId);
 
@@ -52,6 +59,8 @@ public interface CertificateService {
      * Create a new certificate.
      *
      * @param certificate {@link Certificate} instance
+     * @throws EntityAlreadyExistsException when {@link Certificate} already exists
+     * @throws InvalidEntityException       when {@link Certificate} is not correctly written
      */
     void createCertificateService(CertificateDto certificate);
 
@@ -60,6 +69,7 @@ public interface CertificateService {
      *
      * @param certificate {@link Certificate} entity.
      * @return {@code true} if {@link Certificate} was updated, otherwise {@code false}
+     * @throws InvalidEntityException when {@link Certificate} is not correctly written
      */
     boolean updateCertificateService(CertificateDto certificate);
 
@@ -68,6 +78,7 @@ public interface CertificateService {
      *
      * @param id certificate id
      * @return {@code true} if {@link Certificate} was deleted, otherwise {@code false}
+     * @throws InvalidEntityException when id is not correctly written
      */
     boolean deleteCertificateService(long id);
 }

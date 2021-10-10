@@ -22,6 +22,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/tags")
 public class TagController {
+
     private final TagService tagService;
 
     /**

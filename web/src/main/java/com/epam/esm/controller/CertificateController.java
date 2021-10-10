@@ -21,6 +21,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/certificates")
 public class CertificateController {
+
     private final CertificateService certificateService;
 
     /**
