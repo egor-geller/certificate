@@ -13,11 +13,12 @@ import java.util.regex.Pattern;
 @Component
 public class CertificateValidator {
 
-    public CertificateValidator() {
+    private CertificateValidator() {
     }
 
     private static final String NAME_REGEX = "[a-zA-Z0-9.,'?!\"]{5,30}";
     private static final String DESCRIPTION_REGEX = "[a-zA-Z0-9.,'?!\"]{5,100}";
+    private static final String TAG_NAME_REGEX = "[a-zA-Z0-9.,'?!\"]{2,30}";
 
     public boolean isCertificateValid(Certificate certificate) {
         String name = certificate.getName();
@@ -40,8 +41,10 @@ public class CertificateValidator {
 
         boolean areParamsEmpty = areParamsEmpty(name, description, String.valueOf(price), String.valueOf(duration));
 
-        return isValidName(name) && isValidDescription(description) && isValidPrice(price)
-                && isValidDuration(duration) && areParamsEmpty && isTagListValid(tagList);
+        boolean tagListIsEmpty = tagList.stream().allMatch(String::isEmpty);
+
+        return !tagListIsEmpty && !areParamsEmpty && isValidName(name) && isValidDescription(description)
+                && isValidPrice(price) && isValidDuration(duration) && !isTagListValid(tagList);
     }
 
     public boolean areParamsEmpty(String... params) {
@@ -49,7 +52,7 @@ public class CertificateValidator {
     }
 
     private boolean isTagListValid(List<String> tagList) {
-        return tagList.stream().allMatch(tagName -> Pattern.matches(NAME_REGEX, tagName));
+        return tagList.stream().allMatch(tagName -> Pattern.matches(TAG_NAME_REGEX, tagName));
     }
 
     private boolean isValidName(String name) {
