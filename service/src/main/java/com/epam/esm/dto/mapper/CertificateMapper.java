@@ -41,6 +41,8 @@ public class CertificateMapper {
         certificate.setDescription(certificateDto.getDescription());
         certificate.setPrice(certificateDto.getPrice());
         certificate.setDuration(certificateDto.getDuration());
+        certificate.setCreateDate(certificateDto.getCreateDate());
+        certificate.setLastUpdateDate(certificateDto.getLastUpdateDate());
 
         return certificate;
     }
