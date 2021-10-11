@@ -63,9 +63,9 @@ public class TagRepositoryImpl implements TagRepository {
     @Override
     public void create(Tag tag) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
-        SqlParameterSource in = new MapSqlParameterSource().addValue(NAME_PARAMETER, tag.getName());
+        SqlParameterSource mapSqlParameterSource = new MapSqlParameterSource().addValue(NAME_PARAMETER, tag.getName());
 
-        namedParameterJdbcTemplate.update(INSERT_TAG, in, keyHolder);
+        namedParameterJdbcTemplate.update(INSERT_TAG, mapSqlParameterSource, keyHolder);
     }
 
     @Override
