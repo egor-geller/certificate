@@ -1,8 +1,10 @@
 package com.epam.esm.controller;
 
 import com.epam.esm.dto.TagDto;
+import com.epam.esm.entity.Certificate;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.EntityAlreadyExistsException;
+import com.epam.esm.exception.EntityConnectedException;
 import com.epam.esm.exception.EntityNotFoundException;
 import com.epam.esm.exception.InvalidEntityException;
 import com.epam.esm.service.impl.TagServiceImpl;
@@ -79,7 +81,8 @@ public class TagController {
      * @param id tag id
      * @return {@code HttpStatus.OK} and {@code True} when entity has been deleted, otherwise,
      * {@code HttpStatus.NOT_MODIFIED} and {@code False}
-     * @throws InvalidEntityException when id is not written correctly
+     * @throws InvalidEntityException   when id is not written correctly
+     * @throws EntityConnectedException when {@link Tag} is still connected to a {@link Certificate}
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Boolean> deleteTag(@PathVariable("id") Long id) {
