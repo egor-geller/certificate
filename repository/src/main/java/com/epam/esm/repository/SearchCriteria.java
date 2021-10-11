@@ -6,11 +6,11 @@ import java.util.Objects;
 
 public class SearchCriteria {
 
-    String tagName;
-    String certificateName;
-    String certificateDescription;
-    SortType sortByName;
-    SortType sortByCreateDate;
+    private String tagName;
+    private String certificateName;
+    private String certificateDescription;
+    private SortType sortByName;
+    private SortType sortByCreateDate;
 
     public String getTagName() {
         return tagName;
