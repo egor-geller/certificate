@@ -96,7 +96,7 @@ public class CertificateController {
      * @return {@code HttpStatus.OK} and {@code True} when entity has been deleted, otherwise,
      * {@code HttpStatus.NOT_MODIFIED} and {@code False}
      */
-    @DeleteMapping("{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Boolean> deleteCertificate(@PathVariable("id") Long id) {
         boolean hasBeenDeleted = certificateService.deleteCertificateService(id);
         return hasBeenDeleted ? new ResponseEntity<>(hasBeenDeleted, HttpStatus.OK)
