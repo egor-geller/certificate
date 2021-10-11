@@ -5,6 +5,7 @@ dependencies {
     testImplementation group: 'com.h2database', name: 'h2', version: h2Version
 
     implementation group: 'mysql', name: 'mysql-connector-java', version: mysqlConnectorVersion
+    implementation group: 'org.apache.commons', name: 'commons-dbcp2', version: dbcpVersion
     implementation group: 'org.springframework', name: 'spring-jdbc', version: springVersion
     implementation group: 'org.springframework', name: 'spring-context', version: springVersion
     implementation group: 'org.springframework', name: 'spring-beans', version: springVersion
