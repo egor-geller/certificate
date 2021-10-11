@@ -1,0 +1,17 @@
+plugins {
+    id 'war'
+}
+
+dependencies {
+    compileOnly group: 'javax.servlet', name: 'javax.servlet-api', version: '4.0.1'
+    implementation group: 'org.springframework', name: 'spring-web', version: springVersion
+    implementation group: 'org.springframework', name: 'spring-webmvc', version: springVersion
+
+    implementation project(":service")
+    implementation project(":repository")
+    implementation project(":model")
+}
+
+war {
+    archiveName 'certificates-api.war'
+}

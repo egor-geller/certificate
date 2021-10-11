@@ -1,0 +1,16 @@
+plugins{
+    id 'java-library'
+}
+
+dependencies {
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: junitVersion
+    testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: junitVersion
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: junitVersion
+
+    testImplementation group: 'org.mockito', name: 'mockito-core', version: mockitoversion;
+    testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: mockitoversion;
+    implementation group: 'org.springframework', name: 'spring-context', version: springVersion
+
+    implementation project(":repository")
+    implementation project(":model")
+}
