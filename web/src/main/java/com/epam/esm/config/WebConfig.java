@@ -13,8 +13,8 @@ import org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver;
 import java.nio.charset.StandardCharsets;
 
 @Configuration
-@ComponentScan("com.epam.esm")
 @EnableWebMvc
+@ComponentScan("com.epam.esm")
 public class WebConfig extends AcceptHeaderLocaleResolver implements WebMvcConfigurer {
     private static final String ERROR_BUNDLE_PATH = "i18n/errors";
 
@@ -32,3 +32,4 @@ public class WebConfig extends AcceptHeaderLocaleResolver implements WebMvcConfi
         registry.addConverter(new StringToSortByAscDescConverter());
     }
 }
+

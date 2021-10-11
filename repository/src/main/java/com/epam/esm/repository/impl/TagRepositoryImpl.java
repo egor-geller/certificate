@@ -1,9 +1,9 @@
 package com.epam.esm.repository.impl;
 
 import com.epam.esm.entity.Tag;
+import com.epam.esm.repository.mapper.TagMapper;
 import com.epam.esm.repository.repositoryinterfaces.TagRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
@@ -15,21 +15,18 @@ import javax.sql.DataSource;
 import java.util.List;
 import java.util.Optional;
 
-import static com.epam.esm.repository.builder.TagQueries.*;
 import static com.epam.esm.repository.Parameters.*;
+import static com.epam.esm.repository.builder.TagQueries.*;
 
 @Repository
 public class TagRepositoryImpl implements TagRepository {
 
-    private final RowMapper<Tag> rowMapper;
-    private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
-
-    public TagRepositoryImpl(RowMapper<Tag> rowMapper) {
-        this.rowMapper = rowMapper;
-    }
+    private final TagMapper rowMapper;
+    private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     @Autowired
-    public void setDataSource(DataSource dataSource) {
+    public TagRepositoryImpl(TagMapper rowMapper, DataSource dataSource) {
+        this.rowMapper = rowMapper;
         this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
     }
 
@@ -42,7 +39,7 @@ public class TagRepositoryImpl implements TagRepository {
     public Optional<Tag> findById(Long id) {
         SqlParameterSource in = new MapSqlParameterSource().addValue(ID_PARAMETER, id);
 
-        List<Tag> tagList = namedParameterJdbcTemplate.query(SELECT_TAG_BY_ID, in ,rowMapper);
+        List<Tag> tagList = namedParameterJdbcTemplate.query(SELECT_TAG_BY_ID, in, rowMapper);
 
         return tagList.stream().findFirst();
     }
@@ -51,7 +48,7 @@ public class TagRepositoryImpl implements TagRepository {
     public Optional<Tag> findByName(String tagName) {
         SqlParameterSource in = new MapSqlParameterSource().addValue(NAME_PARAMETER, tagName);
 
-        List<Tag> tagList = namedParameterJdbcTemplate.query(SELECT_TAG_BY_NAME, in ,rowMapper);
+        List<Tag> tagList = namedParameterJdbcTemplate.query(SELECT_TAG_BY_NAME, in, rowMapper);
 
         return tagList.stream().findFirst();
     }

@@ -5,7 +5,7 @@ import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.EntityAlreadyExistsException;
 import com.epam.esm.exception.EntityNotFoundException;
 import com.epam.esm.exception.InvalidEntityException;
-import com.epam.esm.service.TagService;
+import com.epam.esm.service.impl.TagServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +23,7 @@ import java.util.List;
 @RequestMapping("/api/tags")
 public class TagController {
 
-    private final TagService tagService;
+    private final TagServiceImpl tagService;
 
     /**
      * Instantiates a new Tag controller.
@@ -31,7 +31,7 @@ public class TagController {
      * @param tagService the tag service
      */
     @Autowired
-    public TagController(TagService tagService) {
+    public TagController(TagServiceImpl tagService) {
         this.tagService = tagService;
     }
 

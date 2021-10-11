@@ -27,10 +27,6 @@ public class DatabaseConfiguration {
     private String password;
     @Value("database.url")
     private String url;
-    @Value("database.pool.min")
-    private int minimumPoolSize;
-    @Value("database.pool.max")
-    private int maximumPoolSize;
 
     @Bean
     public DataSource customSqlData() {

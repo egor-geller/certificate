@@ -3,12 +3,11 @@ package com.epam.esm.repository.impl;
 import com.epam.esm.entity.Certificate;
 import com.epam.esm.exception.DataException;
 import com.epam.esm.repository.SearchCriteria;
-import com.epam.esm.repository.repositoryinterfaces.CertificateRepository;
 import com.epam.esm.repository.builder.QueryBuilder;
-import com.epam.esm.repository.builder.SortType;
+import com.epam.esm.repository.mapper.CertificateMapper;
+import com.epam.esm.repository.repositoryinterfaces.CertificateRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
@@ -19,19 +18,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static com.epam.esm.repository.builder.CertificateQueries.*;
 import static com.epam.esm.repository.Parameters.*;
+import static com.epam.esm.repository.builder.CertificateQueries.*;
 
 @Repository
 public class CertificateRepositoryImpl implements CertificateRepository {
 
-    private final RowMapper<Certificate> rowMapper;
+    private final CertificateMapper rowMapper;
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
     private final QueryBuilder queryBuilder;
 
-    public CertificateRepositoryImpl(RowMapper<Certificate> rowMapper,
-                                     @Autowired DataSource dataSource,
-                                     @Autowired QueryBuilder queryBuilder) {
+    @Autowired
+    public CertificateRepositoryImpl(CertificateMapper rowMapper,
+                                     DataSource dataSource,
+                                     QueryBuilder queryBuilder) {
         this.rowMapper = rowMapper;
         this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
         this.queryBuilder = queryBuilder;
@@ -39,7 +39,6 @@ public class CertificateRepositoryImpl implements CertificateRepository {
 
     @Override
     public List<Certificate> find(SearchCriteria searchCriteria) {
-
         MapSqlParameterSource parameters = new MapSqlParameterSource();
         List<String> whereClauseFindByParameters = new ArrayList<>();
         List<String> orderByAscDesc = new ArrayList<>();

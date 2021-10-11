@@ -6,6 +6,7 @@ import com.epam.esm.exception.EntityAlreadyExistsException;
 import com.epam.esm.exception.EntityNotFoundException;
 import com.epam.esm.exception.InvalidEntityException;
 import com.epam.esm.repository.SearchCriteria;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,6 +16,7 @@ import java.util.Optional;
  *
  * @author Geller Egor
  */
+@Service
 public interface CertificateService {
     /**
      * Retrieve certificates according to specified parameters. All parameters are optional

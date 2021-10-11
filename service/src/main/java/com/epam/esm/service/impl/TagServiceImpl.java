@@ -21,16 +21,20 @@ public class TagServiceImpl implements TagService {
 
     private final TagRepository tagRepository;
     private final TagValidator tagValidator;
+    private final TagMapper tagMapper;
 
-    public TagServiceImpl(TagRepository tagRepository, @Autowired TagValidator tagValidator) {
+    public TagServiceImpl(TagRepository tagRepository,
+                          @Autowired TagValidator tagValidator,
+                          @Autowired TagMapper tagMapper) {
         this.tagRepository = tagRepository;
         this.tagValidator = tagValidator;
+        this.tagMapper = tagMapper;
     }
 
     @Override
     public List<TagDto> findAllTagsService() {
         return tagRepository.findAll().stream()
-                .map(TagMapper::toTagDto)
+                .map(tagMapper::toTagDto)
                 .collect(Collectors.toList());
     }
 
@@ -38,20 +42,20 @@ public class TagServiceImpl implements TagService {
     public TagDto findTagByIdService(Long id) {
         Tag tag = tagRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("There is no tag by this id: " + id));
-        return TagMapper.toTagDto(tag);
+        return tagMapper.toTagDto(tag);
     }
 
     @Override
     public TagDto findTagByNameService(String tagName) {
         boolean tagValid = tagValidator.isTagValid(tagName);
-        if (!tagValid) {
+        if (tagValid) {
             throw new InvalidEntityException("Tag name is not valid " + tagName);
         }
 
         Tag tag = tagRepository.findByName(tagName)
                 .orElseThrow(() -> new EntityNotFoundException("There is no tag by this name: " + tagName));
 
-        return TagMapper.toTagDto(tag);
+        return tagMapper.toTagDto(tag);
     }
 
     @Override
@@ -60,7 +64,7 @@ public class TagServiceImpl implements TagService {
             throw new InvalidEntityException("Tag is not invalid " + tag.getName());
         }
 
-        Tag fromTagDto = TagMapper.fromTagDto(tag);
+        Tag fromTagDto = tagMapper.fromTagDto(tag);
 
         Optional<Tag> isTagExists = tagRepository.findByName(fromTagDto.getName());
         if (isTagExists.isPresent()) {

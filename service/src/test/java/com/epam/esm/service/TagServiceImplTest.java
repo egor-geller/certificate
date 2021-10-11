@@ -2,8 +2,11 @@ package com.epam.esm.service;
 
 import com.epam.esm.dto.TagDto;
 import com.epam.esm.entity.Tag;
+import com.epam.esm.repository.impl.TagRepositoryImpl;
 import com.epam.esm.repository.repositoryinterfaces.TagRepository;
+import com.epam.esm.service.impl.TagServiceImpl;
 import com.epam.esm.validator.CertificateValidator;
+import com.epam.esm.validator.TagValidator;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,13 +27,16 @@ import static org.mockito.Mockito.when;
 class TagServiceImplTest {
 
     @InjectMocks
-    private TagService tagService;
+    private TagServiceImpl tagService;
 
     @Mock
-    private TagRepository tagRepository;
+    private TagRepositoryImpl tagRepository;
 
     @Mock
     private CertificateValidator certificateValidator;
+
+    @Mock
+    private TagValidator tagValidator;
 
     @BeforeAll
     static void setUp() {
@@ -44,7 +50,7 @@ class TagServiceImplTest {
         List<TagDto> expectedTagDtoList = tagDtoList();
         List<TagDto> actualAllTagsService = tagService.findAllTagsService();
 
-        assertEquals(expectedTagDtoList, actualAllTagsService);
+        assertEquals(expectedTagDtoList.toString(), actualAllTagsService.toString());
     }
 
     @Test
@@ -54,7 +60,7 @@ class TagServiceImplTest {
         TagDto expectedTagDto = tagDto();
         TagDto actualTagByIdService = tagService.findTagByIdService(id);
 
-        assertEquals(expectedTagDto, actualTagByIdService);
+        assertEquals(expectedTagDto.toString(), actualTagByIdService.toString());
     }
 
     @Test
@@ -64,7 +70,7 @@ class TagServiceImplTest {
         TagDto expectedTagDto = tagDto();
         TagDto actualTagByNameService = tagService.findTagByNameService(tagName);
 
-        assertEquals(expectedTagDto, actualTagByNameService);
+        assertEquals(expectedTagDto.toString(), actualTagByNameService.toString());
     }
 
     @Test
@@ -99,17 +105,17 @@ class TagServiceImplTest {
         List<Tag> tagList = new ArrayList<>();
 
         Tag tag1 = new Tag();
-        tag1.setId(1L);
+        //tag1.setId(1L);
         tag1.setName("testTagName1");
         tagList.add(tag1);
 
         Tag tag2 = new Tag();
-        tag2.setId(2L);
+        //tag2.setId(2L);
         tag2.setName("testTagName2");
         tagList.add(tag2);
 
         Tag tag3 = new Tag();
-        tag3.setId(3L);
+        //tag3.setId(3L);
         tag3.setName("testTagName3");
         tagList.add(tag3);
 
@@ -120,17 +126,17 @@ class TagServiceImplTest {
         List<TagDto> tagDtoList = new ArrayList<>();
 
         TagDto tagDto1 = new TagDto();
-        tagDto1.setId(1L);
+        //tagDto1.setId(1L);
         tagDto1.setName("testTagName1");
         tagDtoList.add(tagDto1);
 
         TagDto tagDto2 = new TagDto();
-        tagDto2.setId(2L);
+        //tagDto2.setId(2L);
         tagDto2.setName("testTagName2");
         tagDtoList.add(tagDto2);
 
         TagDto tagDto3 = new TagDto();
-        tagDto3.setId(3L);
+        //tagDto3.setId(3L);
         tagDto3.setName("testTagName3");
         tagDtoList.add(tagDto3);
 

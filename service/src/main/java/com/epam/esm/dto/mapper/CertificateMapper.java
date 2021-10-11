@@ -7,7 +7,6 @@ import com.epam.esm.repository.repositoryinterfaces.TagRepository;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 

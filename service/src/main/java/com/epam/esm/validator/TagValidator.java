@@ -10,9 +10,9 @@ public class TagValidator {
     private TagValidator() {
     }
 
-    private static final String NAME_REGEX = "[a-zA-Z0-9.,'?!\"]{5,30}";
+    private static final String NAME_REGEX = "[a-zA-Z0-9.,'?!]{5,30}";
 
     public boolean isTagValid(String tagName) {
-        return !tagName.isEmpty() && Pattern.matches(NAME_REGEX, tagName);
+        return (tagName != null && !tagName.isEmpty() && Pattern.matches(NAME_REGEX, tagName));
     }
 }
