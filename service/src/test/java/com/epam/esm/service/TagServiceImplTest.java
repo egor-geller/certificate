@@ -1,6 +1,7 @@
 package com.epam.esm.service;
 
 import com.epam.esm.dto.TagDto;
+import com.epam.esm.dto.mapper.TagMapper;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.repository.impl.TagRepositoryImpl;
 import com.epam.esm.repository.repositoryinterfaces.TagRepository;
@@ -13,6 +14,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
@@ -37,6 +39,9 @@ class TagServiceImplTest {
 
     @Mock
     private TagValidator tagValidator;
+
+    @Spy
+    private TagMapper tagMapper;
 
     @BeforeAll
     static void setUp() {
@@ -87,7 +92,7 @@ class TagServiceImplTest {
 
     private Tag tag() {
         Tag tag = new Tag();
-        tag.setId(1L);
+        tag.setId(0);
         tag.setName("testTagName1");
 
         return tag;
@@ -95,7 +100,7 @@ class TagServiceImplTest {
 
     private TagDto tagDto() {
         TagDto tag = new TagDto();
-        tag.setId(1L);
+        tag.setId(0L);
         tag.setName("testTagName1");
 
         return tag;
@@ -105,17 +110,17 @@ class TagServiceImplTest {
         List<Tag> tagList = new ArrayList<>();
 
         Tag tag1 = new Tag();
-        //tag1.setId(1L);
+        tag1.setId(1L);
         tag1.setName("testTagName1");
         tagList.add(tag1);
 
         Tag tag2 = new Tag();
-        //tag2.setId(2L);
+        tag2.setId(2L);
         tag2.setName("testTagName2");
         tagList.add(tag2);
 
         Tag tag3 = new Tag();
-        //tag3.setId(3L);
+        tag3.setId(3L);
         tag3.setName("testTagName3");
         tagList.add(tag3);
 
@@ -126,17 +131,17 @@ class TagServiceImplTest {
         List<TagDto> tagDtoList = new ArrayList<>();
 
         TagDto tagDto1 = new TagDto();
-        //tagDto1.setId(1L);
+        tagDto1.setId(1L);
         tagDto1.setName("testTagName1");
         tagDtoList.add(tagDto1);
 
         TagDto tagDto2 = new TagDto();
-        //tagDto2.setId(2L);
+        tagDto2.setId(2L);
         tagDto2.setName("testTagName2");
         tagDtoList.add(tagDto2);
 
         TagDto tagDto3 = new TagDto();
-        //tagDto3.setId(3L);
+        tagDto3.setId(3L);
         tagDto3.setName("testTagName3");
         tagDtoList.add(tagDto3);
 
