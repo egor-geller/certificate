@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class CertificateServiceImpl implements CertificateService {
@@ -55,8 +56,11 @@ public class CertificateServiceImpl implements CertificateService {
             throw new InvalidEntityException("The id isn't correctly written: " + id);
         }
 
-        return certificateMapper.changeCertificateToDto(certificateRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("There is no entity by this id: " + id)), List.of());
+        return certificateMapper.
+                changeListOfCertificatesToDto(certificateRepository.findById(id).stream()
+                        .collect(Collectors.toList()), tagRepository).stream()
+                .findFirst()
+                .orElseThrow(() -> new EntityNotFoundException("There is no entity by this id: " + id));
     }
 
     @Override
@@ -80,10 +84,15 @@ public class CertificateServiceImpl implements CertificateService {
         if (certificate == null) {
             throw new InvalidEntityException("Certificate is null");
         }
+        boolean certificateDtoValid = certificateValidator.isCertificateDtoValid(certificate);
+
+        if (!certificateDtoValid) {
+            throw new InvalidEntityException("Certificate not valid");
+        }
 
         Certificate fromCertificateDto = certificateMapper.changeCertificateFromDto(certificate);
         Optional<Certificate> byId = certificateRepository.findById(fromCertificateDto.getId());
-        if (byId.isPresent()) {
+        if (byId.isPresent() && byId.get().getName().equals(fromCertificateDto.getName())) {
             throw new EntityAlreadyExistsException("Certificate is already exits");
         }
 
@@ -92,8 +101,14 @@ public class CertificateServiceImpl implements CertificateService {
 
     @Override
     public boolean updateCertificateService(CertificateDto certificate) {
-        if (certificate == null || !certificateValidator.isCertificateDtoValid(certificate)) {
+        if (certificate == null) {
             throw new InvalidEntityException("Certificate is null");
+        }
+
+        boolean certificateDtoValid = certificateValidator.isCertificateDtoValid(certificate);
+
+        if (!certificateDtoValid) {
+            throw new InvalidEntityException("Certificate not valid");
         }
 
         Certificate fromCertificateDto = certificateMapper.changeCertificateFromDto(certificate);
@@ -106,6 +121,7 @@ public class CertificateServiceImpl implements CertificateService {
         if (id < 1) {
             throw new InvalidEntityException("Id is not written correctly " + id);
         }
+
         return certificateRepository.delete(id);
     }
 }
