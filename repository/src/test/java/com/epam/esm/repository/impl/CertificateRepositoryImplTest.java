@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.Duration;
@@ -27,6 +28,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = DatabaseConfiguration.class)
+@Transactional
 @ActiveProfiles(resolver = ProfileResolverTest.class)
 class CertificateRepositoryImplTest {
 
@@ -42,6 +44,7 @@ class CertificateRepositoryImplTest {
     String tagName = "tag1";
     String certificateName = "name1";
     String certificateDescription = "description1";
+
 
     @BeforeEach
     void setUp() {
