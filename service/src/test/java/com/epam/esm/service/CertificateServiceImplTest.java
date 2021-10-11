@@ -1,8 +1,10 @@
 package com.epam.esm.service;
 
 import com.epam.esm.dto.CertificateDto;
+import com.epam.esm.dto.mapper.CertificateMapper;
 import com.epam.esm.entity.Certificate;
 import com.epam.esm.entity.Tag;
+import com.epam.esm.exception.EntityAlreadyExistsException;
 import com.epam.esm.exception.EntityNotFoundException;
 import com.epam.esm.exception.InvalidEntityException;
 import com.epam.esm.repository.SearchCriteria;
@@ -19,6 +21,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
@@ -55,8 +58,11 @@ class CertificateServiceImplTest {
     @Mock
     private CertificateValidator certificateValidator;
 
-    @Mock
+    @Spy
     private TagValidator tagValidator;
+
+    @Spy
+    private CertificateMapper certificateMapper;
 
     @BeforeAll
     static void setUp() {
@@ -92,16 +98,16 @@ class CertificateServiceImplTest {
         CertificateDto expectedCertificateDto = provideCertificateDto();
         expectedCertificateDto.setId(certificateId);
 
-        when(certificateRepository.findById(anyLong())).thenReturn(Optional.of(certificate));
-        when(tagRepository.findByCertificateId(anyLong())).thenReturn(tagList());
+        when(certificateRepository.findById(1L)).thenReturn(Optional.of(certificate));
+        when(tagRepository.findByCertificateId(1L)).thenReturn(tagList());
 
         CertificateDto actualCertificateDto = certificateService.findCertificateByIdService(certificateId);
 
         int expectedInteractions = 1;
-        verify(certificateRepository, times(expectedInteractions)).findById(anyLong());
-        verify(tagRepository, times(expectedInteractions)).findByCertificateId(anyLong());
+        verify(certificateRepository, times(expectedInteractions)).findById(1L);
+        verify(tagRepository, times(expectedInteractions)).findByCertificateId(1L);
 
-        Assertions.assertEquals(expectedCertificateDto, actualCertificateDto);
+        Assertions.assertEquals(expectedCertificateDto.toString(), actualCertificateDto.toString());
     }
 
     @Test
@@ -116,66 +122,60 @@ class CertificateServiceImplTest {
     void createCertificateTest() {
         CertificateDto certificateDto = provideCertificateDto();
 
+        when(certificateValidator.isCertificateDtoValid(certificateDto)).thenReturn(true);
+
         certificateService.createCertificateService(certificateDto);
 
         int expectedInteractions = 1;
-        verify(certificateValidator, times(expectedInteractions)).isCertificateValid(any(Certificate.class));
         verify(certificateRepository, times(expectedInteractions)).create(any());
     }
 
     @Test
     void createInvalidCertificateTest() {
-        CertificateDto certificateDto = provideCertificateDto();
-        certificateDto.setName(null);
+        CertificateDto certificateDto = null;
 
         Assertions.assertThrows(InvalidEntityException.class, () -> certificateService.createCertificateService(certificateDto));
     }
 
     @Test
+    void createAlreadyExistsCertificateTest() {
+        CertificateDto certificateDto = provideCertificateDto();
+        Certificate certificate = provideCertificate();
+        certificate.setId(0L);
+        certificateDto.setId(0L);
+        when(certificateRepository.findById(0L)).thenReturn(Optional.of(certificate));
+
+        when(certificateValidator.isCertificateDtoValid(certificateDto)).thenReturn(true);
+
+        Assertions.assertThrows(EntityAlreadyExistsException.class, () -> certificateService.createCertificateService(certificateDto));
+    }
+
+    @Test
     void updateCertificateTest() {
         long certificateId = 0;
-        String tagName = "tag1";
         Certificate certificate = provideCertificate();
         CertificateDto updatedCertificateDto = provideCertificateDto();
         updatedCertificateDto.setId(certificateId);
 
-        when(certificateRepository.findById(certificateId)).thenReturn(Optional.of(certificate));
         when(certificateRepository.update(certificate)).thenReturn(true);
-
+        when(certificateValidator.isCertificateDtoValid(updatedCertificateDto)).thenReturn(true);
         assertTrue(certificateService.updateCertificateService(updatedCertificateDto));
     }
 
     @Test
-    void updateNotFoundCertificateTest() {
-        CertificateDto updatedCertificateDto = provideCertificateDto();
-
-        when(certificateRepository.findById(anyLong())).thenReturn(Optional.empty());
-        Assertions.assertThrows(EntityNotFoundException.class, () -> certificateService.updateCertificateService(updatedCertificateDto));
-    }
-
-    @Test
     void updateInvalidCertificateTest() {
-        Certificate certificate = provideCertificate();
         CertificateDto updatedCertificateDto = provideCertificateDto();
         updatedCertificateDto.setName("");
-
-        System.out.println(updatedCertificateDto);
-
-        //when(certificateRepository.findById(anyLong())).thenReturn(Optional.of(certificate));
 
         Assertions.assertThrows(InvalidEntityException.class, () -> certificateService.updateCertificateService(updatedCertificateDto));
     }
 
     @Test
     void updateInvalidTagTest() {
-        Certificate certificate = provideCertificate();
+        List<String> stringList = new ArrayList<>();
         CertificateDto updatedCertificateDto = provideCertificateDto();
-        updatedCertificateDto.setTagList(new ArrayList<>() {{
-            add("");
-        }});
-
-        when(certificateRepository.findById(anyLong())).thenReturn(Optional.of(certificate));
-        when(certificateRepository.update(any(Certificate.class))).thenReturn(true);
+        stringList.add("");
+        updatedCertificateDto.setTagList(stringList);
 
         Assertions.assertThrows(InvalidEntityException.class, () -> certificateService.updateCertificateService(updatedCertificateDto));
     }
