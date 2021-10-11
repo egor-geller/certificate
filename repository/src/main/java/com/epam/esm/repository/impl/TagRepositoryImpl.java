@@ -37,9 +37,9 @@ public class TagRepositoryImpl implements TagRepository {
 
     @Override
     public Optional<Tag> findById(Long id) {
-        SqlParameterSource in = new MapSqlParameterSource().addValue(ID_PARAMETER, id);
+        SqlParameterSource sqlParameterSource = new MapSqlParameterSource().addValue(ID_PARAMETER, id);
 
-        List<Tag> tagList = namedParameterJdbcTemplate.query(SELECT_TAG_BY_ID, in, rowMapper);
+        List<Tag> tagList = namedParameterJdbcTemplate.query(SELECT_TAG_BY_ID, sqlParameterSource, rowMapper);
 
         return tagList.stream().findFirst();
     }
