@@ -2,10 +2,14 @@ package com.epam.esm.service.impl;
 
 import com.epam.esm.dto.TagDto;
 import com.epam.esm.dto.mapper.TagMapper;
+import com.epam.esm.entity.Certificate;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.EntityAlreadyExistsException;
+import com.epam.esm.exception.EntityConnectedException;
 import com.epam.esm.exception.EntityNotFoundException;
 import com.epam.esm.exception.InvalidEntityException;
+import com.epam.esm.repository.SearchCriteria;
+import com.epam.esm.repository.repositoryinterfaces.CertificateRepository;
 import com.epam.esm.repository.repositoryinterfaces.TagRepository;
 import com.epam.esm.service.TagService;
 import com.epam.esm.validator.TagValidator;
@@ -19,14 +23,17 @@ import java.util.stream.Collectors;
 @Service
 public class TagServiceImpl implements TagService {
 
+    private final CertificateRepository certificateRepository;
     private final TagRepository tagRepository;
     private final TagValidator tagValidator;
     private final TagMapper tagMapper;
 
     public TagServiceImpl(TagRepository tagRepository,
+                          CertificateRepository certificateRepository,
                           @Autowired TagValidator tagValidator,
                           @Autowired TagMapper tagMapper) {
         this.tagRepository = tagRepository;
+        this.certificateRepository = certificateRepository;
         this.tagValidator = tagValidator;
         this.tagMapper = tagMapper;
     }
@@ -79,6 +86,16 @@ public class TagServiceImpl implements TagService {
         if (id == null || id < 1) {
             throw new InvalidEntityException("Id cannot be null");
         }
+
+        SearchCriteria searchCriteria = new SearchCriteria();
+        Optional<Tag> tagById = tagRepository.findById(id);
+        searchCriteria.setTagName(tagById.toString());
+        List<Certificate> certificateList = certificateRepository.find(searchCriteria);
+
+        if (!certificateList.isEmpty()){
+            throw new EntityConnectedException("Tag is connected to a certificate");
+        }
+
         return tagRepository.delete(id);
     }
 }
