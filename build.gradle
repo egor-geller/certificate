@@ -1,5 +1,13 @@
+plugins{
+    id 'war'
+}
+
+group 'org.epam'
+version '1.0'
+
 allprojects {
     apply plugin: "java"
+
 
     repositories {
         mavenCentral()
@@ -11,7 +19,7 @@ allprojects {
 
         implementation group: 'org.apache.commons', name: 'commons-dbcp2', version: dbcpVersion
         implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: jacksonVersion
-        compileOnly("javax.servlet:javax.servlet-api:4.0.1")
+
 
 
     }
@@ -25,5 +33,18 @@ allprojects {
         jvmArgs(['--enable-preview'])
     }
 
+}
 
+/*task explodedWar(type: Sync) {
+    group = "build"
+    into "${war.destinationDirectory.get().asFile.absolutePath}/exploded/${war.archiveFileName.get()}"
+    with war
+}
+war.dependsOn explodedWar*/
+
+dependencies {
+    implementation project(":model")
+    implementation project(":repository")
+    implementation project(":service")
+    implementation project(":web")
 }
