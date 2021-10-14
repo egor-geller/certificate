@@ -14,7 +14,6 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,32 +25,22 @@ public class CertificateRepositoryImpl implements CertificateRepository {
 
     private final CertificateMapper rowMapper;
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
-    private final QueryBuilder queryBuilder;
 
     @Autowired
-    public CertificateRepositoryImpl(CertificateMapper rowMapper,
-                                     DataSource dataSource,
-                                     QueryBuilder queryBuilder) {
+    public CertificateRepositoryImpl(CertificateMapper rowMapper, DataSource dataSource) {
         this.rowMapper = rowMapper;
         this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-        this.queryBuilder = queryBuilder;
     }
 
     @Override
     public List<Certificate> find(SearchCriteria searchCriteria) {
         MapSqlParameterSource parameters = new MapSqlParameterSource();
-        List<String> whereClauseFindByParameters = new ArrayList<>();
-        List<String> orderByAscDesc = new ArrayList<>();
 
-        queryBuilder.nameOfATag(whereClauseFindByParameters, parameters, searchCriteria.getTagName());
-        queryBuilder.nameOfCertificate(whereClauseFindByParameters, parameters, searchCriteria.getCertificateName());
-        queryBuilder.descriptionOfCertificate(whereClauseFindByParameters, parameters, searchCriteria.getCertificateDescription());
-        queryBuilder.sortByCertificateName(orderByAscDesc, searchCriteria.getSortByName());
-        queryBuilder.sortByCertificateCreationDate(orderByAscDesc, searchCriteria.getSortByCreateDate());
-
-        String finishedQuery = queryBuilder.sqlBuild(whereClauseFindByParameters, orderByAscDesc, SELECT_ALL_CERTIFICATES);
-
-        return namedParameterJdbcTemplate.query(finishedQuery, parameters, rowMapper);
+        QueryBuilder sqlClause = new QueryBuilder.Builder(searchCriteria, SELECT_ALL_CERTIFICATES)
+                .findBy(parameters)
+                .orderBy(searchCriteria)
+                .build();
+        return namedParameterJdbcTemplate.query(sqlClause.getNewString(), parameters, rowMapper);
     }
 
     @Override
@@ -110,6 +99,7 @@ public class CertificateRepositoryImpl implements CertificateRepository {
     @Override
     public boolean update(Certificate certificate) {
         SqlParameterSource parameterSource = new MapSqlParameterSource()
+                .addValue(ID_PARAMETER, certificate.getId())
                 .addValue(NAME_PARAMETER, certificate.getName())
                 .addValue(DESCRIPTION_PARAMETER, certificate.getDescription())
                 .addValue(PRICE_PARAMETER, certificate.getPrice())
