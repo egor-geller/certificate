@@ -1,7 +1,7 @@
 package com.epam.esm.service.impl;
 
 import com.epam.esm.dto.TagDto;
-import com.epam.esm.dto.mapper.TagMapper;
+import com.epam.esm.dto.mapper.TagServiceMapper;
 import com.epam.esm.entity.Certificate;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.EntityAlreadyExistsException;
@@ -26,22 +26,22 @@ public class TagServiceImpl implements TagService {
     private final CertificateRepository certificateRepository;
     private final TagRepository tagRepository;
     private final TagValidator tagValidator;
-    private final TagMapper tagMapper;
+    private final TagServiceMapper tagServiceMapper;
 
     public TagServiceImpl(TagRepository tagRepository,
                           CertificateRepository certificateRepository,
                           @Autowired TagValidator tagValidator,
-                          @Autowired TagMapper tagMapper) {
+                          @Autowired TagServiceMapper tagServiceMapper) {
         this.tagRepository = tagRepository;
         this.certificateRepository = certificateRepository;
         this.tagValidator = tagValidator;
-        this.tagMapper = tagMapper;
+        this.tagServiceMapper = tagServiceMapper;
     }
 
     @Override
     public List<TagDto> findAllTagsService() {
         return tagRepository.findAll().stream()
-                .map(tagMapper::toTagDto)
+                .map(tagServiceMapper::toTagDto)
                 .collect(Collectors.toList());
     }
 
@@ -49,7 +49,7 @@ public class TagServiceImpl implements TagService {
     public TagDto findTagByIdService(Long id) {
         Tag tag = tagRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("There is no tag by this id: " + id));
-        return tagMapper.toTagDto(tag);
+        return tagServiceMapper.toTagDto(tag);
     }
 
     @Override
@@ -62,7 +62,7 @@ public class TagServiceImpl implements TagService {
         Tag tag = tagRepository.findByName(tagName)
                 .orElseThrow(() -> new EntityNotFoundException("There is no tag by this name: " + tagName));
 
-        return tagMapper.toTagDto(tag);
+        return tagServiceMapper.toTagDto(tag);
     }
 
     @Override
@@ -71,7 +71,7 @@ public class TagServiceImpl implements TagService {
             throw new InvalidEntityException("Tag is not invalid " + tag.getName());
         }
 
-        Tag fromTagDto = tagMapper.fromTagDto(tag);
+        Tag fromTagDto = tagServiceMapper.fromTagDto(tag);
 
         Optional<Tag> isTagExists = tagRepository.findByName(fromTagDto.getName());
         if (isTagExists.isPresent()) {
