@@ -54,10 +54,7 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public TagDto findTagByNameService(String tagName) {
-        boolean tagValid = tagValidator.isTagValid(tagName);
-        if (tagValid) {
-            throw new InvalidEntityException("Tag name is not valid " + tagName);
-        }
+        tagValidator.isTagValid(tagName);
 
         Tag tag = tagRepository.findByName(tagName)
                 .orElseThrow(() -> new EntityNotFoundException("There is no tag by this name: " + tagName));
@@ -67,9 +64,7 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public void createTagService(TagDto tag) {
-        if (tagValidator.isTagValid(tag.getName())) {
-            throw new InvalidEntityException("Tag is not invalid " + tag.getName());
-        }
+        tagValidator.isTagValid(tag.getName());
 
         Tag fromTagDto = tagServiceMapper.convertTagFromDto(tag);
 
