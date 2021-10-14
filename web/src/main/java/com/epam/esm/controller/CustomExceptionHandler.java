@@ -23,6 +23,7 @@ import java.util.Map;
 public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 
     private static final String ERROR_MESSAGE = "errorMessage";
+    private static final String ERROR_CODE = "errorCode";
     private static final String RESOURCE_NOT_FOUND_MESSAGE = "resource_not_found";
     private static final String ENTITY_ALREADY_EXISTS_MESSAGE = "entity_already_exists";
     private static final String ENTITY_NOT_FOUND_MESSAGE = "entity_not_found";
@@ -40,31 +41,31 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleNoHandlerFoundException(NoHandlerFoundException ex, HttpHeaders headers,
                                                                    HttpStatus status, WebRequest request) {
         String errorMessage = getErrorMessage(RESOURCE_NOT_FOUND_MESSAGE);
-        return buildErrorResponseEntity(HttpStatus.NOT_FOUND, errorMessage);
+        return buildErrorResponseEntity(HttpStatus.I_AM_A_TEAPOT, errorMessage, "404");
     }
 
     @ExceptionHandler(EntityAlreadyExistsException.class)
     public ResponseEntity<Object> entityAlreadyExistsHandle() {
         String errorMessage = getErrorMessage(ENTITY_ALREADY_EXISTS_MESSAGE);
-        return buildErrorResponseEntity(HttpStatus.CONFLICT, errorMessage);
+        return buildErrorResponseEntity(HttpStatus.CONFLICT, errorMessage, "409");
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<Object> entityNotFoundExceptionHandle() {
         String errorMessage = getErrorMessage(ENTITY_NOT_FOUND_MESSAGE);
-        return buildErrorResponseEntity(HttpStatus.NOT_FOUND, errorMessage);
+        return buildErrorResponseEntity(HttpStatus.NOT_FOUND, errorMessage, "404");
     }
 
     @ExceptionHandler(InvalidEntityException.class)
     public ResponseEntity<Object> invalidEntityExceptionHandle() {
         String errorMessage = getErrorMessage(INVALID_MESSAGE);
-        return buildErrorResponseEntity(HttpStatus.BAD_REQUEST, errorMessage);
+        return buildErrorResponseEntity(HttpStatus.BAD_REQUEST, errorMessage, "400");
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> defaultHandle(Exception e) {
         String errorMessage = getErrorMessage(INTERNAL_SERVER_ERROR_MESSAGE);
-        return buildErrorResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, errorMessage);
+        return buildErrorResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, errorMessage, "500");
     }
 
     private String getErrorMessage(String errorMessageName) {
@@ -72,9 +73,10 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         return bundleMessageSource.getMessage(errorMessageName, null, locale);
     }
 
-    private ResponseEntity<Object> buildErrorResponseEntity(HttpStatus status, String errorMessage) {
+    private ResponseEntity<Object> buildErrorResponseEntity(HttpStatus status, String errorMessage, String errorCode) {
         Map<String, Object> body = new HashMap<>();
         body.put(ERROR_MESSAGE, errorMessage);
+        body.put(ERROR_CODE, errorCode);
 
         return new ResponseEntity<>(body, status);
     }

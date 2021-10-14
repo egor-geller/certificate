@@ -1,6 +1,6 @@
 package com.epam.esm.repository;
 
-public class Parameters {
+public final class Parameters {
     public static final String ID_PARAMETER = "id";
     public static final String NAME_PARAMETER = "name";
     public static final String DESCRIPTION_PARAMETER = "description";

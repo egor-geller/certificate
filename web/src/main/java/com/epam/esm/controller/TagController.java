@@ -90,4 +90,9 @@ public class TagController {
         return hasBeenDeleted ? new ResponseEntity<>(hasBeenDeleted, HttpStatus.OK)
                 : new ResponseEntity<>(hasBeenDeleted, HttpStatus.NOT_MODIFIED);
     }
+
+    @GetMapping(value = "/tea")
+    public ResponseEntity<String> kkk() {
+        return new ResponseEntity<>("Hello", HttpStatus.I_AM_A_TEAPOT);
+    }
 }

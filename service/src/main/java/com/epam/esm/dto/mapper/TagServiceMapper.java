@@ -5,9 +5,9 @@ import com.epam.esm.entity.Tag;
 import org.springframework.stereotype.Component;
 
 @Component
-public class TagMapper {
+public class TagServiceMapper {
 
-    private TagMapper() {
+    private TagServiceMapper() {
     }
 
     public TagDto toTagDto(Tag tag) {

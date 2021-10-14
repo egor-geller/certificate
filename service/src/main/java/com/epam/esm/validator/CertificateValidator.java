@@ -2,6 +2,8 @@ package com.epam.esm.validator;
 
 import com.epam.esm.dto.CertificateDto;
 import com.epam.esm.entity.Certificate;
+import com.epam.esm.exception.InvalidEntityException;
+import com.epam.esm.repository.SearchCriteria;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -50,6 +52,19 @@ public class CertificateValidator {
     public boolean areParamsEmpty(String... params) {
         return Arrays.stream(params).allMatch(String::isEmpty);
     }
+
+    public void isSearchCriteriaEmpty(SearchCriteria searchCriteria){
+
+        if (searchCriteria.getTagName() != null && searchCriteria.getTagName().isEmpty()
+                && searchCriteria.getCertificateName() != null && searchCriteria.getCertificateName().isEmpty()
+                && searchCriteria.getCertificateDescription() != null && searchCriteria.getCertificateDescription().isEmpty()
+                && searchCriteria.getSortByName() != null && searchCriteria.getSortByName().toString().isEmpty()
+                && searchCriteria.getSortByCreateDate() != null && searchCriteria.getSortByCreateDate().toString().isEmpty())
+        {
+            throw new InvalidEntityException("All parameters are empty");
+        }
+    }
+
 
     private boolean isTagListValid(List<String> tagList) {
         return tagList.stream().allMatch(tagName -> Pattern.matches(TAG_NAME_REGEX, tagName));

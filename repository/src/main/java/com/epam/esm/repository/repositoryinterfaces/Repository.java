@@ -10,7 +10,7 @@ import java.util.Optional;
  *
  * @param <T> type of Entity
  */
-public interface BaseRepository<T> {
+public interface Repository<T> {
 
     /**
      * Fina a tag or certificate by its unique Id

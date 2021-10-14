@@ -66,4 +66,15 @@ public class SearchCriteria {
     public int hashCode() {
         return Objects.hash(tagName, certificateName, certificateDescription, sortByName, sortByCreateDate);
     }
+
+    @Override
+    public String toString() {
+        return "SearchCriteria{" +
+                "tagName='" + tagName + '\'' +
+                ", certificateName='" + certificateName + '\'' +
+                ", certificateDescription='" + certificateDescription + '\'' +
+                ", sortByName=" + sortByName +
+                ", sortByCreateDate=" + sortByCreateDate +
+                '}';
+    }
 }

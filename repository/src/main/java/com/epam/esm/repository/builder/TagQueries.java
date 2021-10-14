@@ -1,6 +1,6 @@
 package com.epam.esm.repository.builder;
 
-public class TagQueries {
+public final class TagQueries {
 
     public static final String SELECT_ALL_TAGS = """
             SELECT id, name FROM tag
