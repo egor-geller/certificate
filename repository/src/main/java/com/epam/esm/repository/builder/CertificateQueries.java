@@ -1,6 +1,6 @@
 package com.epam.esm.repository.builder;
 
-public class CertificateQueries {
+public final class CertificateQueries {
 
     public static final String SELECT_ALL_CERTIFICATES = """
             SELECT cert.id, cert.name, description, price, duration, create_date, last_update_date
