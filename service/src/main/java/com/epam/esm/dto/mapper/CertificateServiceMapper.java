@@ -14,13 +14,13 @@ public class CertificateServiceMapper {
     private CertificateServiceMapper() {
     }
 
-    public CertificateDto changeCertificateToDto(Certificate certificate, List<Tag> tagName) {
+    public CertificateDto convertCertificateToDto(Certificate certificate, List<Tag> tagName) {
         List<String> tagNamesList = tagName.stream().map(Tag::getName).collect(Collectors.toList());
 
         return new CertificateDto(certificate, tagNamesList);
     }
 
-    public Certificate changeCertificateFromDto(CertificateDto certificateDto) {
+    public Certificate convertCertificateFromDto(CertificateDto certificateDto) {
         Certificate certificate = new Certificate();
         certificate.setName(certificateDto.getName());
         certificate.setDescription(certificateDto.getDescription());

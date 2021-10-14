@@ -41,7 +41,7 @@ public class TagServiceImpl implements TagService {
     @Override
     public List<TagDto> findAllTagsService() {
         return tagRepository.findAll().stream()
-                .map(tagServiceMapper::toTagDto)
+                .map(tagServiceMapper::convertTagToDto)
                 .collect(Collectors.toList());
     }
 
@@ -49,7 +49,7 @@ public class TagServiceImpl implements TagService {
     public TagDto findTagByIdService(Long id) {
         Tag tag = tagRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("There is no tag by this id: " + id));
-        return tagServiceMapper.toTagDto(tag);
+        return tagServiceMapper.convertTagToDto(tag);
     }
 
     @Override
@@ -62,7 +62,7 @@ public class TagServiceImpl implements TagService {
         Tag tag = tagRepository.findByName(tagName)
                 .orElseThrow(() -> new EntityNotFoundException("There is no tag by this name: " + tagName));
 
-        return tagServiceMapper.toTagDto(tag);
+        return tagServiceMapper.convertTagToDto(tag);
     }
 
     @Override
@@ -71,7 +71,7 @@ public class TagServiceImpl implements TagService {
             throw new InvalidEntityException("Tag is not invalid " + tag.getName());
         }
 
-        Tag fromTagDto = tagServiceMapper.fromTagDto(tag);
+        Tag fromTagDto = tagServiceMapper.convertTagFromDto(tag);
 
         Optional<Tag> isTagExists = tagRepository.findByName(fromTagDto.getName());
         if (isTagExists.isPresent()) {

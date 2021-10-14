@@ -48,7 +48,7 @@ public class CertificateServiceImpl implements CertificateService {
         return certificateList.stream().map(certificate -> {
             long id = certificate.getId();
             List<Tag> byCertificateId = tagRepository.findByCertificateId(id);
-            return certificateServiceMapper.changeCertificateToDto(certificate, byCertificateId);
+            return certificateServiceMapper.convertCertificateToDto(certificate, byCertificateId);
         }).collect(Collectors.toList());
     }
 
@@ -62,7 +62,7 @@ public class CertificateServiceImpl implements CertificateService {
                 new EntityNotFoundException("There is no entity by this id: " + id));
         List<Tag> byCertificateId = tagRepository.findByCertificateId(id);
 
-        return certificateServiceMapper.changeCertificateToDto(certificate, byCertificateId);
+        return certificateServiceMapper.convertCertificateToDto(certificate, byCertificateId);
     }
 
     @Override
@@ -92,7 +92,7 @@ public class CertificateServiceImpl implements CertificateService {
             throw new InvalidEntityException("Certificate not valid");
         }
 
-        Certificate fromCertificateDto = certificateServiceMapper.changeCertificateFromDto(certificate);
+        Certificate fromCertificateDto = certificateServiceMapper.convertCertificateFromDto(certificate);
         Optional<Certificate> byId = certificateRepository.findById(fromCertificateDto.getId());
         if (byId.isPresent() && byId.get().getName().equals(fromCertificateDto.getName())) {
             throw new EntityAlreadyExistsException("Certificate is already exits");
@@ -113,7 +113,7 @@ public class CertificateServiceImpl implements CertificateService {
             throw new InvalidEntityException("Certificate not valid");
         }
 
-        Certificate fromCertificateDto = certificateServiceMapper.changeCertificateFromDto(certificate);
+        Certificate fromCertificateDto = certificateServiceMapper.convertCertificateFromDto(certificate);
 
         return certificateRepository.update(fromCertificateDto);
     }
