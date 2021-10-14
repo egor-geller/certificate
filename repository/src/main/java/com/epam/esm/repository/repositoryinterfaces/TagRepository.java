@@ -10,7 +10,7 @@ import java.util.Optional;
  *
  * @author Geller Egor
  */
-public interface TagRepository extends BaseRepository<Tag> {
+public interface TagRepository extends Repository<Tag> {
 
     /**
      * Finds all stored tags

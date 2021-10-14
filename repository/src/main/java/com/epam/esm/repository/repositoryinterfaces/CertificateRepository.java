@@ -10,7 +10,7 @@ import java.util.List;
  *
  * @author Geller Egor
  */
-public interface CertificateRepository extends BaseRepository<Certificate> {
+public interface CertificateRepository extends Repository<Certificate> {
 
     /**
      * Retrieve certificates according to specified parameters. All parameters are optional
