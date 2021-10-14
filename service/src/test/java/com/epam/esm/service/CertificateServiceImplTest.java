@@ -1,7 +1,7 @@
 package com.epam.esm.service;
 
 import com.epam.esm.dto.CertificateDto;
-import com.epam.esm.dto.mapper.CertificateMapper;
+import com.epam.esm.dto.mapper.CertificateServiceMapper;
 import com.epam.esm.entity.Certificate;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.EntityAlreadyExistsException;
@@ -35,11 +35,8 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.internal.verification.VerificationModeFactory.times;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class CertificateServiceImplTest {
@@ -62,7 +59,7 @@ class CertificateServiceImplTest {
     private TagValidator tagValidator;
 
     @Spy
-    private CertificateMapper certificateMapper;
+    private CertificateServiceMapper certificateMapper;
 
     @BeforeAll
     static void setUp() {

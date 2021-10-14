@@ -1,10 +1,10 @@
 package com.epam.esm.service;
 
 import com.epam.esm.dto.TagDto;
-import com.epam.esm.dto.mapper.TagMapper;
+import com.epam.esm.dto.mapper.TagServiceMapper;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.repository.impl.TagRepositoryImpl;
-import com.epam.esm.repository.repositoryinterfaces.TagRepository;
+import com.epam.esm.repository.mapper.TagMapper;
 import com.epam.esm.service.impl.TagServiceImpl;
 import com.epam.esm.validator.CertificateValidator;
 import com.epam.esm.validator.TagValidator;
@@ -41,7 +41,7 @@ class TagServiceImplTest {
     private TagValidator tagValidator;
 
     @Spy
-    private TagMapper tagMapper;
+    private TagServiceMapper tagMapper;
 
     @BeforeAll
     static void setUp() {
@@ -89,7 +89,6 @@ class TagServiceImplTest {
         verify(tagRepository).findByName(tag.getName());
         verify(tagRepository).create(tag);
     }
-
     private Tag tag() {
         Tag tag = new Tag();
         tag.setId(0);
