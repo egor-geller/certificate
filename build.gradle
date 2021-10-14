@@ -1,50 +1,26 @@
-plugins{
-    id 'war'
-}
-
-group 'org.epam'
-version '1.0'
-
 allprojects {
-    apply plugin: "java"
+    apply plugin: 'java'
 
+    group 'com.epam.esm'
+    version '1.0'
 
     repositories {
         mavenCentral()
     }
 
     dependencies {
-        implementation group: 'org.springframework', name: 'spring-tx', version: springVersion
-        testImplementation group: 'org.springframework', name: 'spring-test', version: springVersion
+        testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
 
-        implementation group: 'org.apache.commons', name: 'commons-dbcp2', version: dbcpVersion
         implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: jacksonVersion
 
 
 
-    }
 
-    tasks.withType(JavaCompile).each {
-        it.options.compilerArgs.add('--enable-preview')
     }
 
     test {
         useJUnitPlatform()
-        jvmArgs(['--enable-preview'])
     }
-
 }
 
-/*task explodedWar(type: Sync) {
-    group = "build"
-    into "${war.destinationDirectory.get().asFile.absolutePath}/exploded/${war.archiveFileName.get()}"
-    with war
-}
-war.dependsOn explodedWar*/
-
-dependencies {
-    implementation project(":model")
-    implementation project(":repository")
-    implementation project(":service")
-    implementation project(":web")
-}
