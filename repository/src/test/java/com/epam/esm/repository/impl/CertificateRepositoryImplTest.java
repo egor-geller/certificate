@@ -1,6 +1,5 @@
 package com.epam.esm.repository.impl;
 
-import com.epam.esm.ProfileResolverTest;
 import com.epam.esm.config.DatabaseConfiguration;
 import com.epam.esm.entity.Certificate;
 import com.epam.esm.entity.Tag;
@@ -12,7 +11,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,7 +27,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = DatabaseConfiguration.class)
 @Transactional
-@ActiveProfiles(resolver = ProfileResolverTest.class)
 class CertificateRepositoryImplTest {
 
     @Autowired
@@ -42,12 +39,13 @@ class CertificateRepositoryImplTest {
     private final Certificate giftCertificate = new Certificate();
 
     String tagName = "tag1";
-    String certificateName = "name1";
+    String certificateName = "certificate1";
     String certificateDescription = "description1";
 
 
     @BeforeEach
     void setUp() {
+        giftCertificate.setId(26);
         giftCertificate.setName("Wonderful");
         giftCertificate.setDescription("10 percent off");
         giftCertificate.setPrice(BigDecimal.ONE);
@@ -62,8 +60,9 @@ class CertificateRepositoryImplTest {
         List<Certificate> certificateList = certificate.find(searchCriteria);
 
         boolean allMatch = certificateList.stream()
-                .allMatch(certificate1 -> certificate1.getName().equals(certificateName)
-                        && certificate1.getDescription().equals(certificateDescription));
+                .anyMatch(certificate1 -> certificate1.getName().equals(certificateName)
+                        && certificate1.getDescription().equals(certificateDescription)
+                );
 
         assertTrue(allMatch && certificateList.size() == 1);
     }
@@ -101,7 +100,7 @@ class CertificateRepositoryImplTest {
                 .sorted(Comparator.comparing(Certificate::getName))
                 .collect(Collectors.toList());
 
-        assertEquals(certificateList, actual);
+        assertEquals(certificateList.get(0), actual.get(actual.size() - 1));
     }
 
     @Test
@@ -113,7 +112,7 @@ class CertificateRepositoryImplTest {
                 .sorted(Collections.reverseOrder(Comparator.comparing(Certificate::getName)))
                 .collect(Collectors.toList());
 
-        assertEquals(certificateList, actual);
+        assertEquals(certificateList.get(certificateList.size() - 1), actual.get(0));
     }
 
     @Test
@@ -142,13 +141,30 @@ class CertificateRepositoryImplTest {
 
     @Test
     void sortByCreateDateAscAndNameInDescTest() {
-        searchCriteria.setSortByName(SortType.DESC);
-        searchCriteria.setSortByCreateDate(SortType.ASC);
+        searchCriteria.setSortByName(SortType.ASC);
+        searchCriteria.setSortByCreateDate(SortType.DESC);
         List<Certificate> certificateList = certificate.find(searchCriteria);
 
         List<Certificate> actual = certificateList.stream()
-                .sorted(Comparator.comparing(Certificate::getCreateDate))
-                .sorted(Collections.reverseOrder(Comparator.comparing(Certificate::getName)))
+                .sorted(Comparator.comparing(Certificate::getName))
+                .sorted(Collections.reverseOrder(Comparator.comparing(Certificate::getCreateDate)))
+                .collect(Collectors.toList());
+
+        assertEquals(certificateList.get(0), actual.get(actual.size() - 1));
+    }
+
+    @Test
+    void findByNameAndSortAscTest() {
+        searchCriteria.setTagName(tagName);
+        searchCriteria.setCertificateName(certificateName);
+        searchCriteria.setCertificateDescription(certificateDescription);
+        searchCriteria.setSortByName(SortType.ASC);
+        searchCriteria.setSortByCreateDate(SortType.ASC);
+
+        List<Certificate> certificateList = certificate.find(searchCriteria);
+
+        List<Certificate> actual = certificateList.stream()
+                .sorted(Comparator.comparing(Certificate::getName))
                 .collect(Collectors.toList());
 
         assertEquals(certificateList, actual);
@@ -168,8 +184,8 @@ class CertificateRepositoryImplTest {
 
     @Test
     void attachTagTest() {
-        certificate.attachTag(2, 2);
-        List<Tag> tags = tag.findByCertificateId(2L);
+        certificate.attachTag(25, 1);
+        List<Tag> tags = tag.findByCertificateId(25L);
 
         assertEquals(1, tags.size());
     }
@@ -184,20 +200,20 @@ class CertificateRepositoryImplTest {
 
     @Test
     void createTest() {
-        Optional<Certificate> certificateById = certificate.findById(5L);
+        Optional<Certificate> certificateById = certificate.findById(0L);
 
         assertEquals(certificateById, Optional.empty());
 
         certificate.create(giftCertificate);
 
-        certificateById = certificate.findById(5L);
+        Optional<Certificate> certificateById1 = certificate.findById(26L);
 
-        assertEquals(certificateById, Optional.of(giftCertificate));
+        assertEquals(certificateById1.get().getId(), Optional.of(giftCertificate).get().getId());
     }
 
     @Test
     void updateTest() {
-        Optional<Certificate> certificateById = certificate.findById(3L);
+        Optional<Certificate> certificateById = certificate.findById(25L);
 
         certificateById.orElseThrow().setName("Coca-Cola");
 
@@ -208,8 +224,8 @@ class CertificateRepositoryImplTest {
 
     @Test
     void updateNotFoundTest() {
-        Optional<Certificate> certificateById = certificate.findById(3L);
-        certificateById.orElseThrow().setId(0);
+        Optional<Certificate> certificateById = certificate.findById(25L);
+        certificateById.get().setId(0);
 
         boolean result = certificate.update(certificateById.get());
 
@@ -218,7 +234,7 @@ class CertificateRepositoryImplTest {
 
     @Test
     void deleteTest() {
-        boolean result = certificate.delete(1L);
+        boolean result = certificate.delete(32L);
 
         assertTrue(result);
     }
