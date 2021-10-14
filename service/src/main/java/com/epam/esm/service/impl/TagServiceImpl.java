@@ -30,7 +30,7 @@ public class TagServiceImpl implements TagService {
 
     public TagServiceImpl(TagRepository tagRepository,
                           CertificateRepository certificateRepository,
-                          @Autowired TagValidator tagValidator,
+                          TagValidator tagValidator,
                           @Autowired TagServiceMapper tagServiceMapper) {
         this.tagRepository = tagRepository;
         this.certificateRepository = certificateRepository;
