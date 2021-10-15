@@ -17,7 +17,7 @@ import java.util.Optional;
  * @author Geller Egor
  */
 @Service
-public interface CertificateService {
+public interface CertificateService extends EntityService<CertificateDto> {
     /**
      * Retrieve certificates according to specified parameters. All parameters are optional
      * and can be used in conjunction, if they are not present, all certificates will be retrieved
@@ -64,7 +64,7 @@ public interface CertificateService {
      * @throws EntityAlreadyExistsException when {@link Certificate} already exists
      * @throws InvalidEntityException       when {@link Certificate} is not correctly written
      */
-    void createCertificate(CertificateDto certificate);
+    void create(CertificateDto certificate);
 
     /**
      * Update an existing certificate.
@@ -73,7 +73,7 @@ public interface CertificateService {
      * @return {@code true} if {@link Certificate} was updated, otherwise {@code false}
      * @throws InvalidEntityException when {@link Certificate} is not correctly written
      */
-    boolean updateCertificate(CertificateDto certificate);
+    boolean update(CertificateDto certificate);
 
     /**
      * Delete an existing certificate.
@@ -82,5 +82,5 @@ public interface CertificateService {
      * @return {@code true} if {@link Certificate} was deleted, otherwise {@code false}
      * @throws InvalidEntityException when id is not correctly written
      */
-    boolean deleteCertificate(long id);
+    boolean delete(Long id);
 }

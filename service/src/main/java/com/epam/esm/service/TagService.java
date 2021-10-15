@@ -16,7 +16,7 @@ import java.util.Optional;
  * @author Geller Egor
  */
 @Service
-public interface TagService {
+public interface TagService extends EntityService<TagDto> {
 
     /**
      * Finds all stored tags
@@ -51,7 +51,7 @@ public interface TagService {
      * @throws EntityAlreadyExistsException when {@link Tag} already exists
      * @throws InvalidEntityException       when {@link Tag} is not correctly written
      */
-    void createTag(TagDto tag);
+    void create(TagDto tag);
 
     /**
      * Delete a tag
@@ -60,5 +60,5 @@ public interface TagService {
      * @return {@code true} if {@link Tag} was deleted, otherwise {@code false}
      * @throws InvalidEntityException when id is not correctly written
      */
-    boolean deleteTag(Long id);
+    boolean delete(Long id);
 }

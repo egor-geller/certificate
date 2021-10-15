@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class CertificateServiceImpl implements CertificateService {
@@ -89,7 +88,7 @@ public class CertificateServiceImpl implements CertificateService {
     }
 
     @Override
-    public void createCertificate(CertificateDto certificate) {
+    public void create(CertificateDto certificate) {
         if (certificate == null) {
             throw new EntityNotFoundException();
         }
@@ -109,7 +108,7 @@ public class CertificateServiceImpl implements CertificateService {
     }
 
     @Override
-    public boolean updateCertificate(CertificateDto certificate) {
+    public boolean update(CertificateDto certificate) {
         if (certificate == null) {
             throw new EntityNotFoundException();
         }
@@ -126,7 +125,7 @@ public class CertificateServiceImpl implements CertificateService {
     }
 
     @Override
-    public boolean deleteCertificate(long id) {
+    public boolean delete(Long id) {
         if (id < 1) {
             throw new EntityNotFoundException(id);
         }

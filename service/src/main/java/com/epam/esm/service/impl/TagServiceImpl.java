@@ -61,7 +61,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public void createTag(TagDto tag) {
+    public void create(TagDto tag) {
         tagValidator.isTagValid(tag.getName());
 
         Tag fromTagDto = tagServiceMapper.convertTagFromDto(tag);
@@ -75,7 +75,12 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public boolean deleteTag(Long id) {
+    public boolean update(TagDto tagDto) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean delete(Long id) {
         if (id == null || id < 1) {
             throw new EntityNotFoundException(id);
         }

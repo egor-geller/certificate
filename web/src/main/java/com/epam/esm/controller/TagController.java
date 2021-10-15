@@ -69,7 +69,7 @@ public class TagController {
      */
     @PostMapping("/post")
     public ResponseEntity<Void> createTag(@RequestBody TagDto tagDto) {
-        tagService.createTag(tagDto);
+        tagService.create(tagDto);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
@@ -83,7 +83,7 @@ public class TagController {
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Boolean> deleteTag(@PathVariable("id") Long id) {
-        boolean hasBeenDeleted = tagService.deleteTag(id);
+        boolean hasBeenDeleted = tagService.delete(id);
         return hasBeenDeleted ? new ResponseEntity<>(hasBeenDeleted, HttpStatus.OK)
                 : new ResponseEntity<>(hasBeenDeleted, HttpStatus.NOT_MODIFIED);
     }

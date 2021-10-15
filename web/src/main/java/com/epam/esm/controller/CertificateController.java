@@ -68,7 +68,7 @@ public class CertificateController {
      */
     @PostMapping
     public ResponseEntity<Void> createCertificate(@RequestBody CertificateDto certificateDto) {
-        certificateService.createCertificate(certificateDto);
+        certificateService.create(certificateDto);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
@@ -84,7 +84,7 @@ public class CertificateController {
     public ResponseEntity<Boolean> updateCertificate(@PathVariable("id") Long id,
                                                      @RequestBody CertificateDto certificateDto) {
         certificateDto.setId(id);
-        boolean hasBeenUpdated = certificateService.updateCertificate(certificateDto);
+        boolean hasBeenUpdated = certificateService.update(certificateDto);
         return hasBeenUpdated ? new ResponseEntity<>(hasBeenUpdated, HttpStatus.OK)
                 : new ResponseEntity<>(hasBeenUpdated, HttpStatus.NOT_MODIFIED);
     }
@@ -98,7 +98,7 @@ public class CertificateController {
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Boolean> deleteCertificate(@PathVariable("id") Long id) {
-        boolean hasBeenDeleted = certificateService.deleteCertificate(id);
+        boolean hasBeenDeleted = certificateService.delete(id);
         return hasBeenDeleted ? new ResponseEntity<>(hasBeenDeleted, HttpStatus.OK)
                 : new ResponseEntity<>(hasBeenDeleted, HttpStatus.NOT_MODIFIED);
     }

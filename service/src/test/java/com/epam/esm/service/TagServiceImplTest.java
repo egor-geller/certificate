@@ -83,7 +83,7 @@ class TagServiceImplTest {
         TagDto tagDto = tagDto();
         when(tagRepository.findByName(tagDto.getName())).thenReturn(Optional.empty());
 
-        tagService.createTag(tagDto);
+        tagService.create(tagDto);
 
         verify(tagRepository).findByName(tag.getName());
         verify(tagRepository).create(tag);
