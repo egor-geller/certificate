@@ -26,7 +26,7 @@ public final class QueryBuilder {
             this.searchCriteria = searchCriteria;
         }
 
-        public Builder findBy(MapSqlParameterSource parameters) {
+        public Builder buildWhereClause(MapSqlParameterSource parameters) {
             List<String> list = new ArrayList<>();
             if (this.searchCriteria.getTagName() != null && !this.searchCriteria.getTagName().isEmpty()) {
                 list.add("tag.name = :" + TAG_NAME_PARAMETER);
@@ -63,7 +63,7 @@ public final class QueryBuilder {
             return this;
         }
 
-        public Builder orderBy(SearchCriteria searchCriteria) {
+        public Builder buildOrderByClause(SearchCriteria searchCriteria) {
             List<String> orderOf = new ArrayList<>();
             if (searchCriteria.getSortByName() != null) {
                 orderOf.add("cert.name " + searchCriteria.getSortByName().toString());
