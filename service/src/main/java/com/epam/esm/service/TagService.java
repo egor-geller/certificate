@@ -23,7 +23,7 @@ public interface TagService {
      *
      * @return list of {@link Tag} entity.
      */
-    List<TagDto> findAllTagsService();
+    List<TagDto> findAllTags();
 
     /**
      * Fina a tag by its unique Id
@@ -32,7 +32,7 @@ public interface TagService {
      * @return {@link Optional} of {@link Tag} entity.
      * @throws EntityNotFoundException when there is no such entity
      */
-    TagDto findTagByIdService(Long id);
+    TagDto findTagById(Long id);
 
     /**
      * Find a tag by its name
@@ -42,7 +42,7 @@ public interface TagService {
      * @throws EntityNotFoundException when there is no such entity
      * @throws InvalidEntityException  when the name of the tag is not correctly written
      */
-    TagDto findTagByNameService(String tagName);
+    TagDto findTagByName(String tagName);
 
     /**
      * Create a new tag
@@ -51,7 +51,7 @@ public interface TagService {
      * @throws EntityAlreadyExistsException when {@link Tag} already exists
      * @throws InvalidEntityException       when {@link Tag} is not correctly written
      */
-    void createTagService(TagDto tag);
+    void createTag(TagDto tag);
 
     /**
      * Delete a tag
@@ -60,5 +60,5 @@ public interface TagService {
      * @return {@code true} if {@link Tag} was deleted, otherwise {@code false}
      * @throws InvalidEntityException when id is not correctly written
      */
-    boolean deleteTagService(Long id);
+    boolean deleteTag(Long id);
 }

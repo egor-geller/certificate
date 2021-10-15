@@ -43,7 +43,7 @@ public class CertificateController {
      */
     @GetMapping
     public ResponseEntity<List<CertificateDto>> findCertificateBySearchingWithCriteria(@ModelAttribute SearchCriteria searchCriteria) {
-        List<CertificateDto> certificateDtoList = certificateService.findCertificateByCriteriaService(searchCriteria);
+        List<CertificateDto> certificateDtoList = certificateService.findCertificateByCriteria(searchCriteria);
         return new ResponseEntity<>(certificateDtoList, HttpStatus.OK);
     }
 
@@ -56,7 +56,7 @@ public class CertificateController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<CertificateDto> getCertificateById(@PathVariable("id") Long id) {
-        CertificateDto certificateById = certificateService.findCertificateByIdService(id);
+        CertificateDto certificateById = certificateService.findCertificateById(id);
         return new ResponseEntity<>(certificateById, HttpStatus.OK);
     }
 
@@ -68,7 +68,7 @@ public class CertificateController {
      */
     @PostMapping
     public ResponseEntity<Void> createCertificate(@RequestBody CertificateDto certificateDto) {
-        certificateService.createCertificateService(certificateDto);
+        certificateService.createCertificate(certificateDto);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
@@ -84,7 +84,7 @@ public class CertificateController {
     public ResponseEntity<Boolean> updateCertificate(@PathVariable("id") Long id,
                                                      @RequestBody CertificateDto certificateDto) {
         certificateDto.setId(id);
-        boolean hasBeenUpdated = certificateService.updateCertificateService(certificateDto);
+        boolean hasBeenUpdated = certificateService.updateCertificate(certificateDto);
         return hasBeenUpdated ? new ResponseEntity<>(hasBeenUpdated, HttpStatus.OK)
                 : new ResponseEntity<>(hasBeenUpdated, HttpStatus.NOT_MODIFIED);
     }
@@ -98,7 +98,7 @@ public class CertificateController {
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Boolean> deleteCertificate(@PathVariable("id") Long id) {
-        boolean hasBeenDeleted = certificateService.deleteCertificateService(id);
+        boolean hasBeenDeleted = certificateService.deleteCertificate(id);
         return hasBeenDeleted ? new ResponseEntity<>(hasBeenDeleted, HttpStatus.OK)
                 : new ResponseEntity<>(hasBeenDeleted, HttpStatus.NOT_MODIFIED);
     }

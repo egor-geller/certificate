@@ -25,7 +25,7 @@ public interface CertificateService {
      * @param searchCriteria {@link SearchCriteria} class for searching by specific parameter
      * @return list of {@link Certificate}
      */
-    List<CertificateDto> findCertificateByCriteriaService(SearchCriteria searchCriteria);
+    List<CertificateDto> findCertificateByCriteria(SearchCriteria searchCriteria);
 
     /**
      * Find certificate by its id
@@ -35,7 +35,7 @@ public interface CertificateService {
      * @throws EntityNotFoundException when there is no such entity
      * @throws InvalidEntityException  when id is not correctly written
      */
-    CertificateDto findCertificateByIdService(long id);
+    CertificateDto findCertificateById(long id);
 
     /**
      * Attach tag to existing certificate.
@@ -45,7 +45,7 @@ public interface CertificateService {
      * @return {@code true} if {@link Certificate} was attached, otherwise {@code false}
      * @throws InvalidEntityException when id is not correctly written
      */
-    boolean attachTagToCertificateService(long certificateId, long tagId);
+    boolean attachTagToCertificate(long certificateId, long tagId);
 
     /**
      * Detach tag from existing certificate.
@@ -55,7 +55,7 @@ public interface CertificateService {
      * @return {@code true} if {@link Certificate} was detached, otherwise {@code false}
      * @throws InvalidEntityException when id is not correctly written
      */
-    boolean detachTagFromCertificateService(long certificateId, long tagId);
+    boolean detachTagFromCertificate(long certificateId, long tagId);
 
     /**
      * Create a new certificate.
@@ -64,7 +64,7 @@ public interface CertificateService {
      * @throws EntityAlreadyExistsException when {@link Certificate} already exists
      * @throws InvalidEntityException       when {@link Certificate} is not correctly written
      */
-    void createCertificateService(CertificateDto certificate);
+    void createCertificate(CertificateDto certificate);
 
     /**
      * Update an existing certificate.
@@ -73,7 +73,7 @@ public interface CertificateService {
      * @return {@code true} if {@link Certificate} was updated, otherwise {@code false}
      * @throws InvalidEntityException when {@link Certificate} is not correctly written
      */
-    boolean updateCertificateService(CertificateDto certificate);
+    boolean updateCertificate(CertificateDto certificate);
 
     /**
      * Delete an existing certificate.
@@ -82,5 +82,5 @@ public interface CertificateService {
      * @return {@code true} if {@link Certificate} was deleted, otherwise {@code false}
      * @throws InvalidEntityException when id is not correctly written
      */
-    boolean deleteCertificateService(long id);
+    boolean deleteCertificate(long id);
 }

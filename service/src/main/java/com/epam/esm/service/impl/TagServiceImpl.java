@@ -37,21 +37,21 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public List<TagDto> findAllTagsService() {
+    public List<TagDto> findAllTags() {
         return tagRepository.findAll().stream()
                 .map(tagServiceMapper::convertTagToDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
-    public TagDto findTagByIdService(Long id) {
+    public TagDto findTagById(Long id) {
         Tag tag = tagRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(id));
         return tagServiceMapper.convertTagToDto(tag);
     }
 
     @Override
-    public TagDto findTagByNameService(String tagName) {
+    public TagDto findTagByName(String tagName) {
         tagValidator.isTagValid(tagName);
 
         Tag tag = tagRepository.findByName(tagName)
@@ -61,7 +61,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public void createTagService(TagDto tag) {
+    public void createTag(TagDto tag) {
         tagValidator.isTagValid(tag.getName());
 
         Tag fromTagDto = tagServiceMapper.convertTagFromDto(tag);
@@ -75,7 +75,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public boolean deleteTagService(Long id) {
+    public boolean deleteTag(Long id) {
         if (id == null || id < 1) {
             throw new EntityNotFoundException(id);
         }

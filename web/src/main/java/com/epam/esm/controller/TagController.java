@@ -42,7 +42,7 @@ public class TagController {
      */
     @GetMapping
     public ResponseEntity<List<TagDto>> getAllTags() {
-        List<TagDto> tagDtoList = tagService.findAllTagsService();
+        List<TagDto> tagDtoList = tagService.findAllTags();
         return new ResponseEntity<>(tagDtoList, HttpStatus.OK);
     }
 
@@ -55,7 +55,7 @@ public class TagController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<TagDto> getTag(@PathVariable("id") Long id) {
-        TagDto tagById = tagService.findTagByIdService(id);
+        TagDto tagById = tagService.findTagById(id);
         return new ResponseEntity<>(tagById, HttpStatus.OK);
     }
 
@@ -69,7 +69,7 @@ public class TagController {
      */
     @PostMapping("/post")
     public ResponseEntity<Void> createTag(@RequestBody TagDto tagDto) {
-        tagService.createTagService(tagDto);
+        tagService.createTag(tagDto);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
@@ -83,7 +83,7 @@ public class TagController {
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Boolean> deleteTag(@PathVariable("id") Long id) {
-        boolean hasBeenDeleted = tagService.deleteTagService(id);
+        boolean hasBeenDeleted = tagService.deleteTag(id);
         return hasBeenDeleted ? new ResponseEntity<>(hasBeenDeleted, HttpStatus.OK)
                 : new ResponseEntity<>(hasBeenDeleted, HttpStatus.NOT_MODIFIED);
     }

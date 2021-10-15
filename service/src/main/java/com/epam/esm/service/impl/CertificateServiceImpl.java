@@ -39,7 +39,7 @@ public class CertificateServiceImpl implements CertificateService {
     }
 
     @Override
-    public List<CertificateDto> findCertificateByCriteriaService(SearchCriteria searchCriteria) {
+    public List<CertificateDto> findCertificateByCriteria(SearchCriteria searchCriteria) {
         certificateValidator.isSearchCriteriaEmpty(searchCriteria);
         List<Certificate> certificateList = certificateRepository.find(searchCriteria);
 
@@ -47,11 +47,11 @@ public class CertificateServiceImpl implements CertificateService {
             long id = certificate.getId();
             List<Tag> byCertificateId = tagRepository.findByCertificateId(id);
             return certificateServiceMapper.convertCertificateToDto(certificate, byCertificateId);
-        }).collect(Collectors.toList());
+        }).toList();
     }
 
     @Override
-    public CertificateDto findCertificateByIdService(long id) {
+    public CertificateDto findCertificateById(long id) {
         if (id < 1) {
             throw new EntityNotFoundException(id);
         }
@@ -64,7 +64,7 @@ public class CertificateServiceImpl implements CertificateService {
     }
 
     @Override
-    public boolean attachTagToCertificateService(long certificateId, long tagId) {
+    public boolean attachTagToCertificate(long certificateId, long tagId) {
         if (certificateId < 1 || tagId < 1) {
             throw new EntityNotFoundException(certificateId, tagId);
         }
@@ -72,7 +72,7 @@ public class CertificateServiceImpl implements CertificateService {
     }
 
     @Override
-    public boolean detachTagFromCertificateService(long certificateId, long tagId) {
+    public boolean detachTagFromCertificate(long certificateId, long tagId) {
         if (certificateId < 1 || tagId < 1) {
             throw new EntityNotFoundException(certificateId ,tagId);
         }
@@ -89,7 +89,7 @@ public class CertificateServiceImpl implements CertificateService {
     }
 
     @Override
-    public void createCertificateService(CertificateDto certificate) {
+    public void createCertificate(CertificateDto certificate) {
         if (certificate == null) {
             throw new EntityNotFoundException();
         }
@@ -109,7 +109,7 @@ public class CertificateServiceImpl implements CertificateService {
     }
 
     @Override
-    public boolean updateCertificateService(CertificateDto certificate) {
+    public boolean updateCertificate(CertificateDto certificate) {
         if (certificate == null) {
             throw new EntityNotFoundException();
         }
@@ -126,7 +126,7 @@ public class CertificateServiceImpl implements CertificateService {
     }
 
     @Override
-    public boolean deleteCertificateService(long id) {
+    public boolean deleteCertificate(long id) {
         if (id < 1) {
             throw new EntityNotFoundException(id);
         }
