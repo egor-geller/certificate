@@ -52,7 +52,7 @@ class TagServiceImplTest {
         when(tagRepository.findAll()).thenReturn(tagList());
 
         List<TagDto> expectedTagDtoList = tagDtoList();
-        List<TagDto> actualAllTagsService = tagService.findAllTagsService();
+        List<TagDto> actualAllTagsService = tagService.findAllTags();
 
         assertEquals(expectedTagDtoList.toString(), actualAllTagsService.toString());
     }
@@ -62,7 +62,7 @@ class TagServiceImplTest {
         long id = 1;
         when(tagRepository.findById(id)).thenReturn(Optional.of(tag()));
         TagDto expectedTagDto = tagDto();
-        TagDto actualTagByIdService = tagService.findTagByIdService(id);
+        TagDto actualTagByIdService = tagService.findTagById(id);
 
         assertEquals(expectedTagDto.toString(), actualTagByIdService.toString());
     }
@@ -72,7 +72,7 @@ class TagServiceImplTest {
         String tagName = "testTagName1";
         when(tagRepository.findByName(tagName)).thenReturn(Optional.of(tag()));
         TagDto expectedTagDto = tagDto();
-        TagDto actualTagByNameService = tagService.findTagByNameService(tagName);
+        TagDto actualTagByNameService = tagService.findTagByName(tagName);
 
         assertEquals(expectedTagDto.toString(), actualTagByNameService.toString());
     }
@@ -83,7 +83,7 @@ class TagServiceImplTest {
         TagDto tagDto = tagDto();
         when(tagRepository.findByName(tagDto.getName())).thenReturn(Optional.empty());
 
-        tagService.createTagService(tagDto);
+        tagService.createTag(tagDto);
 
         verify(tagRepository).findByName(tag.getName());
         verify(tagRepository).create(tag);

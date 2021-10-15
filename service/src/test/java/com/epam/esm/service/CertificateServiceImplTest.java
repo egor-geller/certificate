@@ -77,7 +77,7 @@ class CertificateServiceImplTest {
         when(tagRepository.findByCertificateId(anyLong())).thenReturn(tagList());
 
         List<CertificateDto> actualDtoList = certificateService
-                .findCertificateByCriteriaService(provideSearchParameters());
+                .findCertificateByCriteria(provideSearchParameters());
 
 
         int expectedInteractions = 1;
@@ -98,7 +98,7 @@ class CertificateServiceImplTest {
         when(certificateRepository.findById(1L)).thenReturn(Optional.of(certificate));
         when(tagRepository.findByCertificateId(1L)).thenReturn(tagList());
 
-        CertificateDto actualCertificateDto = certificateService.findCertificateByIdService(certificateId);
+        CertificateDto actualCertificateDto = certificateService.findCertificateById(certificateId);
 
         int expectedInteractions = 1;
         verify(certificateRepository, times(expectedInteractions)).findById(1L);
@@ -112,7 +112,7 @@ class CertificateServiceImplTest {
         int certificateId = 1;
         when(certificateRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        Assertions.assertThrows(EntityNotFoundException.class, () -> certificateService.findCertificateByIdService(certificateId));
+        Assertions.assertThrows(EntityNotFoundException.class, () -> certificateService.findCertificateById(certificateId));
     }
 
     @Test
@@ -121,7 +121,7 @@ class CertificateServiceImplTest {
 
         when(certificateValidator.isCertificateDtoValid(certificateDto)).thenReturn(true);
 
-        certificateService.createCertificateService(certificateDto);
+        certificateService.createCertificate(certificateDto);
 
         int expectedInteractions = 1;
         verify(certificateRepository, times(expectedInteractions)).create(any());
@@ -131,7 +131,7 @@ class CertificateServiceImplTest {
     void createInvalidCertificateTest() {
         CertificateDto certificateDto = null;
 
-        Assertions.assertThrows(InvalidEntityException.class, () -> certificateService.createCertificateService(certificateDto));
+        Assertions.assertThrows(InvalidEntityException.class, () -> certificateService.createCertificate(certificateDto));
     }
 
     @Test
@@ -144,7 +144,7 @@ class CertificateServiceImplTest {
 
         when(certificateValidator.isCertificateDtoValid(certificateDto)).thenReturn(true);
 
-        Assertions.assertThrows(EntityAlreadyExistsException.class, () -> certificateService.createCertificateService(certificateDto));
+        Assertions.assertThrows(EntityAlreadyExistsException.class, () -> certificateService.createCertificate(certificateDto));
     }
 
     @Test
@@ -156,7 +156,7 @@ class CertificateServiceImplTest {
 
         when(certificateRepository.update(certificate)).thenReturn(true);
         when(certificateValidator.isCertificateDtoValid(updatedCertificateDto)).thenReturn(true);
-        assertTrue(certificateService.updateCertificateService(updatedCertificateDto));
+        assertTrue(certificateService.updateCertificate(updatedCertificateDto));
     }
 
     @Test
@@ -164,7 +164,7 @@ class CertificateServiceImplTest {
         CertificateDto updatedCertificateDto = provideCertificateDto();
         updatedCertificateDto.setName("");
 
-        Assertions.assertThrows(InvalidEntityException.class, () -> certificateService.updateCertificateService(updatedCertificateDto));
+        Assertions.assertThrows(InvalidEntityException.class, () -> certificateService.updateCertificate(updatedCertificateDto));
     }
 
     @Test
@@ -174,7 +174,7 @@ class CertificateServiceImplTest {
         stringList.add("");
         updatedCertificateDto.setTagList(stringList);
 
-        Assertions.assertThrows(InvalidEntityException.class, () -> certificateService.updateCertificateService(updatedCertificateDto));
+        Assertions.assertThrows(InvalidEntityException.class, () -> certificateService.updateCertificate(updatedCertificateDto));
     }
 
     @Test
@@ -191,7 +191,7 @@ class CertificateServiceImplTest {
     @Test
     void deleteNotFoundCertificateIdTest() {
         int certificateId = 0;
-        Assertions.assertThrows(InvalidEntityException.class, () -> certificateService.deleteCertificateService(certificateId));
+        Assertions.assertThrows(InvalidEntityException.class, () -> certificateService.deleteCertificate(certificateId));
     }
 
     private Certificate provideCertificate() {
