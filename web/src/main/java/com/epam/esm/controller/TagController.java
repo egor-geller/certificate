@@ -1,10 +1,8 @@
 package com.epam.esm.controller;
 
 import com.epam.esm.dto.TagDto;
-import com.epam.esm.entity.Certificate;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.EntityAlreadyExistsException;
-import com.epam.esm.exception.EntityConnectedException;
 import com.epam.esm.exception.EntityNotFoundException;
 import com.epam.esm.exception.InvalidEntityException;
 import com.epam.esm.service.impl.TagServiceImpl;
@@ -57,8 +55,8 @@ public class TagController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<TagDto> getTag(@PathVariable("id") Long id) {
-        TagDto tagByIdService = tagService.findTagByIdService(id);
-        return new ResponseEntity<>(tagByIdService, HttpStatus.OK);
+        TagDto tagById = tagService.findTagByIdService(id);
+        return new ResponseEntity<>(tagById, HttpStatus.OK);
     }
 
     /**
@@ -69,7 +67,7 @@ public class TagController {
      * @throws InvalidEntityException       when the content of {@link TagDto} instance is not correctly written
      * @throws EntityAlreadyExistsException when {@link Tag} entity is already exists
      */
-    @PostMapping
+    @PostMapping("/post")
     public ResponseEntity<Void> createTag(@RequestBody TagDto tagDto) {
         tagService.createTagService(tagDto);
         return new ResponseEntity<>(HttpStatus.CREATED);
@@ -81,18 +79,12 @@ public class TagController {
      * @param id tag id
      * @return {@code HttpStatus.OK} and {@code True} when entity has been deleted, otherwise,
      * {@code HttpStatus.NOT_MODIFIED} and {@code False}
-     * @throws InvalidEntityException   when id is not written correctly
-     * @throws EntityConnectedException when {@link Tag} is still connected to a {@link Certificate}
+     * @throws InvalidEntityException when id is not written correctly
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Boolean> deleteTag(@PathVariable("id") Long id) {
         boolean hasBeenDeleted = tagService.deleteTagService(id);
         return hasBeenDeleted ? new ResponseEntity<>(hasBeenDeleted, HttpStatus.OK)
                 : new ResponseEntity<>(hasBeenDeleted, HttpStatus.NOT_MODIFIED);
-    }
-
-    @GetMapping(value = "/tea")
-    public ResponseEntity<String> kkk() {
-        return new ResponseEntity<>("Hello", HttpStatus.I_AM_A_TEAPOT);
     }
 }

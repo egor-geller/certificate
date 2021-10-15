@@ -5,9 +5,7 @@ import com.epam.esm.dto.mapper.TagServiceMapper;
 import com.epam.esm.entity.Certificate;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.EntityAlreadyExistsException;
-import com.epam.esm.exception.EntityConnectedException;
 import com.epam.esm.exception.EntityNotFoundException;
-import com.epam.esm.exception.InvalidEntityException;
 import com.epam.esm.repository.SearchCriteria;
 import com.epam.esm.repository.repositoryinterfaces.CertificateRepository;
 import com.epam.esm.repository.repositoryinterfaces.TagRepository;
@@ -48,7 +46,7 @@ public class TagServiceImpl implements TagService {
     @Override
     public TagDto findTagByIdService(Long id) {
         Tag tag = tagRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("There is no tag by this id: " + id));
+                .orElseThrow(() -> new EntityNotFoundException(id));
         return tagServiceMapper.convertTagToDto(tag);
     }
 
@@ -57,7 +55,7 @@ public class TagServiceImpl implements TagService {
         tagValidator.isTagValid(tagName);
 
         Tag tag = tagRepository.findByName(tagName)
-                .orElseThrow(() -> new EntityNotFoundException("There is no tag by this name: " + tagName));
+                .orElseThrow(() -> new EntityNotFoundException(tagName));
 
         return tagServiceMapper.convertTagToDto(tag);
     }
@@ -70,7 +68,7 @@ public class TagServiceImpl implements TagService {
 
         Optional<Tag> isTagExists = tagRepository.findByName(fromTagDto.getName());
         if (isTagExists.isPresent()) {
-            throw new EntityAlreadyExistsException("Tag already exists!");
+            throw new EntityAlreadyExistsException();
         }
 
         tagRepository.create(fromTagDto);
@@ -79,7 +77,7 @@ public class TagServiceImpl implements TagService {
     @Override
     public boolean deleteTagService(Long id) {
         if (id == null || id < 1) {
-            throw new InvalidEntityException("Id cannot be null");
+            throw new EntityNotFoundException(id);
         }
 
         SearchCriteria searchCriteria = new SearchCriteria();
@@ -88,7 +86,7 @@ public class TagServiceImpl implements TagService {
         List<Certificate> certificateList = certificateRepository.find(searchCriteria);
 
         if (!certificateList.isEmpty()){
-            throw new EntityConnectedException("Tag is connected to a certificate");
+            throw new EntityAlreadyExistsException();
         }
 
         return tagRepository.delete(id);

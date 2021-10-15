@@ -1,10 +1,8 @@
 package com.epam.esm.service;
 
 import com.epam.esm.dto.TagDto;
-import com.epam.esm.entity.Certificate;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.EntityAlreadyExistsException;
-import com.epam.esm.exception.EntityConnectedException;
 import com.epam.esm.exception.EntityNotFoundException;
 import com.epam.esm.exception.InvalidEntityException;
 import org.springframework.stereotype.Service;
@@ -61,7 +59,6 @@ public interface TagService {
      * @param id id of the tag
      * @return {@code true} if {@link Tag} was deleted, otherwise {@code false}
      * @throws InvalidEntityException when id is not correctly written
-     * @throws EntityConnectedException when {@link Tag} is still connected to a {@link Certificate}
      */
     boolean deleteTagService(Long id);
 }

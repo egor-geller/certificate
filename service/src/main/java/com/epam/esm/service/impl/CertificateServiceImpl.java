@@ -55,11 +55,11 @@ public class CertificateServiceImpl implements CertificateService {
     @Override
     public CertificateDto findCertificateByIdService(long id) {
         if (id < 1) {
-            throw new InvalidEntityException("The id isn't correctly written: " + id);
+            throw new EntityNotFoundException(id);
         }
 
         Certificate certificate = certificateRepository.findById(id).orElseThrow(() ->
-                new EntityNotFoundException("There is no entity by this id: " + id));
+                new EntityNotFoundException(id));
         List<Tag> byCertificateId = tagRepository.findByCertificateId(id);
 
         return certificateServiceMapper.convertCertificateToDto(certificate, byCertificateId);
@@ -68,7 +68,7 @@ public class CertificateServiceImpl implements CertificateService {
     @Override
     public boolean attachTagToCertificateService(long certificateId, long tagId) {
         if (certificateId < 1 || tagId < 1) {
-            throw new InvalidEntityException("Both id's not been written correctly: " + certificateId + ", " + tagId);
+            throw new EntityNotFoundException(certificateId, tagId);
         }
         return certificateRepository.attachTag(certificateId, tagId);
     }
@@ -76,26 +76,37 @@ public class CertificateServiceImpl implements CertificateService {
     @Override
     public boolean detachTagFromCertificateService(long certificateId, long tagId) {
         if (certificateId < 1 || tagId < 1) {
-            throw new InvalidEntityException("Both id's not been written correctly: " + certificateId + ", " + tagId);
+            throw new EntityNotFoundException(certificateId ,tagId);
         }
+
+        List<Tag> allTagsList = tagRepository.findAll();
+        SearchCriteria searchCriteria = new SearchCriteria();
+        for (Tag tag : allTagsList) {
+            searchCriteria.setTagName(tag.getName());
+            List<Certificate> certificateList = certificateRepository.find(searchCriteria);
+            if (certificateList == null || certificateList.isEmpty()) {
+                tagRepository.delete(tag.getId());
+            }
+        }
+
         return certificateRepository.detachTag(certificateId, tagId);
     }
 
     @Override
     public void createCertificateService(CertificateDto certificate) {
         if (certificate == null) {
-            throw new InvalidEntityException("Certificate is null");
+            throw new EntityNotFoundException();
         }
         boolean certificateDtoValid = certificateValidator.isCertificateDtoValid(certificate);
 
         if (!certificateDtoValid) {
-            throw new InvalidEntityException("Certificate not valid");
+            throw new InvalidEntityException(Certificate.class);
         }
 
         Certificate fromCertificateDto = certificateServiceMapper.convertCertificateFromDto(certificate);
         Optional<Certificate> byId = certificateRepository.findById(fromCertificateDto.getId());
         if (byId.isPresent() && byId.get().getName().equals(fromCertificateDto.getName())) {
-            throw new EntityAlreadyExistsException("Certificate is already exits");
+            throw new EntityAlreadyExistsException();
         }
 
         certificateRepository.create(fromCertificateDto);
@@ -104,13 +115,13 @@ public class CertificateServiceImpl implements CertificateService {
     @Override
     public boolean updateCertificateService(CertificateDto certificate) {
         if (certificate == null) {
-            throw new InvalidEntityException("Certificate is null");
+            throw new EntityNotFoundException();
         }
 
         boolean certificateDtoValid = certificateValidator.isCertificateDtoValid(certificate);
 
         if (!certificateDtoValid) {
-            throw new InvalidEntityException("Certificate not valid");
+            throw new InvalidEntityException(Certificate.class);
         }
 
         Certificate fromCertificateDto = certificateServiceMapper.convertCertificateFromDto(certificate);
@@ -121,7 +132,7 @@ public class CertificateServiceImpl implements CertificateService {
     @Override
     public boolean deleteCertificateService(long id) {
         if (id < 1) {
-            throw new InvalidEntityException("Id is not written correctly " + id);
+            throw new EntityNotFoundException(id);
         }
 
         return certificateRepository.delete(id);

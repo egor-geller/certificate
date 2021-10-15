@@ -42,9 +42,9 @@ public class CertificateController {
      * @return JSON {@link ResponseEntity} object that contains list of {@link CertificateDto}
      */
     @GetMapping
-    public ResponseEntity<List<CertificateDto>> findCertificateBySearchParameters(@ModelAttribute SearchCriteria searchCriteria) {
-        List<CertificateDto> certificateByCriteriaService = certificateService.findCertificateByCriteriaService(searchCriteria);
-        return new ResponseEntity<>(certificateByCriteriaService, HttpStatus.OK);
+    public ResponseEntity<List<CertificateDto>> findCertificateBySearchingWithCriteria(@ModelAttribute SearchCriteria searchCriteria) {
+        List<CertificateDto> certificateDtoList = certificateService.findCertificateByCriteriaService(searchCriteria);
+        return new ResponseEntity<>(certificateDtoList, HttpStatus.OK);
     }
 
     /**
@@ -56,8 +56,8 @@ public class CertificateController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<CertificateDto> getCertificateById(@PathVariable("id") Long id) {
-        CertificateDto certificateByIdService = certificateService.findCertificateByIdService(id);
-        return new ResponseEntity<>(certificateByIdService, HttpStatus.OK);
+        CertificateDto certificateById = certificateService.findCertificateByIdService(id);
+        return new ResponseEntity<>(certificateById, HttpStatus.OK);
     }
 
     /**

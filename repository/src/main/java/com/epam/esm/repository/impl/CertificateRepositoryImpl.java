@@ -13,7 +13,6 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Repository;
 
-import javax.sql.DataSource;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,9 +26,9 @@ public class CertificateRepositoryImpl implements CertificateRepository {
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     @Autowired
-    public CertificateRepositoryImpl(CertificateMapper rowMapper, DataSource dataSource) {
+    public CertificateRepositoryImpl(CertificateMapper rowMapper, NamedParameterJdbcTemplate jdbcTemplate) {
         this.rowMapper = rowMapper;
-        this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
+        this.namedParameterJdbcTemplate = jdbcTemplate;
     }
 
     @Override
@@ -37,8 +36,8 @@ public class CertificateRepositoryImpl implements CertificateRepository {
         MapSqlParameterSource parameters = new MapSqlParameterSource();
 
         QueryBuilder sqlClause = new QueryBuilder.Builder(searchCriteria, SELECT_ALL_CERTIFICATES)
-                .findBy(parameters)
-                .orderBy(searchCriteria)
+                .buildWhereClause(parameters)
+                .buildOrderByClause(searchCriteria)
                 .build();
         return namedParameterJdbcTemplate.query(sqlClause.getNewString(), parameters, rowMapper);
     }
@@ -61,8 +60,7 @@ public class CertificateRepositoryImpl implements CertificateRepository {
         try {
             update = namedParameterJdbcTemplate.update(INSERT_TAG_TO_CERTIFICATE, parameterSource);
         } catch (DataAccessException e) {
-            throw new DataException("There is a problem to attach: Tag id - " +
-                    tagId + ", Certificate id - " + certificateId, e);
+            throw new DataException(e, tagId, certificateId);
         }
         return update > 0;
     }
@@ -77,8 +75,7 @@ public class CertificateRepositoryImpl implements CertificateRepository {
         try {
             update = namedParameterJdbcTemplate.update(DELETE_TAG_FROM_CERTIFICATE, parameterSource);
         } catch (DataAccessException e) {
-            throw new DataException("There is a problem to delete: Tag id - " +
-                    tagId + ", Certificate id - " + certificateId, e);
+            throw new DataException(e, tagId, certificateId);
         }
         return update > 0;
     }

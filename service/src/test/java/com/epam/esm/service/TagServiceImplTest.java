@@ -4,7 +4,6 @@ import com.epam.esm.dto.TagDto;
 import com.epam.esm.dto.mapper.TagServiceMapper;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.repository.impl.TagRepositoryImpl;
-import com.epam.esm.repository.mapper.TagMapper;
 import com.epam.esm.service.impl.TagServiceImpl;
 import com.epam.esm.validator.CertificateValidator;
 import com.epam.esm.validator.TagValidator;
