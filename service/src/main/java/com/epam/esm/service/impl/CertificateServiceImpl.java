@@ -13,6 +13,7 @@ import com.epam.esm.repository.repositoryinterfaces.TagRepository;
 import com.epam.esm.service.CertificateService;
 import com.epam.esm.validator.CertificateValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -39,11 +40,8 @@ public class CertificateServiceImpl implements CertificateService {
 
     @Override
     public List<CertificateDto> findCertificateByCriteriaService(SearchCriteria searchCriteria) {
-
         certificateValidator.isSearchCriteriaEmpty(searchCriteria);
-
         List<Certificate> certificateList = certificateRepository.find(searchCriteria);
-
 
         return certificateList.stream().map(certificate -> {
             long id = certificate.getId();
@@ -79,14 +77,12 @@ public class CertificateServiceImpl implements CertificateService {
             throw new EntityNotFoundException(certificateId ,tagId);
         }
 
-        List<Tag> allTagsList = tagRepository.findAll();
         SearchCriteria searchCriteria = new SearchCriteria();
-        for (Tag tag : allTagsList) {
-            searchCriteria.setTagName(tag.getName());
-            List<Certificate> certificateList = certificateRepository.find(searchCriteria);
-            if (certificateList == null || certificateList.isEmpty()) {
-                tagRepository.delete(tag.getId());
-            }
+        Optional<Tag> tag = tagRepository.findById(tagId);
+        searchCriteria.setTagName(tag.toString());
+        List<Certificate> certificateList = certificateRepository.find(searchCriteria);
+        if (certificateList == null || certificateList.isEmpty()) {
+            tagRepository.delete(tagId);
         }
 
         return certificateRepository.detachTag(certificateId, tagId);
@@ -136,5 +132,18 @@ public class CertificateServiceImpl implements CertificateService {
         }
 
         return certificateRepository.delete(id);
+    }
+
+    @Scheduled(fixedDelay = 3000)
+    public void scheduleDeletionOfDetachedTag() {
+        List<Tag> allTagsList = tagRepository.findAll();
+        SearchCriteria searchCriteria = new SearchCriteria();
+        for (Tag tag : allTagsList) {
+            searchCriteria.setTagName(tag.getName());
+            List<Certificate> certificateList = certificateRepository.find(searchCriteria);
+            if (certificateList == null || certificateList.isEmpty()) {
+                tagRepository.delete(tag.getId());
+            }
+        }
     }
 }
