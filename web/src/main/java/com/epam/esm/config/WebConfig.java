@@ -6,6 +6,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.format.FormatterRegistry;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -16,6 +17,8 @@ import java.nio.charset.StandardCharsets;
 @Configuration
 @EnableWebMvc
 @ComponentScan("com.epam.esm")
+@EnableScheduling
+@EnableAsync
 public class WebConfig extends AcceptHeaderLocaleResolver implements WebMvcConfigurer {
 
     private static final String ERROR_BUNDLE_PATH = "i18n/errors";

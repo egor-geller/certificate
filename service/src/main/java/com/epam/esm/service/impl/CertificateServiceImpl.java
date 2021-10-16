@@ -133,7 +133,7 @@ public class CertificateServiceImpl implements CertificateService {
         return certificateRepository.delete(id);
     }
 
-    @Scheduled(fixedDelay = 3000)
+    @Scheduled(cron = "0 30 9-17 * * MON-FRI")
     public void scheduleDeletionOfDetachedTag() {
         List<Tag> allTagsList = tagRepository.findAll();
         SearchCriteria searchCriteria = new SearchCriteria();
