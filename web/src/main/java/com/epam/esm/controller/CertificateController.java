@@ -19,7 +19,7 @@ import java.util.List;
  * @author Egor Geller
  */
 @RestController
-@RequestMapping("/api/certificates")
+@RequestMapping("/api/{ver}/certificates")
 public class CertificateController {
 
     private final CertificateService certificateService;

@@ -20,7 +20,7 @@ import java.util.List;
  * @author Egor Geller
  */
 @RestController
-@RequestMapping("/api/tags")
+@RequestMapping("/api/{ver}/tags")
 public class TagController {
 
     private final TagServiceImpl tagService;
@@ -67,7 +67,7 @@ public class TagController {
      * @throws InvalidEntityException       when the content of {@link TagDto} instance is not correctly written
      * @throws EntityAlreadyExistsException when {@link Tag} entity is already exists
      */
-    @PostMapping("/post")
+    @PostMapping
     public ResponseEntity<Void> createTag(@RequestBody TagDto tagDto) {
         tagService.create(tagDto);
         return new ResponseEntity<>(HttpStatus.CREATED);
