@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class CertificateServiceImpl implements CertificateService {
@@ -39,14 +40,14 @@ public class CertificateServiceImpl implements CertificateService {
 
     @Override
     public List<CertificateDto> findCertificateByCriteria(SearchCriteria searchCriteria) {
-        certificateValidator.isSearchCriteriaEmpty(searchCriteria);
+        certificateValidator.validateSearchCriteriaEmpty(searchCriteria);
         List<Certificate> certificateList = certificateRepository.find(searchCriteria);
 
         return certificateList.stream().map(certificate -> {
             long id = certificate.getId();
             List<Tag> byCertificateId = tagRepository.findByCertificateId(id);
             return certificateServiceMapper.convertCertificateToDto(certificate, byCertificateId);
-        }).toList();
+        }).collect(Collectors.toList());
     }
 
     @Override

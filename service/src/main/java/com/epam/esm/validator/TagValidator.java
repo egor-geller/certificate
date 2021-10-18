@@ -13,7 +13,7 @@ public class TagValidator {
 
     private static final String NAME_REGEX = "[a-zA-Z0-9.,'?!]{2,30}";
 
-    public void isTagValid(String tagName) {
+    public void validateTagValid(String tagName) {
         if (tagName == null || tagName.isEmpty() || !Pattern.matches(NAME_REGEX, tagName)) {
             throw new InvalidEntityException(TagValidator.class);
         }

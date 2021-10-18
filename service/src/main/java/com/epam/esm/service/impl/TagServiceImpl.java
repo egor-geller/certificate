@@ -40,7 +40,7 @@ public class TagServiceImpl implements TagService {
     public List<TagDto> findAllTags() {
         return tagRepository.findAll().stream()
                 .map(tagServiceMapper::convertTagToDto)
-                .toList();
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -52,7 +52,7 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public TagDto findTagByName(String tagName) {
-        tagValidator.isTagValid(tagName);
+        tagValidator.validateTagValid(tagName);
 
         Tag tag = tagRepository.findByName(tagName)
                 .orElseThrow(() -> new EntityNotFoundException(tagName));
@@ -62,12 +62,12 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public void create(TagDto tag) {
-        tagValidator.isTagValid(tag.getName());
+        tagValidator.validateTagValid(tag.getName());
 
         Tag fromTagDto = tagServiceMapper.convertTagFromDto(tag);
 
-        Optional<Tag> isTagExists = tagRepository.findByName(fromTagDto.getName());
-        if (isTagExists.isPresent()) {
+        Optional<Tag> maybeFoundTag = tagRepository.findByName(fromTagDto.getName());
+        if (maybeFoundTag.isPresent()) {
             throw new EntityAlreadyExistsException();
         }
 

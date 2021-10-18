@@ -33,14 +33,14 @@ public class CertificateValidator {
         boolean tagListIsEmpty = tagList.stream().allMatch(String::isEmpty);
 
         return !tagListIsEmpty && !areParamsEmpty && isValidName(name) && isValidDescription(description)
-                && isValidPrice(price) && isValidDuration(duration) && !isTagListValid(tagList);
+                && isValidPrice(price) && isValidDuration(duration) && !isTagListInvalid(tagList);
     }
 
     public boolean areParamsEmpty(String... params) {
         return Arrays.stream(params).allMatch(String::isEmpty);
     }
 
-    public void isSearchCriteriaEmpty(SearchCriteria searchCriteria) {
+    public void validateSearchCriteriaEmpty(SearchCriteria searchCriteria) {
 
         if (searchCriteria.getTagName() != null && searchCriteria.getTagName().isEmpty()
                 && searchCriteria.getCertificateName() != null && searchCriteria.getCertificateName().isEmpty()
@@ -52,7 +52,7 @@ public class CertificateValidator {
     }
 
 
-    private boolean isTagListValid(List<String> tagList) {
+    private boolean isTagListInvalid(List<String> tagList) {
         return tagList.stream().allMatch(tagName -> Pattern.matches(TAG_NAME_REGEX, tagName));
     }
 
