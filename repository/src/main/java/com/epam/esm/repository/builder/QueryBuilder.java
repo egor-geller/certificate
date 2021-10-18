@@ -12,14 +12,14 @@ import static com.epam.esm.repository.Parameters.*;
 
 @Component
 public final class QueryBuilder {
-    String newString;
+    private String newString;
 
     public static class Builder {
         private final SearchCriteria searchCriteria;
         private String findBy;
         private String orderBy;
         MapSqlParameterSource parameters;
-        String sqlString;
+        private final String sqlString;
 
         public Builder(SearchCriteria searchCriteria, String sqlString) {
             this.sqlString = sqlString;
