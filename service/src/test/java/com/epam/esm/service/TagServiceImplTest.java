@@ -49,9 +49,9 @@ class TagServiceImplTest {
 
     @Test
     void findAllTagsTest() {
-        when(tagRepository.findAll()).thenReturn(tagList());
+        when(tagRepository.findAll()).thenReturn(createTagList());
 
-        List<TagDto> expectedTagDtoList = tagDtoList();
+        List<TagDto> expectedTagDtoList = createTagDtoList();
         List<TagDto> actualAllTagsService = tagService.findAllTags();
 
         assertEquals(expectedTagDtoList.toString(), actualAllTagsService.toString());
@@ -60,8 +60,8 @@ class TagServiceImplTest {
     @Test
     void findByIdTest() {
         long id = 1;
-        when(tagRepository.findById(id)).thenReturn(Optional.of(tag()));
-        TagDto expectedTagDto = tagDto();
+        when(tagRepository.findById(id)).thenReturn(Optional.of(createTag()));
+        TagDto expectedTagDto = createTagDto();
         TagDto actualTagByIdService = tagService.findTagById(id);
 
         assertEquals(expectedTagDto.toString(), actualTagByIdService.toString());
@@ -70,8 +70,8 @@ class TagServiceImplTest {
     @Test
     void findByNameTest() {
         String tagName = "testTagName1";
-        when(tagRepository.findByName(tagName)).thenReturn(Optional.of(tag()));
-        TagDto expectedTagDto = tagDto();
+        when(tagRepository.findByName(tagName)).thenReturn(Optional.of(createTag()));
+        TagDto expectedTagDto = createTagDto();
         TagDto actualTagByNameService = tagService.findTagByName(tagName);
 
         assertEquals(expectedTagDto.toString(), actualTagByNameService.toString());
@@ -79,8 +79,8 @@ class TagServiceImplTest {
 
     @Test
     void createTest() {
-        Tag tag = tag();
-        TagDto tagDto = tagDto();
+        Tag tag = createTag();
+        TagDto tagDto = createTagDto();
         when(tagRepository.findByName(tagDto.getName())).thenReturn(Optional.empty());
 
         tagService.create(tagDto);
@@ -88,7 +88,7 @@ class TagServiceImplTest {
         verify(tagRepository).findByName(tag.getName());
         verify(tagRepository).create(tag);
     }
-    private Tag tag() {
+    private Tag createTag() {
         Tag tag = new Tag();
         tag.setId(0);
         tag.setName("testTagName1");
@@ -96,7 +96,7 @@ class TagServiceImplTest {
         return tag;
     }
 
-    private TagDto tagDto() {
+    private TagDto createTagDto() {
         TagDto tag = new TagDto();
         tag.setId(0L);
         tag.setName("testTagName1");
@@ -104,7 +104,7 @@ class TagServiceImplTest {
         return tag;
     }
 
-    private List<Tag> tagList() {
+    private List<Tag> createTagList() {
         List<Tag> tagList = new ArrayList<>();
 
         Tag tag1 = new Tag();
@@ -125,7 +125,7 @@ class TagServiceImplTest {
         return tagList;
     }
 
-    private List<TagDto> tagDtoList() {
+    private List<TagDto> createTagDtoList() {
         List<TagDto> tagDtoList = new ArrayList<>();
 
         TagDto tagDto1 = new TagDto();

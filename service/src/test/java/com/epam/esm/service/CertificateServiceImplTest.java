@@ -42,6 +42,7 @@ import static org.mockito.Mockito.*;
 class CertificateServiceImplTest {
 
     private static final ZonedDateTime l = LocalDateTime.now().atZone(ZoneOffset.UTC);
+    private static final int expectedInteractions = 1;
 
     @InjectMocks
     private CertificateServiceImpl certificateService;
@@ -70,11 +71,11 @@ class CertificateServiceImplTest {
     void findByCriteriaTest() {
         List<Certificate> certificateList = new ArrayList<>();
         List<CertificateDto> certificateDtoList = new ArrayList<>();
-        certificateList.add(provideCertificate());
-        certificateDtoList.add(provideCertificateDto());
+        certificateList.add(createCertificate());
+        certificateDtoList.add(createCertificateDto());
 
         when(certificateRepository.find(provideSearchParameters())).thenReturn(certificateList);
-        when(tagRepository.findByCertificateId(anyLong())).thenReturn(tagList());
+        when(tagRepository.findByCertificateId(anyLong())).thenReturn(createTagList());
 
         List<CertificateDto> actualDtoList = certificateService
                 .findCertificateByCriteria(provideSearchParameters());
@@ -89,18 +90,17 @@ class CertificateServiceImplTest {
     @Test
     void findCertificateByIdTest() {
         long certificateId = 1;
-        Certificate certificate = provideCertificate();
+        Certificate certificate = createCertificate();
         certificate.setId(certificateId);
 
-        CertificateDto expectedCertificateDto = provideCertificateDto();
+        CertificateDto expectedCertificateDto = createCertificateDto();
         expectedCertificateDto.setId(certificateId);
 
         when(certificateRepository.findById(1L)).thenReturn(Optional.of(certificate));
-        when(tagRepository.findByCertificateId(1L)).thenReturn(tagList());
+        when(tagRepository.findByCertificateId(1L)).thenReturn(createTagList());
 
         CertificateDto actualCertificateDto = certificateService.findCertificateById(certificateId);
 
-        int expectedInteractions = 1;
         verify(certificateRepository, times(expectedInteractions)).findById(1L);
         verify(tagRepository, times(expectedInteractions)).findByCertificateId(1L);
 
@@ -117,13 +117,12 @@ class CertificateServiceImplTest {
 
     @Test
     void createCertificateTest() {
-        CertificateDto certificateDto = provideCertificateDto();
+        CertificateDto certificateDto = createCertificateDto();
 
         when(certificateValidator.isCertificateDtoValid(certificateDto)).thenReturn(true);
 
         certificateService.create(certificateDto);
 
-        int expectedInteractions = 1;
         verify(certificateRepository, times(expectedInteractions)).create(any());
     }
 
@@ -136,8 +135,8 @@ class CertificateServiceImplTest {
 
     @Test
     void createAlreadyExistsCertificateTest() {
-        CertificateDto certificateDto = provideCertificateDto();
-        Certificate certificate = provideCertificate();
+        CertificateDto certificateDto = createCertificateDto();
+        Certificate certificate = createCertificate();
         certificate.setId(0L);
         certificateDto.setId(0L);
         when(certificateRepository.findById(0L)).thenReturn(Optional.of(certificate));
@@ -150,8 +149,8 @@ class CertificateServiceImplTest {
     @Test
     void updateCertificateTest() {
         long certificateId = 0;
-        Certificate certificate = provideCertificate();
-        CertificateDto updatedCertificateDto = provideCertificateDto();
+        Certificate certificate = createCertificate();
+        CertificateDto updatedCertificateDto = createCertificateDto();
         updatedCertificateDto.setId(certificateId);
 
         when(certificateRepository.update(certificate)).thenReturn(true);
@@ -161,7 +160,7 @@ class CertificateServiceImplTest {
 
     @Test
     void updateInvalidCertificateTest() {
-        CertificateDto updatedCertificateDto = provideCertificateDto();
+        CertificateDto updatedCertificateDto = createCertificateDto();
         updatedCertificateDto.setName("");
 
         Assertions.assertThrows(InvalidEntityException.class, () -> certificateService.update(updatedCertificateDto));
@@ -170,7 +169,7 @@ class CertificateServiceImplTest {
     @Test
     void updateInvalidTagTest() {
         List<String> stringList = new ArrayList<>();
-        CertificateDto updatedCertificateDto = provideCertificateDto();
+        CertificateDto updatedCertificateDto = createCertificateDto();
         stringList.add("");
         updatedCertificateDto.setTagList(stringList);
 
@@ -184,7 +183,6 @@ class CertificateServiceImplTest {
         long certificateId = 1;
         certificateRepository.delete(certificateId);
 
-        int expectedInteractions = 1;
         verify(certificateRepository, times(expectedInteractions)).delete(anyLong());
     }
 
@@ -194,7 +192,7 @@ class CertificateServiceImplTest {
         Assertions.assertThrows(InvalidEntityException.class, () -> certificateService.delete(certificateId));
     }
 
-    private Certificate provideCertificate() {
+    private Certificate createCertificate() {
         Certificate certificate = new Certificate();
         certificate.setName("certificate1");
         certificate.setDescription("description1");
@@ -206,7 +204,7 @@ class CertificateServiceImplTest {
         return certificate;
     }
 
-    private CertificateDto provideCertificateDto() {
+    private CertificateDto createCertificateDto() {
         CertificateDto certificateDto = new CertificateDto();
         certificateDto.setName("certificate1");
         certificateDto.setDescription("description1");
@@ -214,7 +212,7 @@ class CertificateServiceImplTest {
         certificateDto.setDuration(Duration.ofDays(1));
         certificateDto.setCreateDate(l);
         certificateDto.setLastUpdateDate(l);
-        certificateDto.setTagList(tagNameList());
+        certificateDto.setTagList(createTagNameList());
 
         return certificateDto;
     }
@@ -231,7 +229,7 @@ class CertificateServiceImplTest {
         return searchParameters;
     }
 
-    private List<Tag> tagList() {
+    private List<Tag> createTagList() {
         List<Tag> tags = new ArrayList<>();
         Tag tag = new Tag();
 
@@ -243,7 +241,7 @@ class CertificateServiceImplTest {
         return tags;
     }
 
-    private List<String> tagNameList() {
+    private List<String> createTagNameList() {
         List<String> tags = new ArrayList<>();
         tags.add("tag1");
 
