@@ -20,6 +20,8 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import static com.epam.esm.controller.ErrorCode.*;
+
 @RestControllerAdvice
 public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 
@@ -43,37 +45,37 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleNoHandlerFoundException(NoHandlerFoundException ex, HttpHeaders headers,
                                                                    HttpStatus status, WebRequest request) {
         String errorMessage = getErrorMessage(RESOURCE_NOT_FOUND_MESSAGE);
-        return buildErrorResponseEntity(HttpStatus.NOT_FOUND, errorMessage, "404");
+        return buildErrorResponseEntity(HttpStatus.NOT_FOUND, errorMessage, CODE_ERROR_404);
     }
 
     @ExceptionHandler(EntityAlreadyExistsException.class)
     public ResponseEntity<Object> entityAlreadyExistsHandle() {
         String errorMessage = getErrorMessage(ENTITY_ALREADY_EXISTS_MESSAGE);
-        return buildErrorResponseEntity(HttpStatus.CONFLICT, errorMessage, "409");
+        return buildErrorResponseEntity(HttpStatus.CONFLICT, errorMessage, CODE_ERROR_409);
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<Object> entityNotFoundExceptionHandle() {
         String errorMessage = getErrorMessage(ENTITY_NOT_FOUND_MESSAGE);
-        return buildErrorResponseEntity(HttpStatus.NOT_FOUND, errorMessage, "404");
+        return buildErrorResponseEntity(HttpStatus.NOT_FOUND, errorMessage, CODE_ERROR_404);
     }
 
     @ExceptionHandler(InvalidEntityException.class)
     public ResponseEntity<Object> invalidEntityExceptionHandle(InvalidEntityException e) {
         String errorMessage = String.format(getErrorMessage(INVALID_MESSAGE), e.getCauseEntity());
-        return buildErrorResponseEntity(HttpStatus.BAD_REQUEST, errorMessage, "400");
+        return buildErrorResponseEntity(HttpStatus.BAD_REQUEST, errorMessage, CODE_ERROR_400);
     }
 
     @ExceptionHandler(DataException.class)
     public ResponseEntity<Object> dataExceptionHandle() {
         String errorMessage = getErrorMessage(ATTACH_DETACH_ERROR_MESSAGE);
-        return buildErrorResponseEntity(HttpStatus.UNPROCESSABLE_ENTITY, errorMessage, "402");
+        return buildErrorResponseEntity(HttpStatus.UNPROCESSABLE_ENTITY, errorMessage, CODE_ERROR_402);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> defaultHandle() {
         String errorMessage = getErrorMessage(INTERNAL_SERVER_ERROR_MESSAGE);
-        return buildErrorResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, errorMessage, "500");
+        return buildErrorResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, errorMessage, CODE_ERROR_500);
     }
 
     private String getErrorMessage(String errorMessageName) {
