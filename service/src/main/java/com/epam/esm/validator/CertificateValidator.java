@@ -43,10 +43,10 @@ public class CertificateValidator {
 
     public void validateSearchCriteriaEmpty(SearchCriteria searchCriteria) {
         if (StringUtils.isNoneEmpty(searchCriteria.getTagName())
-                && StringUtils.isNoneEmpty(searchCriteria.getCertificateName())
-                && StringUtils.isNoneEmpty(searchCriteria.getCertificateDescription())
-                && StringUtils.isNoneEmpty(searchCriteria.getSortByName().name())
-                && StringUtils.isNoneEmpty(searchCriteria.getSortByCreateDate().name())) {
+                && StringUtils.isNotEmpty(searchCriteria.getCertificateName())
+                && StringUtils.isNotEmpty(searchCriteria.getCertificateDescription())
+                && searchCriteria.getSortByName() != null && !StringUtils.isNotEmpty(searchCriteria.getSortByName().toString())
+                && searchCriteria.getSortByCreateDate() != null && !StringUtils.isNotEmpty(searchCriteria.getSortByCreateDate().toString())) {
 
             throw new InvalidEntityException(CertificateValidator.class);
         }

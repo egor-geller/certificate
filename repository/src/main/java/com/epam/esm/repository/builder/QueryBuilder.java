@@ -6,7 +6,6 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import static com.epam.esm.repository.Parameters.*;
@@ -29,17 +28,17 @@ public final class QueryBuilder {
 
         public Builder buildWhereClause(MapSqlParameterSource parameters) {
             List<String> list = new ArrayList<>();
-            if (StringUtils.isNoneEmpty(searchCriteria.getTagName())) {
+            if (StringUtils.isNotEmpty(searchCriteria.getTagName())) {
                 list.add("tag.name = :" + TAG_NAME_PARAMETER);
                 parameters.addValue(TAG_NAME_PARAMETER, this.searchCriteria.getTagName());
             }
 
-            if (StringUtils.isNoneEmpty(searchCriteria.getCertificateName())) {
+            if (StringUtils.isNotEmpty(searchCriteria.getCertificateName())) {
                 list.add("cert.name = :" + NAME_PARAMETER);
                 parameters.addValue(NAME_PARAMETER, this.searchCriteria.getCertificateName());
             }
 
-            if (StringUtils.isNoneEmpty(searchCriteria.getCertificateDescription())) {
+            if (StringUtils.isNotEmpty(searchCriteria.getCertificateDescription())) {
                 list.add("cert.description = :" + DESCRIPTION_PARAMETER);
                 parameters.addValue(DESCRIPTION_PARAMETER, this.searchCriteria.getCertificateDescription());
             }
@@ -47,17 +46,10 @@ public final class QueryBuilder {
             StringBuilder stringBuilder = new StringBuilder();
             if (!list.isEmpty()) {
                 stringBuilder.append("WHERE ");
-                Iterator<String> iterator = list.iterator();
-                while (iterator.hasNext()) {
-                    String next = iterator.next();
-                    stringBuilder.append(next);
 
-                    if (iterator.hasNext()) {
-                        stringBuilder.append(" AND ");
-                    }
-                }
+                String collect = String.join(" AND ", list);
+                stringBuilder.append(collect);
             }
-
 
             this.findBy = stringBuilder.toString();
             this.parameters = parameters;
@@ -77,15 +69,9 @@ public final class QueryBuilder {
             StringBuilder stringBuilder = new StringBuilder();
             if (!orderOf.isEmpty()) {
                 stringBuilder.append(" ORDER BY ");
-                Iterator<String> iterator = orderOf.iterator();
-                while (iterator.hasNext()) {
-                    String next = iterator.next();
-                    stringBuilder.append(next);
 
-                    if (iterator.hasNext()) {
-                        stringBuilder.append(" ,");
-                    }
-                }
+                String join = String.join(" ,", orderOf);
+                stringBuilder.append(join);
             }
 
             this.orderBy = stringBuilder.toString();
