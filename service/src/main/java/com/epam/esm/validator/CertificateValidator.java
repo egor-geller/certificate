@@ -3,6 +3,7 @@ package com.epam.esm.validator;
 import com.epam.esm.dto.CertificateDto;
 import com.epam.esm.exception.InvalidEntityException;
 import com.epam.esm.repository.SearchCriteria;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -41,12 +42,12 @@ public class CertificateValidator {
     }
 
     public void validateSearchCriteriaEmpty(SearchCriteria searchCriteria) {
+        if (StringUtils.isNoneEmpty(searchCriteria.getTagName())
+                && StringUtils.isNoneEmpty(searchCriteria.getCertificateName())
+                && StringUtils.isNoneEmpty(searchCriteria.getCertificateDescription())
+                && StringUtils.isNoneEmpty(searchCriteria.getSortByName().name())
+                && StringUtils.isNoneEmpty(searchCriteria.getSortByCreateDate().name())) {
 
-        if (searchCriteria.getTagName() != null && searchCriteria.getTagName().isEmpty()
-                && searchCriteria.getCertificateName() != null && searchCriteria.getCertificateName().isEmpty()
-                && searchCriteria.getCertificateDescription() != null && searchCriteria.getCertificateDescription().isEmpty()
-                && searchCriteria.getSortByName() != null && searchCriteria.getSortByName().toString().isEmpty()
-                && searchCriteria.getSortByCreateDate() != null && searchCriteria.getSortByCreateDate().toString().isEmpty()) {
             throw new InvalidEntityException(CertificateValidator.class);
         }
     }

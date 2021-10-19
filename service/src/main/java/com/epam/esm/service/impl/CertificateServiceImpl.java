@@ -15,6 +15,7 @@ import com.epam.esm.validator.CertificateValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 import java.util.Optional;
@@ -74,14 +75,14 @@ public class CertificateServiceImpl implements CertificateService {
     @Override
     public boolean detachTagFromCertificate(long certificateId, long tagId) {
         if (certificateId < 1 || tagId < 1) {
-            throw new EntityNotFoundException(certificateId ,tagId);
+            throw new EntityNotFoundException(certificateId, tagId);
         }
 
         SearchCriteria searchCriteria = new SearchCriteria();
         Optional<Tag> tag = tagRepository.findById(tagId);
         searchCriteria.setTagName(tag.toString());
         List<Certificate> certificateList = certificateRepository.find(searchCriteria);
-        if (certificateList == null || certificateList.isEmpty()) {
+        if (CollectionUtils.isEmpty(certificateList)) {
             tagRepository.delete(tagId);
         }
 
