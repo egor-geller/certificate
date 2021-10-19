@@ -1,6 +1,7 @@
 package com.epam.esm.repository.builder;
 
 import com.epam.esm.repository.SearchCriteria;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Component;
 
@@ -28,17 +29,17 @@ public final class QueryBuilder {
 
         public Builder buildWhereClause(MapSqlParameterSource parameters) {
             List<String> list = new ArrayList<>();
-            if (this.searchCriteria.getTagName() != null && !this.searchCriteria.getTagName().isEmpty()) {
+            if (StringUtils.isNoneEmpty(searchCriteria.getTagName())) {
                 list.add("tag.name = :" + TAG_NAME_PARAMETER);
                 parameters.addValue(TAG_NAME_PARAMETER, this.searchCriteria.getTagName());
             }
 
-            if (this.searchCriteria.getCertificateName() != null && !this.searchCriteria.getCertificateName().isEmpty()) {
+            if (StringUtils.isNoneEmpty(searchCriteria.getCertificateName())) {
                 list.add("cert.name = :" + NAME_PARAMETER);
                 parameters.addValue(NAME_PARAMETER, this.searchCriteria.getCertificateName());
             }
 
-            if (this.searchCriteria.getCertificateDescription() != null && !this.searchCriteria.getCertificateDescription().isEmpty()) {
+            if (StringUtils.isNoneEmpty(searchCriteria.getCertificateDescription())) {
                 list.add("cert.description = :" + DESCRIPTION_PARAMETER);
                 parameters.addValue(DESCRIPTION_PARAMETER, this.searchCriteria.getCertificateDescription());
             }
