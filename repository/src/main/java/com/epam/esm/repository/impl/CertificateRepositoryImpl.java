@@ -11,9 +11,12 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import static com.epam.esm.repository.Parameters.*;
@@ -60,7 +63,7 @@ public class CertificateRepositoryImpl implements CertificateRepository {
         try {
             update = namedParameterJdbcTemplate.update(INSERT_TAG_TO_CERTIFICATE, parameterSource);
         } catch (DataAccessException e) {
-            throw new DataException(e, tagId, certificateId);
+            throw new DataException(tagId, certificateId);
         }
         return update > 0;
     }
@@ -75,36 +78,36 @@ public class CertificateRepositoryImpl implements CertificateRepository {
         try {
             update = namedParameterJdbcTemplate.update(DELETE_TAG_FROM_CERTIFICATE, parameterSource);
         } catch (DataAccessException e) {
-            throw new DataException(e, tagId, certificateId);
+            throw new DataException(tagId, certificateId);
         }
         return update > 0;
     }
 
     @Override
-    public void create(Certificate certificate) {
+    public Long create(Certificate certificate) {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
         SqlParameterSource parameterSource = new MapSqlParameterSource()
                 .addValue(NAME_PARAMETER, certificate.getName())
                 .addValue(DESCRIPTION_PARAMETER, certificate.getDescription())
                 .addValue(PRICE_PARAMETER, certificate.getPrice())
-                .addValue(DURATION_PARAMETER, certificate.getDuration().toDays())
-                .addValue(CREATE_DATE_PARAMETER, certificate.getCreateDate())
-                .addValue(LAST_UPDATE_PARAMETER, certificate.getLastUpdateDate());
+                .addValue(DURATION_PARAMETER, certificate.getDuration().toDays());
 
-        namedParameterJdbcTemplate.update(INSERT_CERTIFICATE, parameterSource);
+        namedParameterJdbcTemplate.update(INSERT_CERTIFICATE, parameterSource, keyHolder);
+        Number key = Objects.requireNonNull(keyHolder).getKey();
+        return Objects.requireNonNull(key).longValue();
     }
 
     @Override
-    public boolean update(Certificate certificate) {
+    public Long update(Certificate certificate) {
         SqlParameterSource parameterSource = new MapSqlParameterSource()
                 .addValue(ID_PARAMETER, certificate.getId())
                 .addValue(NAME_PARAMETER, certificate.getName())
                 .addValue(DESCRIPTION_PARAMETER, certificate.getDescription())
                 .addValue(PRICE_PARAMETER, certificate.getPrice())
-                .addValue(DURATION_PARAMETER, certificate.getDuration().toDays())
-                .addValue(CREATE_DATE_PARAMETER, certificate.getCreateDate())
-                .addValue(LAST_UPDATE_PARAMETER, certificate.getLastUpdateDate());
+                .addValue(DURATION_PARAMETER, certificate.getDuration().toDays());
 
-        return namedParameterJdbcTemplate.update(UPDATE_CERTIFICATE, parameterSource) > 0;
+        namedParameterJdbcTemplate.update(UPDATE_CERTIFICATE, parameterSource);
+        return certificate.getId();
     }
 
     @Override

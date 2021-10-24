@@ -8,6 +8,7 @@ import com.epam.esm.exception.InvalidEntityException;
 import com.epam.esm.service.impl.TagServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,7 +21,7 @@ import java.util.List;
  * @author Egor Geller
  */
 @RestController
-@RequestMapping("/api/v3/tags")
+@RequestMapping("/api/v1/tags")
 public class TagController {
 
     private final TagServiceImpl tagService;
@@ -63,28 +64,26 @@ public class TagController {
      * Create new tag entity.
      *
      * @param tagDto {@link TagDto} instance
-     * @return JSON {@link ResponseEntity} object that contains status {@code HttpStatus.CREATED}
+     * @return JSON {@link ResponseEntity} object that contains status {@code HttpStatus.CREATED} and {@link TagDto} object
      * @throws InvalidEntityException       when the content of {@link TagDto} instance is not correctly written
      * @throws EntityAlreadyExistsException when {@link Tag} entity is already exists
      */
-    @PostMapping
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> createTag(@RequestBody TagDto tagDto) {
-        tagService.create(tagDto);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        TagDto tag = tagService.create(tagDto);
+        return new ResponseEntity<>(tag, HttpStatus.CREATED);
     }
 
     /**
      * Delete existing tag.
      *
      * @param id tag id
-     * @return {@code HttpStatus.OK} and {@code True} when entity has been deleted, otherwise,
-     * {@code HttpStatus.NOT_MODIFIED} and {@code False}
+     * @return {@code HttpStatus.NO_CONTENT} when entity has been deleted
      * @throws InvalidEntityException when id is not written correctly
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Object> deleteTag(@PathVariable("id") Long id) {
-        boolean hasBeenDeleted = tagService.delete(id);
-        return hasBeenDeleted ? new ResponseEntity<>(hasBeenDeleted, HttpStatus.OK)
-                : new ResponseEntity<>(hasBeenDeleted, HttpStatus.NOT_MODIFIED);
+        tagService.delete(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

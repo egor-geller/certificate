@@ -4,6 +4,7 @@ import com.epam.esm.dto.TagDto;
 import com.epam.esm.dto.mapper.TagServiceMapper;
 import com.epam.esm.entity.Certificate;
 import com.epam.esm.entity.Tag;
+import com.epam.esm.exception.AttachedTagException;
 import com.epam.esm.exception.EntityAlreadyExistsException;
 import com.epam.esm.exception.EntityNotFoundException;
 import com.epam.esm.repository.SearchCriteria;
@@ -45,6 +46,7 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public TagDto findTagById(Long id) {
+        tagValidator.validateId(id);
         Tag tag = tagRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(id));
         return tagServiceMapper.convertTagToDto(tag);
@@ -61,37 +63,43 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public void create(TagDto tag) {
-        tagValidator.validateTagValid(tag.getName());
+    public TagDto create(TagDto tagDto) {
+        tagValidator.validateTagValid(tagDto.getName());
 
-        Tag fromTagDto = tagServiceMapper.convertTagFromDto(tag);
+        Tag fromTagDto = tagServiceMapper.convertTagFromDto(tagDto);
 
         Optional<Tag> maybeFoundTag = tagRepository.findByName(fromTagDto.getName());
         if (maybeFoundTag.isPresent()) {
             throw new EntityAlreadyExistsException();
         }
 
-        tagRepository.create(fromTagDto);
+        Long tagId = tagRepository.create(fromTagDto);
+        Optional<Tag> tag = tagRepository.findById(tagId);
+        if (tag.isEmpty()) {
+            throw new EntityNotFoundException(tagId);
+        }
+        return tagServiceMapper.convertTagToDto(tag.get());
     }
 
     @Override
-    public boolean update(TagDto tagDto) {
+    public TagDto update(TagDto tagDto) {
         throw new UnsupportedOperationException();
     }
 
     @Override
     public boolean delete(Long id) {
-        if (id == null || id < 1) {
-            throw new EntityNotFoundException(id);
-        }
+        tagValidator.validateId(id);
 
         SearchCriteria searchCriteria = new SearchCriteria();
         Optional<Tag> tagById = tagRepository.findById(id);
-        searchCriteria.setTagName(tagById.toString());
+        if (tagById.isEmpty()) {
+            throw new EntityNotFoundException(id);
+        }
+        tagById.ifPresent(tag -> searchCriteria.setTagName(tag.getName()));
         List<Certificate> certificateList = certificateRepository.find(searchCriteria);
 
-        if (!certificateList.isEmpty()){
-            throw new EntityAlreadyExistsException();
+        if (!certificateList.isEmpty()) {
+            throw new AttachedTagException(tagById.get().getId(), tagById.get().getName());
         }
 
         return tagRepository.delete(id);

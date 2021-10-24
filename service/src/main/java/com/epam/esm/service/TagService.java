@@ -8,7 +8,6 @@ import com.epam.esm.exception.InvalidEntityException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Interface that provides functionality for manipulating {@link Tag} entity.
@@ -29,7 +28,7 @@ public interface TagService extends EntityService<TagDto> {
      * Fina a tag by its unique Id
      *
      * @param id id of a tag
-     * @return {@link Optional} of {@link Tag} entity.
+     * @return {@link TagDto} entity.
      * @throws EntityNotFoundException when there is no such entity
      */
     TagDto findTagById(Long id);
@@ -38,7 +37,7 @@ public interface TagService extends EntityService<TagDto> {
      * Find a tag by its name
      *
      * @param tagName name of the tag
-     * @return {@link Optional} of {@link Tag} entity.
+     * @return {@link TagDto} entity.
      * @throws EntityNotFoundException when there is no such entity
      * @throws InvalidEntityException  when the name of the tag is not correctly written
      */
@@ -48,10 +47,11 @@ public interface TagService extends EntityService<TagDto> {
      * Create a new tag
      *
      * @param tag {@link Tag} entity.
+     * @return {@link TagDto} entity.
      * @throws EntityAlreadyExistsException when {@link Tag} already exists
      * @throws InvalidEntityException       when {@link Tag} is not correctly written
      */
-    void create(TagDto tag);
+    TagDto create(TagDto tag);
 
     /**
      * Delete a tag

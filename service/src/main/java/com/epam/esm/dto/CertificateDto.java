@@ -1,7 +1,12 @@
 package com.epam.esm.dto;
 
+import com.epam.esm.dto.mapper.DayDurationDeserializer;
+import com.epam.esm.dto.mapper.DayDurationSerializer;
 import com.epam.esm.entity.Certificate;
+import com.epam.esm.entity.Tag;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import java.math.BigDecimal;
 import java.time.Duration;
@@ -14,6 +19,9 @@ public class CertificateDto {
     private String name;
     private String description;
     private BigDecimal price;
+
+    @JsonSerialize(using = DayDurationSerializer.class)
+    @JsonDeserialize(using = DayDurationDeserializer.class)
     private Duration duration;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING,
@@ -26,11 +34,12 @@ public class CertificateDto {
             timezone = "UTC")
     private ZonedDateTime lastUpdateDate;
 
-    private List<String> tagList;
+    private List<Tag> tagList;
 
     public CertificateDto(){}
 
-    public CertificateDto(Certificate certificate, List<String> tagList) {
+    public CertificateDto(Certificate certificate, List<Tag> tagList) {
+        this.id = certificate.getId();
         this.name = certificate.getName();
         this.description = certificate.getDescription();
         this.price = certificate.getPrice();
@@ -96,18 +105,19 @@ public class CertificateDto {
         this.lastUpdateDate = lastUpdateDate;
     }
 
-    public List<String> getTagList() {
+    public List<Tag> getTagList() {
         return tagList;
     }
 
-    public void setTagList(List<String> tagList) {
+    public void setTagList(List<Tag> tagList) {
         this.tagList = tagList;
     }
 
     @Override
     public String toString() {
         return "CertificateDto{" +
-                "name='" + name + '\'' +
+                "id=" + id +
+                ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", price=" + price +
                 ", duration=" + duration +

@@ -7,6 +7,7 @@ import com.epam.esm.repository.SearchCriteria;
 import com.epam.esm.service.CertificateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,7 +20,7 @@ import java.util.List;
  * @author Egor Geller
  */
 @RestController
-@RequestMapping("/api/v3/certificates")
+@RequestMapping("/api/v1/certificates")
 public class CertificateController {
 
     private final CertificateService certificateService;
@@ -66,10 +67,10 @@ public class CertificateController {
      * @param certificateDto {@link CertificateDto} instance
      * @return JSON {@link ResponseEntity} object that contains created {@link CertificateDto} object
      */
-    @PostMapping
-    public ResponseEntity<Void> createCertificate(@RequestBody CertificateDto certificateDto) {
-        certificateService.create(certificateDto);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<CertificateDto> createCertificate(@RequestBody CertificateDto certificateDto) {
+        CertificateDto certificate = certificateService.create(certificateDto);
+        return new ResponseEntity<>(certificate, HttpStatus.CREATED);
     }
 
     /**
@@ -80,26 +81,53 @@ public class CertificateController {
      * @return JSON {@link ResponseEntity} object that contains updated {@link CertificateDto} object
      * @throws InvalidEntityException in case when passed DTO object contains invalid data
      */
-    @PatchMapping("/{id}")
-    public ResponseEntity<Boolean> updateCertificate(@PathVariable("id") Long id,
+    @PatchMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<CertificateDto> updateCertificate(@PathVariable("id") Long id,
                                                      @RequestBody CertificateDto certificateDto) {
         certificateDto.setId(id);
-        boolean hasBeenUpdated = certificateService.update(certificateDto);
-        return hasBeenUpdated ? new ResponseEntity<>(hasBeenUpdated, HttpStatus.OK)
-                : new ResponseEntity<>(hasBeenUpdated, HttpStatus.NOT_MODIFIED);
+        CertificateDto update = certificateService.update(certificateDto);
+        return new ResponseEntity<>(update, HttpStatus.OK);
+    }
+
+    /**
+     * Attach tag to certificate entity.
+     *
+     * @param tagId  the tag id
+     * @param certId the certificate id
+     * @return {@code HttpStatus.NO_CONTENT} when entity has been attached
+     */
+    @PostMapping("/{certId}/tag/{tagId}")
+    public ResponseEntity<Boolean> attachTagToCertificate(@PathVariable("tagId") Long tagId,
+                                                          @PathVariable("certId") Long certId) {
+
+        certificateService.attachTagToCertificate(certId, tagId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    /**
+     * Detach tag from certificate entity.
+     *
+     * @param tagId  the tag id
+     * @param certId the certificate id
+     * @return {@code HttpStatus.NO_CONTENT} when entity has been detached
+     */
+    @DeleteMapping("/{certId}/tag/{tagId}")
+    public ResponseEntity<Boolean> detachTagFromCertificate(@PathVariable("tagId") Long tagId,
+                                                          @PathVariable("certId") Long certId) {
+
+        certificateService.detachTagFromCertificate(certId, tagId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     /**
      * Delete an existing {@link Certificate} entity.
      *
      * @param id certificate id
-     * @return {@code HttpStatus.OK} and {@code True} when entity has been deleted, otherwise,
-     * {@code HttpStatus.NOT_MODIFIED} and {@code False}
+     * @return {@code HttpStatus.NO_CONTENT} when entity has been deleted
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Boolean> deleteCertificate(@PathVariable("id") Long id) {
-        boolean hasBeenDeleted = certificateService.delete(id);
-        return hasBeenDeleted ? new ResponseEntity<>(hasBeenDeleted, HttpStatus.OK)
-                : new ResponseEntity<>(hasBeenDeleted, HttpStatus.NOT_MODIFIED);
+        certificateService.delete(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

@@ -12,6 +12,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import static com.epam.esm.repository.Parameters.*;
@@ -60,11 +61,13 @@ public class TagRepositoryImpl implements TagRepository {
     }
 
     @Override
-    public void create(Tag tag) {
+    public Long create(Tag tag) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         SqlParameterSource mapSqlParameterSource = new MapSqlParameterSource().addValue(NAME_PARAMETER, tag.getName());
 
         namedParameterJdbcTemplate.update(INSERT_TAG, mapSqlParameterSource, keyHolder);
+        Number key = Objects.requireNonNull(keyHolder).getKey();
+        return Objects.requireNonNull(key).longValue();
     }
 
     @Override

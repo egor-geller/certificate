@@ -18,6 +18,7 @@ import java.util.Optional;
  */
 @Service
 public interface CertificateService extends EntityService<CertificateDto> {
+
     /**
      * Retrieve certificates according to specified parameters. All parameters are optional
      * and can be used in conjunction, if they are not present, all certificates will be retrieved
@@ -64,7 +65,7 @@ public interface CertificateService extends EntityService<CertificateDto> {
      * @throws EntityAlreadyExistsException when {@link Certificate} already exists
      * @throws InvalidEntityException       when {@link Certificate} is not correctly written
      */
-    void create(CertificateDto certificate);
+    CertificateDto create(CertificateDto certificate);
 
     /**
      * Update an existing certificate.
@@ -73,7 +74,7 @@ public interface CertificateService extends EntityService<CertificateDto> {
      * @return {@code true} if {@link Certificate} was updated, otherwise {@code false}
      * @throws InvalidEntityException when {@link Certificate} is not correctly written
      */
-    boolean update(CertificateDto certificate);
+    CertificateDto update(CertificateDto certificate);
 
     /**
      * Delete an existing certificate.

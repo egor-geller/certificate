@@ -1,5 +1,6 @@
 package com.epam.esm.repository.builder;
 
+import com.epam.esm.exception.QueryBuildException;
 import com.epam.esm.repository.SearchCriteria;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -58,19 +59,25 @@ public final class QueryBuilder {
 
         public Builder buildOrderByClause(SearchCriteria searchCriteria) {
             List<String> orderOf = new ArrayList<>();
-            if (searchCriteria.getSortByName() != null) {
-                orderOf.add("cert.name " + searchCriteria.getSortByName().toString());
+            if (StringUtils.isNotEmpty(searchCriteria.getSortByNameOrCreationDate()) || searchCriteria.getOrderType() != null) {
+                if (StringUtils.equalsIgnoreCase(searchCriteria.getSortByNameOrCreationDate(), "name")) {
+                    orderOf.add("cert.name ");
+                } else if (StringUtils.equalsIgnoreCase(searchCriteria.getSortByNameOrCreationDate(), "create_date")) {
+                    orderOf.add("cert.create_date ");
+                } else {
+                    throw new QueryBuildException(searchCriteria.getSortByNameOrCreationDate());
+                }
             }
 
-            if (searchCriteria.getSortByCreateDate() != null) {
-                orderOf.add("cert.create_date " + searchCriteria.getSortByCreateDate().toString());
+            if (searchCriteria.getOrderType() != null) {
+                orderOf.add(searchCriteria.getOrderType().toString());
             }
 
             StringBuilder stringBuilder = new StringBuilder();
             if (!orderOf.isEmpty()) {
                 stringBuilder.append(" ORDER BY ");
 
-                String join = String.join(" ,", orderOf);
+                String join = String.join(" ", orderOf);
                 stringBuilder.append(join);
             }
 

@@ -43,7 +43,7 @@ public interface CertificateRepository extends Repository<Certificate> {
      * Update an existing certificate.
      *
      * @param certificate {@link Certificate} entity.
-     * @return {@code true} if {@link Certificate} was updated, otherwise {@code false}
+     * @return id of {@link Certificate}
      */
-    boolean update(Certificate certificate);
+    Long update(Certificate certificate);
 }

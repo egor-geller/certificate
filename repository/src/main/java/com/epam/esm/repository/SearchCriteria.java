@@ -9,8 +9,8 @@ public class SearchCriteria {
     private String tagName;
     private String certificateName;
     private String certificateDescription;
-    private SortType sortByName;
-    private SortType sortByCreateDate;
+    private String sortByNameOrCreationDate;
+    private SortType orderType;
 
     public String getTagName() {
         return tagName;
@@ -36,20 +36,20 @@ public class SearchCriteria {
         this.certificateDescription = certificateDescription;
     }
 
-    public SortType getSortByName() {
-        return sortByName;
+    public String getSortByNameOrCreationDate() {
+        return sortByNameOrCreationDate;
     }
 
-    public void setSortByName(SortType sortByName) {
-        this.sortByName = sortByName;
+    public void setSortByNameOrCreationDate(String sortByNameOrCreationDate) {
+        this.sortByNameOrCreationDate = sortByNameOrCreationDate;
     }
 
-    public SortType getSortByCreateDate() {
-        return sortByCreateDate;
+    public SortType getOrderType() {
+        return orderType;
     }
 
-    public void setSortByCreateDate(SortType sortByCreateDate) {
-        this.sortByCreateDate = sortByCreateDate;
+    public void setOrderType(SortType orderType) {
+        this.orderType = orderType;
     }
 
     @Override
@@ -59,12 +59,12 @@ public class SearchCriteria {
         SearchCriteria that = (SearchCriteria) o;
         return tagName.equals(that.tagName) && certificateName.equals(that.certificateName)
                 && certificateDescription.equals(that.certificateDescription)
-                && sortByName == that.sortByName && sortByCreateDate == that.sortByCreateDate;
+                && sortByNameOrCreationDate.equals(that.sortByNameOrCreationDate) && orderType == that.orderType;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(tagName, certificateName, certificateDescription, sortByName, sortByCreateDate);
+        return Objects.hash(tagName, certificateName, certificateDescription, sortByNameOrCreationDate, orderType);
     }
 
     @Override
@@ -73,8 +73,8 @@ public class SearchCriteria {
                 "tagName='" + tagName + '\'' +
                 ", certificateName='" + certificateName + '\'' +
                 ", certificateDescription='" + certificateDescription + '\'' +
-                ", sortByName=" + sortByName +
-                ", sortByCreateDate=" + sortByCreateDate +
+                ", sortByNameOrCreationDate='" + sortByNameOrCreationDate + '\'' +
+                ", orderType=" + orderType +
                 '}';
     }
 }

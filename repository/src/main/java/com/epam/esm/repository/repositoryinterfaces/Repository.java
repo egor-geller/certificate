@@ -24,8 +24,9 @@ public interface Repository<T> {
      * Create a new certificate or tag.
      *
      * @param t {@link Certificate} or {@link Tag} instance
+     * @return id of {@link Certificate} or {@link Tag}
      */
-    void create(T t);
+    Long create(T t);
 
     /**
      * Delete a tag

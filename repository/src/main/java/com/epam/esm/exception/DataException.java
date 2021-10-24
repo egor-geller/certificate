@@ -1,10 +1,20 @@
 package com.epam.esm.exception;
 
-import java.util.Arrays;
+public class DataException extends RuntimeException {
 
-public class DataException extends RuntimeException{
+    private final Long tagId;
+    private final Long certificateId;
 
-    public DataException(Throwable cause, long... id) {
-        super(Arrays.toString(id), cause);
+    public DataException(Long tagId, Long certificateId) {
+        this.tagId = tagId;
+        this.certificateId = certificateId;
+    }
+
+    public Long getTagId() {
+        return tagId;
+    }
+
+    public Long getCertificateId() {
+        return certificateId;
     }
 }
