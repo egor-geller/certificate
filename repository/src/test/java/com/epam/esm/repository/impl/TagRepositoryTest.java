@@ -1,7 +1,6 @@
 package com.epam.esm.repository.impl;
 
 import com.epam.esm.config.DatabaseConfiguration;
-import com.epam.esm.entity.Certificate;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.repository.repositoryinterfaces.TagRepository;
 import org.junit.jupiter.api.Test;
@@ -51,32 +50,38 @@ class TagRepositoryTest {
     @Test
     void createTest() {
         Tag tag = new Tag();
-        tag.setName("tag2");
+        tag.setName("tag21");
         Optional<Tag> expectedTag = tagRepository.findByName(tag.getName());
         assertEquals(expectedTag, Optional.empty());
 
-        tagRepository.create(tag);
+        Long aLong = tagRepository.create(tag);
+        tag.setId(aLong);
         Optional<Tag> expectedTagAfterCreation = tagRepository.findByName(tag.getName());
         assertEquals(expectedTagAfterCreation, Optional.of(tag));
     }
 
     @Test
     void deleteTest() {
-        boolean delete = tagRepository.delete(2L);
+        boolean delete = tagRepository.delete(17L);
         assertTrue(delete);
     }
 
     private List<Tag> tagList() {
         List<Tag> tags = new ArrayList<>();
         Tag tag = new Tag();
-        tag.setName("tag1");
+        tag.setId(6L);
+        tag.setName("content1");
         tags.add(tag);
+        Tag tag1 = new Tag();
+        tag1.setId(12L);
+        tag1.setName("tag1");
+        tags.add(tag1);
         return tags;
     }
 
     private Tag tag() {
         Tag tag = new Tag();
-        tag.setId(1L);
+        tag.setId(12L);
         tag.setName("tag1");
         return tag;
     }

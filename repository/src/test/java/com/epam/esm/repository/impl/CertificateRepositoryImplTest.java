@@ -64,60 +64,64 @@ class CertificateRepositoryImplTest {
                         && certificate1.getDescription().equals(certificateDescription)
                 );
 
-        assertTrue(allMatch && certificateList.size() == 1);
+        assertTrue(allMatch && certificateList.size() > 0);
     }
 
     @Test
     void findByNameParamTest() {
         searchCriteria.setCertificateName(certificateName);
         List<Certificate> certificateList = certificate.find(searchCriteria);
+        List<Certificate> list = certificateList.stream().distinct().collect(Collectors.toList());
 
-        boolean allMatch = certificateList.stream()
+        boolean allMatch = list.stream()
                 .allMatch(certificate1 -> certificate1.getName().equals(certificateName)
                         && certificate1.getDescription().equals(certificateDescription));
 
-        assertTrue(allMatch && certificateList.size() == 1);
+        assertTrue(allMatch && list.size() == 1);
     }
 
     @Test
     void findByDescriptionParamTest() {
         searchCriteria.setCertificateDescription(certificateDescription);
         List<Certificate> certificateList = certificate.find(searchCriteria);
-
-        boolean allMatch = certificateList.stream()
+        List<Certificate> list = certificateList.stream().distinct().collect(Collectors.toList());
+        boolean allMatch = list.stream()
                 .allMatch(certificate1 -> certificate1.getName().equals(certificateName)
                         && certificate1.getDescription().equals(certificateDescription));
 
-        assertTrue(allMatch && certificateList.size() == 1);
+        assertTrue(allMatch && list.size() == 1);
     }
 
     @Test
     void sortByNameAscTest() {
-        searchCriteria.setSortByName(SortType.ASC);
-        List<Certificate> certificateList = certificate.find(searchCriteria);
-
-        List<Certificate> actual = certificateList.stream()
-                .sorted(Comparator.comparing(Certificate::getName))
-                .collect(Collectors.toList());
-
-        assertEquals(certificateList.get(0), actual.get(actual.size() - 1));
-    }
-
-    @Test
-    void sortByNameDescTest() {
-        searchCriteria.setSortByName(SortType.DESC);
+        searchCriteria.setSortByNameOrCreationDate("name");
+        searchCriteria.setOrderType(SortType.ASC);
         List<Certificate> certificateList = certificate.find(searchCriteria);
 
         List<Certificate> actual = certificateList.stream()
                 .sorted(Collections.reverseOrder(Comparator.comparing(Certificate::getName)))
                 .collect(Collectors.toList());
 
-        assertEquals(certificateList.get(certificateList.size() - 1), actual.get(0));
+        assertEquals(certificateList.get(certificateList.size() - 1), actual.get(actual.size() -1));
+    }
+
+    @Test
+    void sortByNameDescTest() {
+        searchCriteria.setSortByNameOrCreationDate("name");
+        searchCriteria.setOrderType(SortType.DESC);
+        List<Certificate> certificateList = certificate.find(searchCriteria);
+
+        List<Certificate> actual = certificateList.stream()
+                .sorted(Comparator.comparing(Certificate::getName))
+                .collect(Collectors.toList());
+
+        assertEquals(certificateList.get(0), actual.get(0));
     }
 
     @Test
     void sortByCreateDateAscTest() {
-        searchCriteria.setSortByCreateDate(SortType.ASC);
+        searchCriteria.setSortByNameOrCreationDate("create_date");
+        searchCriteria.setOrderType(SortType.ASC);
         List<Certificate> certificateList = certificate.find(searchCriteria);
 
         List<Certificate> actual = certificateList.stream()
@@ -129,7 +133,8 @@ class CertificateRepositoryImplTest {
 
     @Test
     void sortByCreateDateDescTest() {
-        searchCriteria.setSortByCreateDate(SortType.DESC);
+        searchCriteria.setSortByNameOrCreationDate("create_date");
+        searchCriteria.setOrderType(SortType.DESC);
         List<Certificate> certificateList = certificate.find(searchCriteria);
 
         List<Certificate> actual = certificateList.stream()
@@ -140,26 +145,12 @@ class CertificateRepositoryImplTest {
     }
 
     @Test
-    void sortByCreateDateAscAndNameInDescTest() {
-        searchCriteria.setSortByName(SortType.ASC);
-        searchCriteria.setSortByCreateDate(SortType.DESC);
-        List<Certificate> certificateList = certificate.find(searchCriteria);
-
-        List<Certificate> actual = certificateList.stream()
-                .sorted(Comparator.comparing(Certificate::getName))
-                .sorted(Collections.reverseOrder(Comparator.comparing(Certificate::getCreateDate)))
-                .collect(Collectors.toList());
-
-        assertEquals(certificateList.get(0), actual.get(actual.size() - 1));
-    }
-
-    @Test
     void findByNameAndSortAscTest() {
         searchCriteria.setTagName(tagName);
         searchCriteria.setCertificateName(certificateName);
         searchCriteria.setCertificateDescription(certificateDescription);
-        searchCriteria.setSortByName(SortType.ASC);
-        searchCriteria.setSortByCreateDate(SortType.ASC);
+        searchCriteria.setSortByNameOrCreationDate("name");
+        searchCriteria.setOrderType(SortType.ASC);
 
         List<Certificate> certificateList = certificate.find(searchCriteria);
 
@@ -183,19 +174,22 @@ class CertificateRepositoryImplTest {
     }
 
     @Test
-    void attachTagTest() {
-        certificate.attachTag(25, 1);
+    void detachTagTest() {
+        certificate.detachTag(25, 6);
         List<Tag> tags = tag.findByCertificateId(25L);
-
-        assertEquals(1, tags.size());
+        tags.forEach(tag -> assertNotEquals(6, tag.getId()));
     }
 
     @Test
-    void detachTagTest() {
-        certificate.detachTag(1, 1);
-        List<Tag> tags = tag.findByCertificateId(1L);
-
-        assertTrue(tags.isEmpty());
+    void attachTagTest() {
+        certificate.attachTag(25, 14);
+        List<Tag> tags = tag.findByCertificateId(25L);
+        System.out.println(tags);
+        tags.forEach(tag -> {
+            if (tag.getId() == 14) {
+                assertEquals(14, tag.getId());
+            }
+        });
     }
 
     @Test
@@ -217,19 +211,9 @@ class CertificateRepositoryImplTest {
 
         certificateById.orElseThrow().setName("Coca-Cola");
 
-        boolean result = certificate.update(certificateById.get());
+        Long update = certificate.update(certificateById.get());
 
-        assertTrue(result);
-    }
-
-    @Test
-    void updateNotFoundTest() {
-        Optional<Certificate> certificateById = certificate.findById(25L);
-        certificateById.get().setId(0);
-
-        boolean result = certificate.update(certificateById.get());
-
-        assertFalse(result);
+        assertEquals(25L, update);
     }
 
     @Test
@@ -245,21 +229,20 @@ class CertificateRepositoryImplTest {
 
         assertFalse(result);
     }
-
     private SearchCriteria criteriaToSearchWithASC() {
         Map<String, String> map = new HashMap<>();
         SearchCriteria searchCriteria = new SearchCriteria();
         searchCriteria.setTagName(tagName);
         searchCriteria.setCertificateName(certificateName);
         searchCriteria.setCertificateDescription(certificateDescription);
-        searchCriteria.setSortByName(SortType.ASC);
-        searchCriteria.setSortByCreateDate(SortType.ASC);
+        searchCriteria.setSortByNameOrCreationDate("name");
+        searchCriteria.setOrderType(SortType.ASC);
 
         map.put(tagName, tagName);
         map.put(certificateName, certificateName);
         map.put(certificateDescription, certificateDescription);
-        map.put("sortByNameASC", SortType.ASC.name());
-        map.put("sortByCreateDateASC", SortType.ASC.name());
+        map.put("sortByName", searchCriteria.getSortByNameOrCreationDate());
+        map.put("orderType", SortType.ASC.name());
 
         return searchCriteria;
     }
@@ -269,8 +252,8 @@ class CertificateRepositoryImplTest {
         searchCriteria.setTagName(tagName);
         searchCriteria.setCertificateName(certificateName);
         searchCriteria.setCertificateDescription(certificateDescription);
-        searchCriteria.setSortByName(SortType.DESC);
-        searchCriteria.setSortByCreateDate(SortType.DESC);
+        searchCriteria.setSortByNameOrCreationDate("name");
+        searchCriteria.setOrderType(SortType.DESC);
         return searchCriteria;
     }
 }
