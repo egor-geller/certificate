@@ -2,13 +2,18 @@ package com.epam.esm.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.Objects;
 
+@Entity
+@Table(name = "gift_certificate")
 public class Certificate {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     private String name;
     private String description;
@@ -24,6 +29,11 @@ public class Certificate {
             pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX",
             timezone = "UTC")
     private ZonedDateTime lastUpdateDate;
+
+    @ManyToMany
+    @JoinTable(name = "gift_certificate_has_tag",
+            joinColumns = @JoinColumn(name = "gift_certificate_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id"))
 
     public long getId() {
         return id;
