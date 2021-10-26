@@ -12,6 +12,7 @@ allprojects {
         implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: jacksonVersion
         implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: jacksonVersion
         implementation group: 'org.apache.commons', name: 'commons-lang3', version: apacheCommon
+        implementation group: 'org.hibernate', name: 'hibernate-gradle-plugin', version: hibernateVersion
 
         testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: junitVersion
         testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: junitVersion
