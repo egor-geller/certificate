@@ -1,0 +1,13 @@
+plugins {
+    id 'war'
+}
+
+dependencies {
+    implementation project(":model")
+    implementation project(":repository")
+    implementation project(":service")
+
+    compileOnly group: 'javax.servlet', name: 'javax.servlet-api', version: '4.0.1'
+    implementation group: 'org.springframework', name: 'spring-web', version: '5.3.10'
+    implementation group: 'org.springframework', name: 'spring-webmvc', version: '5.3.10'
+}
