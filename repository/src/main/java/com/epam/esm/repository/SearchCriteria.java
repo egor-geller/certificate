@@ -1,23 +1,25 @@
 package com.epam.esm.repository;
 
+import com.epam.esm.entity.Tag;
 import com.epam.esm.repository.builder.SortType;
 
+import java.util.List;
 import java.util.Objects;
 
 public class SearchCriteria {
 
-    private String tagName;
+    private List<Tag> tagList;
     private String certificateName;
     private String certificateDescription;
-    private String sortByNameOrCreationDate;
+    private String sortByParameter;
     private SortType orderType;
 
-    public String getTagName() {
-        return tagName;
+    public List<Tag> getTagList() {
+        return tagList;
     }
 
-    public void setTagName(String tagName) {
-        this.tagName = tagName;
+    public void setTagList(List<Tag> tagList) {
+        this.tagList = tagList;
     }
 
     public String getCertificateName() {
@@ -36,12 +38,12 @@ public class SearchCriteria {
         this.certificateDescription = certificateDescription;
     }
 
-    public String getSortByNameOrCreationDate() {
-        return sortByNameOrCreationDate;
+    public String getSortByParameter() {
+        return sortByParameter;
     }
 
-    public void setSortByNameOrCreationDate(String sortByNameOrCreationDate) {
-        this.sortByNameOrCreationDate = sortByNameOrCreationDate;
+    public void setSortByParameter(String sortByParameter) {
+        this.sortByParameter = sortByParameter;
     }
 
     public SortType getOrderType() {
@@ -57,23 +59,23 @@ public class SearchCriteria {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         SearchCriteria that = (SearchCriteria) o;
-        return tagName.equals(that.tagName) && certificateName.equals(that.certificateName)
+        return tagList.equals(that.tagList) && certificateName.equals(that.certificateName)
                 && certificateDescription.equals(that.certificateDescription)
-                && sortByNameOrCreationDate.equals(that.sortByNameOrCreationDate) && orderType == that.orderType;
+                && sortByParameter.equals(that.sortByParameter) && orderType == that.orderType;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(tagName, certificateName, certificateDescription, sortByNameOrCreationDate, orderType);
+        return Objects.hash(tagList, certificateName, certificateDescription, sortByParameter, orderType);
     }
 
     @Override
     public String toString() {
         return "SearchCriteria{" +
-                "tagName='" + tagName + '\'' +
+                "tagName=" + tagList +
                 ", certificateName='" + certificateName + '\'' +
                 ", certificateDescription='" + certificateDescription + '\'' +
-                ", sortByNameOrCreationDate='" + sortByNameOrCreationDate + '\'' +
+                ", sortByParameter='" + sortByParameter + '\'' +
                 ", orderType=" + orderType +
                 '}';
     }

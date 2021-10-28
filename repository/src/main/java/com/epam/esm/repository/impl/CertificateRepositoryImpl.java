@@ -3,117 +3,153 @@ package com.epam.esm.repository.impl;
 import com.epam.esm.entity.Certificate;
 import com.epam.esm.exception.DataException;
 import com.epam.esm.repository.SearchCriteria;
-import com.epam.esm.repository.builder.QueryBuilder;
-import com.epam.esm.repository.mapper.CertificateMapper;
 import com.epam.esm.repository.repositoryinterfaces.CertificateRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.criteria.*;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
-import static com.epam.esm.repository.Parameters.*;
-import static com.epam.esm.repository.builder.CertificateQueries.*;
+import static com.epam.esm.repository.builder.CertificateQueries.DELETE_TAG_FROM_CERTIFICATE;
+import static com.epam.esm.repository.builder.CertificateQueries.INSERT_TAG_TO_CERTIFICATE;
 
 @Repository
 public class CertificateRepositoryImpl implements CertificateRepository {
 
-    private final CertificateMapper rowMapper;
-    private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+    private static final String TAGS = "tags";
+    private static final String ID = "id";
+    private static final String NAME = "name";
+    private static final String DESCRIPTION = "description";
+    private static final String PARAMETER = "parameter";
+    private static final String PRICE = "price";
+    private static final String DURATION = "duration";
+    private static final String CREATE_DATE = "createDate";
+    private static final String LAST_UPDATE_DATE = "lastUpdateDate";
+    private static final String PARTIAL_STRING = "%%%s%%";
 
-    @Autowired
-    public CertificateRepositoryImpl(CertificateMapper rowMapper, NamedParameterJdbcTemplate jdbcTemplate) {
-        this.rowMapper = rowMapper;
-        this.namedParameterJdbcTemplate = jdbcTemplate;
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    public CertificateRepositoryImpl(EntityManager entityManager) {
+        this.entityManager = entityManager;
     }
 
     @Override
     public List<Certificate> find(SearchCriteria searchCriteria) {
-        MapSqlParameterSource parameters = new MapSqlParameterSource();
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Certificate> query = criteriaBuilder.createQuery(Certificate.class);
+        Root<Certificate> certificateRoot = query.from(Certificate.class);
+        List<Predicate> predicateList = new ArrayList<>();
+        Join<Object, Object> join = certificateRoot.join(TAGS, JoinType.LEFT);
+        query = query.select(certificateRoot);
 
-        QueryBuilder sqlClause = new QueryBuilder.Builder(searchCriteria, SELECT_ALL_CERTIFICATES)
-                .buildWhereClause(parameters)
-                .buildOrderByClause(searchCriteria)
-                .build();
-        return namedParameterJdbcTemplate.query(sqlClause.getNewString(), parameters, rowMapper);
+        //Condition by certificate name
+        if (StringUtils.isNotEmpty(searchCriteria.getCertificateName())) {
+            String partialName = String.format(PARTIAL_STRING, searchCriteria.getCertificateName());
+            Predicate predicate = criteriaBuilder.like(certificateRoot.get(NAME), partialName);
+            predicateList.add(predicate);
+        }
+
+        //Condition by certificate description
+        if (StringUtils.isNotEmpty(searchCriteria.getCertificateDescription())) {
+            String partialName = String.format(PARTIAL_STRING, searchCriteria.getCertificateDescription());
+            Predicate predicate = criteriaBuilder.like(certificateRoot.get(DESCRIPTION), partialName);
+            predicateList.add(predicate);
+        }
+
+        //Condition on which parameter to sort by
+        if (StringUtils.isNotEmpty(searchCriteria.getSortByParameter())) {
+            String partialName = String.format(PARTIAL_STRING, searchCriteria.getSortByParameter());
+            Predicate predicate = criteriaBuilder.like(certificateRoot.get(PARAMETER), partialName);
+            predicateList.add(predicate);
+        }
+
+        //Condition by order type
+        if (searchCriteria.getOrderType() != null) {
+            Order order = switch (searchCriteria.getOrderType()) {
+                case ASC -> criteriaBuilder.asc(certificateRoot.get(PARAMETER));
+                case DESC -> criteriaBuilder.desc(certificateRoot.get(PARAMETER));
+            };
+            query.orderBy(order);
+        }
+
+        query = query.select(certificateRoot).distinct(true);
+
+        //Condition to find number of tags if exists
+        if (searchCriteria.getTagList() != null) {
+            Predicate inListPredicate = join.get(NAME).in(searchCriteria.getTagList());
+            predicateList.add(inListPredicate);
+
+            query = query.where(predicateList.toArray(new Predicate[0]))
+                    .groupBy(
+                            certificateRoot.get(ID),
+                            certificateRoot.get(NAME),
+                            certificateRoot.get(DESCRIPTION),
+                            certificateRoot.get(PRICE),
+                            certificateRoot.get(DURATION),
+                            certificateRoot.get(CREATE_DATE),
+                            certificateRoot.get(LAST_UPDATE_DATE)
+                    ).having(
+                            criteriaBuilder.equal(
+                                    criteriaBuilder.countDistinct(join.get(ID)),
+                                    searchCriteria.getTagList().size()
+                            )
+                    );
+        } else {
+            query = query.where(predicateList.toArray(new Predicate[0]));
+        }
+
+        return entityManager.createQuery(query).getResultList();
     }
 
     @Override
     public Optional<Certificate> findById(Long id) {
-        SqlParameterSource parameterSource = new MapSqlParameterSource().addValue(ID_PARAMETER, id);
-        List<Certificate> certificates = namedParameterJdbcTemplate.query(SELECT_CERTIFICATE_BY_ID, parameterSource, rowMapper);
-
-        return certificates.stream().findFirst();
+        return Optional.of(entityManager.find(Certificate.class, id));
     }
 
     @Override
-    public boolean attachTag(long certificateId, long tagId) {
-        int update;
-        SqlParameterSource parameterSource = new MapSqlParameterSource()
-                .addValue(GIFT_CERTIFICATE_ID_PARAMETER, certificateId)
-                .addValue(TAG_ID_PARAMETER, tagId);
-
+    public void attachTag(long certificateId, long tagId) {
         try {
-            update = namedParameterJdbcTemplate.update(INSERT_TAG_TO_CERTIFICATE, parameterSource);
+            entityManager.createNativeQuery(INSERT_TAG_TO_CERTIFICATE)
+                    .setParameter(1, certificateId)
+                    .setParameter(2, tagId);
         } catch (DataAccessException e) {
             throw new DataException(tagId, certificateId);
         }
-        return update > 0;
     }
 
     @Override
-    public boolean detachTag(long certificateId, long tagId) {
-        int update;
-        SqlParameterSource parameterSource = new MapSqlParameterSource()
-                .addValue(GIFT_CERTIFICATE_ID_PARAMETER, certificateId)
-                .addValue(TAG_ID_PARAMETER, tagId);
-
+    public void detachTag(long certificateId, long tagId) {
         try {
-            update = namedParameterJdbcTemplate.update(DELETE_TAG_FROM_CERTIFICATE, parameterSource);
+            entityManager.createNativeQuery(DELETE_TAG_FROM_CERTIFICATE)
+                    .setParameter(1, certificateId)
+                    .setParameter(2, tagId);
         } catch (DataAccessException e) {
             throw new DataException(tagId, certificateId);
         }
-        return update > 0;
     }
 
     @Override
-    public Long create(Certificate certificate) {
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-        SqlParameterSource parameterSource = new MapSqlParameterSource()
-                .addValue(NAME_PARAMETER, certificate.getName())
-                .addValue(DESCRIPTION_PARAMETER, certificate.getDescription())
-                .addValue(PRICE_PARAMETER, certificate.getPrice())
-                .addValue(DURATION_PARAMETER, certificate.getDuration().toDays());
-
-        namedParameterJdbcTemplate.update(INSERT_CERTIFICATE, parameterSource, keyHolder);
-        Number key = Objects.requireNonNull(keyHolder).getKey();
-        return Objects.requireNonNull(key).longValue();
+    public Certificate create(Certificate certificate) {
+        entityManager.persist(certificate);
+        SearchCriteria searchCriteria = new SearchCriteria();
+        searchCriteria.setCertificateName(certificate.getName());
+        List<Certificate> certificateList = find(searchCriteria);
+        return certificateList.stream().findFirst().orElse(certificate);
     }
 
     @Override
-    public Long update(Certificate certificate) {
-        SqlParameterSource parameterSource = new MapSqlParameterSource()
-                .addValue(ID_PARAMETER, certificate.getId())
-                .addValue(NAME_PARAMETER, certificate.getName())
-                .addValue(DESCRIPTION_PARAMETER, certificate.getDescription())
-                .addValue(PRICE_PARAMETER, certificate.getPrice())
-                .addValue(DURATION_PARAMETER, certificate.getDuration().toDays());
-
-        namedParameterJdbcTemplate.update(UPDATE_CERTIFICATE, parameterSource);
-        return certificate.getId();
+    public Certificate update(Certificate certificate) {
+        return entityManager.merge(certificate);
     }
 
     @Override
-    public boolean delete(Long id) {
-        SqlParameterSource parameterSource = new MapSqlParameterSource().addValue(ID_PARAMETER, id);
-
-        return namedParameterJdbcTemplate.update(DELETE_CERTIFICATE, parameterSource) > 0;
+    public void delete(Certificate certificate) {
+        entityManager.remove(certificate);
     }
 }

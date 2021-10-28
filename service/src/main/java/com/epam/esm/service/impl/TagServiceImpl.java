@@ -73,10 +73,10 @@ public class TagServiceImpl implements TagService {
             throw new EntityAlreadyExistsException();
         }
 
-        Long tagId = tagRepository.create(fromTagDto);
-        Optional<Tag> tag = tagRepository.findById(tagId);
+        Tag tag1 = tagRepository.create(fromTagDto);
+        Optional<Tag> tag = tagRepository.findById(tag1.getId());
         if (tag.isEmpty()) {
-            throw new EntityNotFoundException(tagId);
+            throw new EntityNotFoundException(tag1.getId());
         }
         return tagServiceMapper.convertTagToDto(tag.get());
     }
@@ -95,13 +95,14 @@ public class TagServiceImpl implements TagService {
         if (tagById.isEmpty()) {
             throw new EntityNotFoundException(id);
         }
-        tagById.ifPresent(tag -> searchCriteria.setTagName(tag.getName()));
+        tagById.ifPresent(tag -> searchCriteria.setTagList(List.of(tag)));
         List<Certificate> certificateList = certificateRepository.find(searchCriteria);
 
         if (!certificateList.isEmpty()) {
             throw new AttachedTagException(tagById.get().getId(), tagById.get().getName());
         }
 
-        return tagRepository.delete(id);
+        tagRepository.delete(tagById.get());
+        return true;
     }
 }
