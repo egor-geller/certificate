@@ -1,6 +1,8 @@
 package com.epam.esm.entity;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -10,8 +12,10 @@ public class Tag {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    @Column(unique = true)
+    @Column(name = "name", nullable = false,length = 100)
     private String name;
+    @ManyToMany(mappedBy = "tags")
+    private List<Certificate> certificateList = new ArrayList<>();
 
     public long getId() {
         return id;

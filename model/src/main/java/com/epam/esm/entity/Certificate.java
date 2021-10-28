@@ -6,6 +6,8 @@ import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -15,6 +17,7 @@ public class Certificate {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+    @Column(unique = true)
     private String name;
     private String description;
     private BigDecimal price;
@@ -23,17 +26,20 @@ public class Certificate {
     @JsonFormat(shape = JsonFormat.Shape.STRING,
             pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX",
             timezone = "UTC")
+    @Column(name = "create_date")
     private ZonedDateTime createDate;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING,
             pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX",
             timezone = "UTC")
+    @Column(name = "last_update_date")
     private ZonedDateTime lastUpdateDate;
 
     @ManyToMany
     @JoinTable(name = "gift_certificate_has_tag",
-            joinColumns = @JoinColumn(name = "gift_certificate_id"),
-            inverseJoinColumns = @JoinColumn(name = "tag_id"))
+            joinColumns = @JoinColumn(name = "gift_certificate_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id", referencedColumnName = "id"))
+    private List<Tag> tags = new ArrayList<>();
 
     public long getId() {
         return id;
