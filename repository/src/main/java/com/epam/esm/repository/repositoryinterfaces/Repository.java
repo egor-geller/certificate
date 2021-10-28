@@ -24,15 +24,14 @@ public interface Repository<T> {
      * Create a new certificate or tag.
      *
      * @param t {@link Certificate} or {@link Tag} instance
-     * @return id of {@link Certificate} or {@link Tag}
+     * @return entity of {@link Certificate} or {@link Tag}
      */
-    Long create(T t);
+    T create(T t);
 
     /**
      * Delete a tag
      *
-     * @param id id of the tag or certificate
-     * @return {@code true} if {@link Tag} or {@link Certificate} was deleted, otherwise {@code false}
+     * @param t entity of {@link Tag} or {@link Certificate}
      */
-    boolean delete(Long id);
+    void delete(T t);
 }
