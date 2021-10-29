@@ -6,10 +6,7 @@ import javax.persistence.Table;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Column;
-import javax.persistence.ManyToMany;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -21,8 +18,6 @@ public class Tag {
     private long id;
     @Column(name = "name", nullable = false,length = 100)
     private String name;
-    @ManyToMany(mappedBy = "tags")
-    private List<Certificate> certificateList = new ArrayList<>();
 
     public long getId() {
         return id;
