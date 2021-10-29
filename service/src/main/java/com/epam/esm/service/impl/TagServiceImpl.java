@@ -73,10 +73,10 @@ public class TagServiceImpl implements TagService {
             throw new EntityAlreadyExistsException();
         }
 
-        Tag tag1 = tagRepository.create(fromTagDto);
-        Optional<Tag> tag = tagRepository.findById(tag1.getId());
+        Tag newTag = tagRepository.create(fromTagDto);
+        Optional<Tag> tag = tagRepository.findById(newTag.getId());
         if (tag.isEmpty()) {
-            throw new EntityNotFoundException(tag1.getId());
+            throw new EntityNotFoundException(newTag.getId());
         }
         return tagServiceMapper.convertTagToDto(tag.get());
     }
