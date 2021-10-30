@@ -29,7 +29,7 @@ public class TagRepositoryImpl implements TagRepository {
 
     @Override
     public Optional<Tag> findById(Long id) {
-        return Optional.of(entityManager.find(Tag.class, id));
+        return Optional.ofNullable(entityManager.find(Tag.class, id));
     }
 
     @Override
