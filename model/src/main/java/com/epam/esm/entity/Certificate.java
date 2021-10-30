@@ -1,6 +1,8 @@
 package com.epam.esm.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -35,13 +37,15 @@ public class Certificate {
     @JsonFormat(shape = JsonFormat.Shape.STRING,
             pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX",
             timezone = "UTC")
-    @Column(name = "create_date")
+    @Column(name = "create_date", updatable = false, columnDefinition = "TIMESTAMP() default CURRENT_TIMESTAMP() on update CURRENT_TIMESTAMP()")
+    @CreationTimestamp
     private ZonedDateTime createDate;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING,
             pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX",
             timezone = "UTC")
-    @Column(name = "last_update_date")
+    @Column(name = "last_update_date", nullable = false, columnDefinition = "TIMESTAMP default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP")
+    @UpdateTimestamp
     private ZonedDateTime lastUpdateDate;
 
     @ManyToMany
