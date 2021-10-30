@@ -95,7 +95,7 @@ public class TagServiceImpl implements TagService {
         if (tagById.isEmpty()) {
             throw new EntityNotFoundException(id);
         }
-        tagById.ifPresent(tag -> searchCriteria.setTagList(List.of(tag)));
+        tagById.ifPresent(tag -> searchCriteria.setTagList(List.of(tag.getName())));
         List<Certificate> certificateList = certificateRepository.find(searchCriteria);
 
         if (!certificateList.isEmpty()) {
