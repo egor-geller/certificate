@@ -3,6 +3,7 @@ package com.epam.esm.repository.impl;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.repository.repositoryinterfaces.TagRepository;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -33,9 +34,12 @@ public class TagRepositoryImpl implements TagRepository {
 
     @Override
     public Optional<Tag> findByName(String tagName) {
-        return Optional.of(entityManager.createQuery(SELECT_TAG_BY_NAME, Tag.class)
+        return entityManager.createQuery(SELECT_TAG_BY_NAME, Tag.class)
                 .setParameter(1, tagName)
-                .getSingleResult());
+                .getResultList()
+                .stream()
+                .findFirst();
+
     }
 
     @Override
@@ -45,17 +49,22 @@ public class TagRepositoryImpl implements TagRepository {
                 .getResultList();
     }
 
+    @Transactional
     @Override
     public Tag create(Tag tag) {
         entityManager.persist(tag);
-        Optional<Tag> optionalTag = findByName(tag.getName());
+        Optional<Tag> optionalTag = findById(tag.getId());
 
         return optionalTag.orElse(tag);
 
     }
 
+    @Transactional
     @Override
     public void delete(Tag tag) {
+        if (!entityManager.contains(tag)) {
+            tag = entityManager.merge(tag);
+        }
         entityManager.remove(tag);
     }
 }

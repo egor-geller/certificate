@@ -7,9 +7,9 @@ import com.epam.esm.repository.repositoryinterfaces.CertificateRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
+import javax.persistence.*;
 import javax.persistence.criteria.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,11 +25,12 @@ public class CertificateRepositoryImpl implements CertificateRepository {
     private static final String ID = "id";
     private static final String NAME = "name";
     private static final String DESCRIPTION = "description";
-    private static final String PARAMETER = "parameter";
     private static final String PRICE = "price";
     private static final String DURATION = "duration";
     private static final String CREATE_DATE = "createDate";
     private static final String LAST_UPDATE_DATE = "lastUpdateDate";
+    private static final String NAME_EXPRESSION = "name";
+    private static final String CREATE_DATE_EXPRESSION = "create_date";
     private static final String PARTIAL_STRING = "%%%s%%";
 
     @PersistenceContext
@@ -41,6 +42,7 @@ public class CertificateRepositoryImpl implements CertificateRepository {
 
     @Override
     public List<Certificate> find(SearchCriteria searchCriteria) {
+        String parameter = "";
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Certificate> query = criteriaBuilder.createQuery(Certificate.class);
         Root<Certificate> certificateRoot = query.from(Certificate.class);
@@ -64,16 +66,18 @@ public class CertificateRepositoryImpl implements CertificateRepository {
 
         //Condition on which parameter to sort by
         if (StringUtils.isNotEmpty(searchCriteria.getSortByParameter())) {
-            String partialName = String.format(PARTIAL_STRING, searchCriteria.getSortByParameter());
-            Predicate predicate = criteriaBuilder.like(certificateRoot.get(PARAMETER), partialName);
-            predicateList.add(predicate);
+            if (searchCriteria.getSortByParameter().equals(CREATE_DATE_EXPRESSION)) {
+                parameter = CREATE_DATE;
+            } else if (searchCriteria.getSortByParameter().equals(NAME_EXPRESSION)) {
+                parameter = NAME;
+            }
         }
 
         //Condition by order type
         if (searchCriteria.getOrderType() != null) {
             Order order = switch (searchCriteria.getOrderType()) {
-                case ASC -> criteriaBuilder.asc(certificateRoot.get(PARAMETER));
-                case DESC -> criteriaBuilder.desc(certificateRoot.get(PARAMETER));
+                case ASC -> criteriaBuilder.asc(certificateRoot.get(parameter));
+                case DESC -> criteriaBuilder.desc(certificateRoot.get(parameter));
             };
             query.orderBy(order);
         }
@@ -109,47 +113,56 @@ public class CertificateRepositoryImpl implements CertificateRepository {
 
     @Override
     public Optional<Certificate> findById(Long id) {
-        return Optional.of(entityManager.find(Certificate.class, id));
+        return Optional.ofNullable(entityManager.find(Certificate.class, id));
     }
 
+    @Transactional
     @Override
     public void attachTag(long certificateId, long tagId) {
         try {
             entityManager.createNativeQuery(INSERT_TAG_TO_CERTIFICATE)
                     .setParameter(1, certificateId)
-                    .setParameter(2, tagId);
-        } catch (DataAccessException e) {
+                    .setParameter(2, tagId)
+                    .executeUpdate();
+        } catch (DataAccessException | IllegalArgumentException e) {
             throw new DataException(tagId, certificateId);
         }
     }
 
+    @Transactional
     @Override
     public void detachTag(long certificateId, long tagId) {
         try {
             entityManager.createNativeQuery(DELETE_TAG_FROM_CERTIFICATE)
                     .setParameter(1, certificateId)
-                    .setParameter(2, tagId);
+                    .setParameter(2, tagId)
+                    .executeUpdate();
         } catch (DataAccessException e) {
             throw new DataException(tagId, certificateId);
         }
     }
 
+    @Transactional
     @Override
     public Certificate create(Certificate certificate) {
         entityManager.persist(certificate);
-        SearchCriteria searchCriteria = new SearchCriteria();
-        searchCriteria.setCertificateName(certificate.getName());
-        List<Certificate> certificateList = find(searchCriteria);
-        return certificateList.stream().findFirst().orElse(certificate);
+        long certificateId = certificate.getId();
+        Optional<Certificate> optionalCertificate = findById(certificateId);
+        return optionalCertificate.orElse(certificate);
     }
 
+    @Transactional
     @Override
     public Certificate update(Certificate certificate) {
         return entityManager.merge(certificate);
     }
 
+    @Transactional
     @Override
     public void delete(Certificate certificate) {
+        if (!entityManager.contains(certificate)) {
+            certificate = entityManager.merge(certificate);
+        }
         entityManager.remove(certificate);
     }
 }
