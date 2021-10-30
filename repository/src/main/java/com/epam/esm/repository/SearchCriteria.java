@@ -1,24 +1,22 @@
 package com.epam.esm.repository;
 
-import com.epam.esm.entity.Tag;
 import com.epam.esm.repository.builder.SortType;
 
 import java.util.List;
-import java.util.Objects;
 
 public class SearchCriteria {
 
-    private List<Tag> tagList;
+    private List<String> tagList;
     private String certificateName;
     private String certificateDescription;
     private String sortByParameter;
     private SortType orderType;
 
-    public List<Tag> getTagList() {
+    public List<String> getTagList() {
         return tagList;
     }
 
-    public void setTagList(List<Tag> tagList) {
+    public void setTagList(List<String> tagList) {
         this.tagList = tagList;
     }
 
@@ -54,25 +52,25 @@ public class SearchCriteria {
         this.orderType = orderType;
     }
 
-    @Override
+   /* @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         SearchCriteria that = (SearchCriteria) o;
-        return tagList.equals(that.tagList) && certificateName.equals(that.certificateName)
+        return tagName.equals(that.tagName) && certificateName.equals(that.certificateName)
                 && certificateDescription.equals(that.certificateDescription)
                 && sortByParameter.equals(that.sortByParameter) && orderType == that.orderType;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(tagList, certificateName, certificateDescription, sortByParameter, orderType);
-    }
+        return Objects.hash(tagName, certificateName, certificateDescription, sortByParameter, orderType);
+    }*/
 
     @Override
     public String toString() {
         return "SearchCriteria{" +
-                "tagName=" + tagList +
+                "tagList=" + tagList +
                 ", certificateName='" + certificateName + '\'' +
                 ", certificateDescription='" + certificateDescription + '\'' +
                 ", sortByParameter='" + sortByParameter + '\'' +
