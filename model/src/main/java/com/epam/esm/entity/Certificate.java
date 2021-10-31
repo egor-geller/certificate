@@ -28,10 +28,13 @@ public class Certificate {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    @Column(unique = true)
+    @Column(name = "name", unique = true)
     private String name;
+    @Column(name = "description")
     private String description;
+    @Column(name = "price")
     private BigDecimal price;
+    @Column(name = "duration")
     private Duration duration;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING,
