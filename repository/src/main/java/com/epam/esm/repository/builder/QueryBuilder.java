@@ -1,105 +1,95 @@
 package com.epam.esm.repository.builder;
 
-import com.epam.esm.exception.QueryBuildException;
+import com.epam.esm.entity.Certificate;
 import com.epam.esm.repository.SearchCriteria;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import javax.persistence.criteria.*;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.epam.esm.repository.Parameters.*;
-
 @Component
 public final class QueryBuilder {
-    private String newString;
 
-    public static class Builder {
-        private final SearchCriteria searchCriteria;
-        private String findBy;
-        private String orderBy;
-        MapSqlParameterSource parameters;
-        private final String sqlString;
+    private static final String TAGS = "tags";
+    private static final String ID = "id";
+    private static final String NAME = "name";
+    private static final String DESCRIPTION = "description";
+    private static final String PRICE = "price";
+    private static final String DURATION = "duration";
+    private static final String CREATE_DATE = "createDate";
+    private static final String LAST_UPDATE_DATE = "lastUpdateDate";
+    private static final String NAME_EXPRESSION = "name";
+    private static final String CREATE_DATE_EXPRESSION = "create_date";
+    private static final String PARTIAL_STRING = "%%%s%%";
 
-        public Builder(SearchCriteria searchCriteria, String sqlString) {
-            this.sqlString = sqlString;
-            this.searchCriteria = searchCriteria;
+    public CriteriaQuery<Certificate> queryBuild(CriteriaBuilder criteriaBuilder, SearchCriteria searchCriteria) {
+        String parameter = "";
+        CriteriaQuery<Certificate> query = criteriaBuilder.createQuery(Certificate.class);
+        Root<Certificate> certificateRoot = query.from(Certificate.class);
+        List<Predicate> predicateList = new ArrayList<>();
+        Join<Object, Object> join = certificateRoot.join(TAGS, JoinType.LEFT);
+        query = query.select(certificateRoot);
+
+        //Condition by certificate name
+        if (StringUtils.isNotEmpty(searchCriteria.getCertificateName())) {
+            String partialName = String.format(PARTIAL_STRING, searchCriteria.getCertificateName());
+            Predicate predicate = criteriaBuilder.like(certificateRoot.get(NAME), partialName);
+            predicateList.add(predicate);
         }
 
-        public Builder buildWhereClause(MapSqlParameterSource parameters) {
-            List<String> list = new ArrayList<>();
-            if (StringUtils.isNotEmpty(searchCriteria.getTagName())) {
-                list.add("tag.name = :" + TAG_NAME_PARAMETER);
-                parameters.addValue(TAG_NAME_PARAMETER, this.searchCriteria.getTagName());
-            }
-
-            if (StringUtils.isNotEmpty(searchCriteria.getCertificateName())) {
-                list.add("cert.name = :" + NAME_PARAMETER);
-                parameters.addValue(NAME_PARAMETER, this.searchCriteria.getCertificateName());
-            }
-
-            if (StringUtils.isNotEmpty(searchCriteria.getCertificateDescription())) {
-                list.add("cert.description = :" + DESCRIPTION_PARAMETER);
-                parameters.addValue(DESCRIPTION_PARAMETER, this.searchCriteria.getCertificateDescription());
-            }
-
-            StringBuilder stringBuilder = new StringBuilder();
-            if (!list.isEmpty()) {
-                stringBuilder.append("WHERE ");
-
-                String collect = String.join(" AND ", list);
-                stringBuilder.append(collect);
-            }
-
-            this.findBy = stringBuilder.toString();
-            this.parameters = parameters;
-            return this;
+        //Condition by certificate description
+        if (StringUtils.isNotEmpty(searchCriteria.getCertificateDescription())) {
+            String partialName = String.format(PARTIAL_STRING, searchCriteria.getCertificateDescription());
+            Predicate predicate = criteriaBuilder.like(certificateRoot.get(DESCRIPTION), partialName);
+            predicateList.add(predicate);
         }
 
-        public Builder buildOrderByClause(SearchCriteria searchCriteria) {
-            List<String> orderOf = new ArrayList<>();
-            if (StringUtils.isNotEmpty(searchCriteria.getSortByNameOrCreationDate()) || searchCriteria.getOrderType() != null) {
-                if (StringUtils.equalsIgnoreCase(searchCriteria.getSortByNameOrCreationDate(), "name")) {
-                    orderOf.add("cert.name ");
-                } else if (StringUtils.equalsIgnoreCase(searchCriteria.getSortByNameOrCreationDate(), "create_date")) {
-                    orderOf.add("cert.create_date ");
-                } else {
-                    throw new QueryBuildException(searchCriteria.getSortByNameOrCreationDate());
-                }
+        //Condition on which parameter to sort by
+        if (StringUtils.isNotEmpty(searchCriteria.getSortByParameter())) {
+            if (searchCriteria.getSortByParameter().equals(CREATE_DATE_EXPRESSION)) {
+                parameter = CREATE_DATE;
+            } else if (searchCriteria.getSortByParameter().equals(NAME_EXPRESSION)) {
+                parameter = NAME;
             }
-
-            if (searchCriteria.getOrderType() != null) {
-                orderOf.add(searchCriteria.getOrderType().toString());
-            }
-
-            StringBuilder stringBuilder = new StringBuilder();
-            if (!orderOf.isEmpty()) {
-                stringBuilder.append(" ORDER BY ");
-
-                String join = String.join(" ", orderOf);
-                stringBuilder.append(join);
-            }
-
-            this.orderBy = stringBuilder.toString();
-            return this;
         }
 
-        public QueryBuilder build() {
-            QueryBuilder queryBuilder = new QueryBuilder();
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append(this.findBy).append(this.orderBy);
-            queryBuilder.newString = String.format(sqlString, stringBuilder);
-
-            return queryBuilder;
+        //Condition by order type
+        if (searchCriteria.getOrderType() != null) {
+            Order order = switch (searchCriteria.getOrderType()) {
+                case ASC -> criteriaBuilder.asc(certificateRoot.get(parameter));
+                case DESC -> criteriaBuilder.desc(certificateRoot.get(parameter));
+            };
+            query.orderBy(order);
         }
-    }
 
+        query = query.select(certificateRoot).distinct(true);
 
-    private QueryBuilder() {
-    }
+        //Condition to find number of tags if exists
+        if (searchCriteria.getTagList() != null) {
+            Predicate inListPredicate = join.get(NAME).in(searchCriteria.getTagList());
+            predicateList.add(inListPredicate);
 
-    public String getNewString() {
-        return newString;
+            query = query.where(predicateList.toArray(new Predicate[0]))
+                    .groupBy(
+                            certificateRoot.get(ID),
+                            certificateRoot.get(NAME),
+                            certificateRoot.get(DESCRIPTION),
+                            certificateRoot.get(PRICE),
+                            certificateRoot.get(DURATION),
+                            certificateRoot.get(CREATE_DATE),
+                            certificateRoot.get(LAST_UPDATE_DATE)
+                    ).having(
+                            criteriaBuilder.equal(
+                                    criteriaBuilder.countDistinct(join.get(ID)),
+                                    searchCriteria.getTagList().size()
+                            )
+                    );
+        } else {
+            query = query.where(predicateList.toArray(new Predicate[0]));
+        }
+
+        return query;
     }
 }
