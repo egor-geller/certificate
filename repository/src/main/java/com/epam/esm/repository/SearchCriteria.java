@@ -3,6 +3,7 @@ package com.epam.esm.repository;
 import com.epam.esm.repository.builder.SortType;
 
 import java.util.List;
+import java.util.Objects;
 
 public class SearchCriteria {
 
@@ -52,20 +53,20 @@ public class SearchCriteria {
         this.orderType = orderType;
     }
 
-   /* @Override
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         SearchCriteria that = (SearchCriteria) o;
-        return tagName.equals(that.tagName) && certificateName.equals(that.certificateName)
+        return tagList.equals(that.tagList) && certificateName.equals(that.certificateName)
                 && certificateDescription.equals(that.certificateDescription)
                 && sortByParameter.equals(that.sortByParameter) && orderType == that.orderType;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(tagName, certificateName, certificateDescription, sortByParameter, orderType);
-    }*/
+        return Objects.hash(tagList, certificateName, certificateDescription, sortByParameter, orderType);
+    }
 
     @Override
     public String toString() {
