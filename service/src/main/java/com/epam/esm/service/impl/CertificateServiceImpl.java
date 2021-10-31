@@ -63,7 +63,7 @@ public class CertificateServiceImpl implements CertificateService {
     }
 
     @Override
-    public boolean attachTagToCertificate(long certificateId, long tagId) {
+    public CertificateDto attachTagToCertificate(long certificateId, long tagId) {
         certificateValidator.validateId(certificateId, tagId);
         Optional<Tag> tag = tagRepository.findById(tagId);
         Optional<Certificate> certificate = certificateRepository.findById(certificateId);
@@ -71,11 +71,11 @@ public class CertificateServiceImpl implements CertificateService {
             throw new EntityNotFoundException(tagId, certificateId);
         }
         certificateRepository.attachTag(certificateId, tagId);
-        return true;
+        return getCertificateDto(certificateId, tagId);
     }
 
     @Override
-    public boolean detachTagFromCertificate(long certificateId, long tagId) {
+    public CertificateDto detachTagFromCertificate(long certificateId, long tagId) {
         certificateValidator.validateId(certificateId, tagId);
 
         SearchCriteria searchCriteria = new SearchCriteria();
@@ -92,7 +92,7 @@ public class CertificateServiceImpl implements CertificateService {
         }
 
         certificateRepository.detachTag(certificateId, tagId);
-        return true;
+        return getCertificateDto(certificateId, tagId);
     }
 
     @Override
@@ -207,5 +207,14 @@ public class CertificateServiceImpl implements CertificateService {
                 tagRepository.delete(tag);
             }
         }
+    }
+
+    private CertificateDto getCertificateDto(long certificateId, long tagId) {
+        Optional<Certificate> updatedCertificate = certificateRepository.findById(certificateId);
+        if (updatedCertificate.isEmpty()) {
+            throw new EntityNotFoundException(tagId, certificateId);
+        }
+        List<Tag> tagsOfCurrentCertificate = tagRepository.findByCertificateId(certificateId);
+        return certificateServiceMapper.convertCertificateToDto(updatedCertificate.get(), tagsOfCurrentCertificate);
     }
 }
