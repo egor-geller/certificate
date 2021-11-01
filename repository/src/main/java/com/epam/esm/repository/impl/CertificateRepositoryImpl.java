@@ -5,7 +5,6 @@ import com.epam.esm.exception.DataException;
 import com.epam.esm.repository.SearchCriteria;
 import com.epam.esm.repository.builder.QueryBuilder;
 import com.epam.esm.repository.repositoryinterfaces.CertificateRepository;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Repository;
@@ -13,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.*;
 import javax.persistence.criteria.*;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,21 +21,22 @@ import static com.epam.esm.repository.builder.CertificateQueries.INSERT_TAG_TO_C
 @Repository
 public class CertificateRepositoryImpl implements CertificateRepository {
 
-    private final QueryBuilder queryBuilder;
-
     @PersistenceContext
     private EntityManager entityManager;
 
     @Autowired
-    public CertificateRepositoryImpl(EntityManager entityManager, QueryBuilder queryBuilder) {
+    public CertificateRepositoryImpl(EntityManager entityManager) {
         this.entityManager = entityManager;
-        this.queryBuilder = queryBuilder;
     }
 
     @Override
     public List<Certificate> find(SearchCriteria searchCriteria) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Certificate> query = queryBuilder.queryBuild(criteriaBuilder, searchCriteria);
+        QueryBuilder build = new QueryBuilder.Builder(searchCriteria, criteriaBuilder)
+                .buildQueryClause()
+                .findNumberOfTags()
+                .build();
+        CriteriaQuery<Certificate> query = build.getQuery();
         return entityManager.createQuery(query).getResultList();
     }
 
