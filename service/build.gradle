@@ -2,5 +2,10 @@ dependencies {
     implementation project(":model")
     implementation project(":repository")
 
+    implementation group: 'org.springframework', name: 'spring-context', version: springVersion
     implementation group: 'org.apache.commons', name: 'commons-collections4', version: apacheCollections
+
+    testImplementation group: 'org.mockito', name: 'mockito-core', version: mockitoversion
+    testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: mockitoversion
+
 }
