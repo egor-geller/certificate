@@ -6,4 +6,7 @@ dependencies {
     implementation project(":model")
     implementation project(":repository")
     implementation project(":service")
+
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: bootVersion
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-hateoas', version: bootVersion
 }
