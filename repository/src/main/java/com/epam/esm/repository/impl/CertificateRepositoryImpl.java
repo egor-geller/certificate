@@ -75,9 +75,8 @@ public class CertificateRepositoryImpl implements CertificateRepository {
     @Override
     public Certificate create(Certificate certificate) {
         entityManager.persist(certificate);
-        long certificateId = certificate.getId();
-        Optional<Certificate> optionalCertificate = findById(certificateId);
-        return optionalCertificate.orElse(certificate);
+        entityManager.flush();
+        return certificate;
     }
 
     @Transactional
