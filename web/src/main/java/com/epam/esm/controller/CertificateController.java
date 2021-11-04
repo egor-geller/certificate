@@ -97,11 +97,11 @@ public class CertificateController {
      * @return {@code HttpStatus.NO_CONTENT} when entity has been attached
      */
     @PostMapping("/{certId}/tag/{tagId}")
-    public ResponseEntity<Boolean> attachTagToCertificate(@PathVariable("tagId") Long tagId,
+    public ResponseEntity<CertificateDto> attachTagToCertificate(@PathVariable("tagId") Long tagId,
                                                           @PathVariable("certId") Long certId) {
 
-        certificateService.attachTagToCertificate(certId, tagId);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        CertificateDto certificateDto = certificateService.attachTagToCertificate(certId, tagId);
+        return new ResponseEntity<>(certificateDto, HttpStatus.OK);
     }
 
     /**
@@ -112,11 +112,11 @@ public class CertificateController {
      * @return {@code HttpStatus.NO_CONTENT} when entity has been detached
      */
     @DeleteMapping("/{certId}/tag/{tagId}")
-    public ResponseEntity<Boolean> detachTagFromCertificate(@PathVariable("tagId") Long tagId,
+    public ResponseEntity<CertificateDto> detachTagFromCertificate(@PathVariable("tagId") Long tagId,
                                                           @PathVariable("certId") Long certId) {
 
-        certificateService.detachTagFromCertificate(certId, tagId);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        CertificateDto certificateDto = certificateService.detachTagFromCertificate(certId, tagId);
+        return new ResponseEntity<>(certificateDto, HttpStatus.OK);
     }
 
     /**

@@ -46,7 +46,7 @@ public interface CertificateService extends EntityService<CertificateDto> {
      * @return {@code true} if {@link Certificate} was attached, otherwise {@code false}
      * @throws InvalidEntityException when id is not correctly written
      */
-    boolean attachTagToCertificate(long certificateId, long tagId);
+    CertificateDto attachTagToCertificate(long certificateId, long tagId);
 
     /**
      * Detach tag from existing certificate.
@@ -56,7 +56,7 @@ public interface CertificateService extends EntityService<CertificateDto> {
      * @return {@code true} if {@link Certificate} was detached, otherwise {@code false}
      * @throws InvalidEntityException when id is not correctly written
      */
-    boolean detachTagFromCertificate(long certificateId, long tagId);
+    CertificateDto detachTagFromCertificate(long certificateId, long tagId);
 
     /**
      * Create a new certificate.

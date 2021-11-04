@@ -26,18 +26,16 @@ public interface CertificateRepository extends Repository<Certificate> {
      *
      * @param certificateId certificate id
      * @param tagId         tag id
-     * @return {@code true} if {@link Certificate} was attached, otherwise {@code false}
      */
-    boolean attachTag(long certificateId, long tagId);
+    void attachTag(long certificateId, long tagId);
 
     /**
      * Detach tag from existing certificate.
      *
      * @param certificateId certificate id
      * @param tagId         tag id
-     * @return {@code true} if {@link Certificate} was detached, otherwise {@code false}
      */
-    boolean detachTag(long certificateId, long tagId);
+    void detachTag(long certificateId, long tagId);
 
     /**
      * Update an existing certificate.
@@ -45,5 +43,5 @@ public interface CertificateRepository extends Repository<Certificate> {
      * @param certificate {@link Certificate} entity.
      * @return id of {@link Certificate}
      */
-    Long update(Certificate certificate);
+    Certificate update(Certificate certificate);
 }

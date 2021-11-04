@@ -1,79 +1,68 @@
 package com.epam.esm.repository.impl;
 
 import com.epam.esm.entity.Tag;
-import com.epam.esm.repository.mapper.TagMapper;
 import com.epam.esm.repository.repositoryinterfaces.TagRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
-import static com.epam.esm.repository.Parameters.*;
 import static com.epam.esm.repository.builder.TagQueries.*;
 
 @Repository
 public class TagRepositoryImpl implements TagRepository {
 
-    private final TagMapper rowMapper;
-    private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+    @PersistenceContext
+    private EntityManager entityManager;
 
-    @Autowired
-    public TagRepositoryImpl(TagMapper rowMapper, NamedParameterJdbcTemplate jdbcTemplate) {
-        this.rowMapper = rowMapper;
-        this.namedParameterJdbcTemplate = jdbcTemplate;
+    public TagRepositoryImpl(EntityManager entityManager) {
+        this.entityManager = entityManager;
     }
 
     @Override
     public List<Tag> findAll() {
-        return namedParameterJdbcTemplate.query(SELECT_ALL_TAGS, rowMapper);
+        return entityManager.createQuery(SELECT_ALL_TAGS, Tag.class).getResultList();
     }
 
     @Override
     public Optional<Tag> findById(Long id) {
-        SqlParameterSource sqlParameterSource = new MapSqlParameterSource().addValue(ID_PARAMETER, id);
-
-        List<Tag> tagList = namedParameterJdbcTemplate.query(SELECT_TAG_BY_ID, sqlParameterSource, rowMapper);
-
-        return tagList.stream().findFirst();
+        return Optional.ofNullable(entityManager.find(Tag.class, id));
     }
 
     @Override
     public Optional<Tag> findByName(String tagName) {
-        SqlParameterSource source = new MapSqlParameterSource().addValue(NAME_PARAMETER, tagName);
+        return entityManager.createQuery(SELECT_TAG_BY_NAME, Tag.class)
+                .setParameter(1, tagName)
+                .getResultList()
+                .stream()
+                .findFirst();
 
-        List<Tag> tagList = namedParameterJdbcTemplate.query(SELECT_TAG_BY_NAME, source, rowMapper);
-
-        return tagList.stream().findFirst();
     }
 
     @Override
     public List<Tag> findByCertificateId(Long id) {
-        SqlParameterSource source = new MapSqlParameterSource().addValue(CERTIFICATE_ID_PARAMETER, id);
-
-        return namedParameterJdbcTemplate.query(SELECT_TAG_BY_CERTIFICATE, source, rowMapper);
+        return entityManager.createQuery(SELECT_TAG_BY_CERTIFICATE, Tag.class)
+                .setParameter(1, id)
+                .getResultList();
     }
 
+    @Transactional
     @Override
-    public Long create(Tag tag) {
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-        SqlParameterSource mapSqlParameterSource = new MapSqlParameterSource().addValue(NAME_PARAMETER, tag.getName());
-
-        namedParameterJdbcTemplate.update(INSERT_TAG, mapSqlParameterSource, keyHolder);
-        Number key = Objects.requireNonNull(keyHolder).getKey();
-        return Objects.requireNonNull(key).longValue();
+    public Tag create(Tag tag) {
+        entityManager.persist(tag);
+        entityManager.flush();
+        return tag;
     }
 
+    @Transactional
     @Override
-    public boolean delete(Long id) {
-        SqlParameterSource source = new MapSqlParameterSource().addValue(ID_PARAMETER, id);
-
-        return namedParameterJdbcTemplate.update(DELETE_TAG, source) > 0;
+    public void delete(Tag tag) {
+        if (!entityManager.contains(tag)) {
+            tag = entityManager.merge(tag);
+        }
+        entityManager.remove(tag);
     }
 }
