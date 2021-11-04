@@ -23,7 +23,7 @@ public class CertificateRepositoryImpl implements CertificateRepository {
 
     @PersistenceContext
     private EntityManager entityManager;
-    private QueryBuilder queryBuilder;
+    private final QueryBuilder queryBuilder;
 
     @Autowired
     public CertificateRepositoryImpl(EntityManager entityManager, QueryBuilder queryBuilder) {
