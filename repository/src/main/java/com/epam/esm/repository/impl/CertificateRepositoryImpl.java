@@ -34,7 +34,7 @@ public class CertificateRepositoryImpl implements CertificateRepository {
     @Override
     public List<Certificate> find(SearchCriteria searchCriteria) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Certificate> query = queryBuilder.someMethod(criteriaBuilder, searchCriteria);
+        CriteriaQuery<Certificate> query = queryBuilder.queryBuild(criteriaBuilder, searchCriteria);
         return entityManager.createQuery(query).getResultList();
     }
 

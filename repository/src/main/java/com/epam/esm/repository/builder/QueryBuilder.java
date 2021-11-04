@@ -3,7 +3,9 @@ package com.epam.esm.repository.builder;
 import com.epam.esm.entity.Certificate;
 import com.epam.esm.repository.SearchCriteria;
 import org.apache.commons.lang3.StringUtils;
+
 import javax.persistence.criteria.*;
+
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -23,115 +25,107 @@ public final class QueryBuilder {
     private static final String NAME_EXPRESSION = "name";
     private static final String CREATE_DATE_EXPRESSION = "create_date";
     private static final String PARTIAL_STRING = "%%%s%%";
-    private CriteriaQuery<Certificate> query;
 
-    public static class Builder {
-        private final SearchCriteria searchCriteria;
-        private CriteriaQuery<Certificate> query;
-        private final CriteriaBuilder criteriaBuilder;
-        private final Root<Certificate> certificateRoot;
-        private final Join<Object, Object> join;
+    private QueryBuilder(){}
+
+    public CriteriaQuery<Certificate> queryBuild(CriteriaBuilder criteriaBuilder, SearchCriteria searchCriteria) {
+        CriteriaQuery<Certificate> query = criteriaBuilder.createQuery(Certificate.class);
+        Root<Certificate> certificateRoot = query.from(Certificate.class);
         List<Predicate> predicateList = new ArrayList<>();
+        Join<Object, Object> join = certificateRoot.join(TAGS, JoinType.LEFT);
+        query = query.select(certificateRoot);
 
-        public Builder(SearchCriteria searchCriteria, CriteriaBuilder criteriaBuilder) {
-            this.searchCriteria = searchCriteria;
-            this.criteriaBuilder = criteriaBuilder;
-            query = criteriaBuilder.createQuery(Certificate.class);
-            certificateRoot = query.from(Certificate.class);
-            join = certificateRoot.join(TAGS, JoinType.LEFT);
-            query = query.select(certificateRoot);
+        //Condition by certificate name
+        createWhereCondition(searchCriteria.getCertificateName(), NAME, criteriaBuilder, certificateRoot, predicateList);
+
+        //Condition by certificate description
+        createWhereCondition(searchCriteria.getCertificateDescription(), DESCRIPTION,
+                criteriaBuilder, certificateRoot, predicateList);
+
+        //Condition on which parameter to sort by with order type
+        String sortCondition = createSortCondition(searchCriteria.getSortByParameter());
+
+        //Condition by order type
+        Order order = orderBy(searchCriteria.getOrderType(), sortCondition, criteriaBuilder, certificateRoot);
+        if (order != null) {
+            query.orderBy(order);
         }
 
-        public Builder buildQueryClause() {
-            String parameter;
-            //Condition by certificate name
-            createConditionByParameter(searchCriteria.getCertificateName(), NAME);
+        query = query.select(certificateRoot).distinct(true);
 
-            //Condition by certificate description
-            createConditionByParameter(searchCriteria.getCertificateDescription(), DESCRIPTION);
+        //Condition to find number of tags if exists
+        query = createConditionForTags(searchCriteria.getTagList(), predicateList, join, query, criteriaBuilder, certificateRoot);
 
-            //Condition on which parameter to sort by
-            parameter = createConditionBySortParameter();
+        return query;
+    }
 
-            //Condition by order type
-            Order order = orderBy(parameter);
-            if (order != null) {
-                query.orderBy(order);
-            }
-
-            this.query = query.select(certificateRoot).distinct(true);
-            return this;
-        }
-
-        public Builder findNumberOfTags() {
-            //Condition to find number of tags if exists
-            if (searchCriteria.getTagList() != null) {
-                Predicate inListPredicate = join.get(NAME).in(searchCriteria.getTagList());
-                predicateList.add(inListPredicate);
-
-                this.query = query.where(predicateList.toArray(new Predicate[0]))
-                        .groupBy(
-                                certificateRoot.get(ID),
-                                certificateRoot.get(NAME),
-                                certificateRoot.get(DESCRIPTION),
-                                certificateRoot.get(PRICE),
-                                certificateRoot.get(DURATION),
-                                certificateRoot.get(CREATE_DATE),
-                                certificateRoot.get(LAST_UPDATE_DATE)
-                        ).having(
-                                criteriaBuilder.equal(
-                                        criteriaBuilder.countDistinct(join.get(ID)),
-                                        searchCriteria.getTagList().size()
-                                )
-                        );
-            } else {
-                this.query = query.where(predicateList.toArray(new Predicate[0]));
-            }
-            return this;
-        }
-
-        public QueryBuilder build(){
-            QueryBuilder queryBuilder = new QueryBuilder();
-            queryBuilder.query = this.query;
-            return queryBuilder;
-        }
-
-        private void createConditionByParameter(String parameter, String attributeName) {
-            if (StringUtils.isNotEmpty(parameter)) {
-                String partialName = String.format(PARTIAL_STRING, parameter);
-                Predicate predicate = criteriaBuilder.like(certificateRoot.get(attributeName), partialName);
-                predicateList.add(predicate);
-            }
-        }
-
-        private String createConditionBySortParameter() {
-            String parameter = "";
-            if (StringUtils.isNotEmpty(searchCriteria.getSortByParameter())) {
-                if (searchCriteria.getSortByParameter().equals(CREATE_DATE_EXPRESSION)) {
-                    parameter = CREATE_DATE;
-                } else if (searchCriteria.getSortByParameter().equals(NAME_EXPRESSION)) {
-                    parameter = NAME;
-                }
-            }
-            return parameter;
-        }
-
-        private Order orderBy(String parameter) {
-            Order order = null;
-            if (searchCriteria.getOrderType() != null) {
-                order = switch (searchCriteria.getOrderType()) {
-                    case ASC -> criteriaBuilder.asc(certificateRoot.get(parameter));
-                    case DESC -> criteriaBuilder.desc(certificateRoot.get(parameter));
-                };
-            }
-            return order;
+    private void createWhereCondition(String searchCriteria,
+                                      String attributeValue,
+                                      CriteriaBuilder criteriaBuilder,
+                                      Root<Certificate> certificateRoot,
+                                      List<Predicate> predicateList) {
+        if (StringUtils.isNotEmpty(searchCriteria)) {
+            String partialName = String.format(PARTIAL_STRING, searchCriteria);
+            Predicate predicate = criteriaBuilder.like(certificateRoot.get(attributeValue), partialName);
+            predicateList.add(predicate);
         }
     }
 
-    private QueryBuilder() {
+    private String createSortCondition(String searchCriteria) {
+        String parameter = "";
+        if (StringUtils.isNotEmpty(searchCriteria)) {
+            if (searchCriteria.equals(NAME_EXPRESSION)) {
+                parameter = NAME;
+            } else if (searchCriteria.equals(CREATE_DATE_EXPRESSION)) {
+                parameter = CREATE_DATE;
+            }
+        }
+        return parameter;
     }
 
-    public CriteriaQuery<Certificate> getQuery() {
+    private Order orderBy(SortType sortType,
+                          String parameter,
+                          CriteriaBuilder criteriaBuilder,
+                          Root<Certificate> certificateRoot) {
+        Order order = null;
+        if (sortType != null) {
+            order = switch (sortType) {
+                case ASC -> criteriaBuilder.asc(certificateRoot.get(parameter));
+                case DESC -> criteriaBuilder.desc(certificateRoot.get(parameter));
+            };
+        }
+        return order;
+    }
+
+    private CriteriaQuery<Certificate> createConditionForTags(List<String> tagList,
+                                                              List<Predicate> predicateList,
+                                                              Join<Object, Object> join,
+                                                              CriteriaQuery<Certificate> query,
+                                                              CriteriaBuilder criteriaBuilder,
+                                                              Root<Certificate> certificateRoot) {
+        if (tagList != null) {
+            Predicate inListPredicate = join.get(NAME).in(tagList);
+            predicateList.add(inListPredicate);
+
+            query = query.where(predicateList.toArray(new Predicate[0]))
+                    .groupBy(
+                            certificateRoot.get(ID),
+                            certificateRoot.get(NAME),
+                            certificateRoot.get(DESCRIPTION),
+                            certificateRoot.get(PRICE),
+                            certificateRoot.get(DURATION),
+                            certificateRoot.get(CREATE_DATE),
+                            certificateRoot.get(LAST_UPDATE_DATE)
+                    ).having(
+                            criteriaBuilder.equal(
+                                    criteriaBuilder.countDistinct(join.get(ID)),
+                                    tagList.size()
+                            )
+                    );
+        } else {
+            query = query.where(predicateList.toArray(new Predicate[0]));
+        }
         return query;
     }
 }
+
