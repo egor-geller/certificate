@@ -53,10 +53,8 @@ public class TagRepositoryImpl implements TagRepository {
     @Override
     public Tag create(Tag tag) {
         entityManager.persist(tag);
-        Optional<Tag> optionalTag = findById(tag.getId());
-
-        return optionalTag.orElse(tag);
-
+        entityManager.flush();
+        return tag;
     }
 
     @Transactional

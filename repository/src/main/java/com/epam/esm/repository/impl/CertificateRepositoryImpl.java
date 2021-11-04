@@ -23,20 +23,18 @@ public class CertificateRepositoryImpl implements CertificateRepository {
 
     @PersistenceContext
     private EntityManager entityManager;
+    private final QueryBuilder queryBuilder;
 
     @Autowired
-    public CertificateRepositoryImpl(EntityManager entityManager) {
+    public CertificateRepositoryImpl(EntityManager entityManager, QueryBuilder queryBuilder) {
         this.entityManager = entityManager;
+        this.queryBuilder = queryBuilder;
     }
 
     @Override
     public List<Certificate> find(SearchCriteria searchCriteria) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        QueryBuilder build = new QueryBuilder.Builder(searchCriteria, criteriaBuilder)
-                .buildQueryClause()
-                .findNumberOfTags()
-                .build();
-        CriteriaQuery<Certificate> query = build.getQuery();
+        CriteriaQuery<Certificate> query = queryBuilder.someMethod(criteriaBuilder, searchCriteria);
         return entityManager.createQuery(query).getResultList();
     }
 
@@ -75,9 +73,8 @@ public class CertificateRepositoryImpl implements CertificateRepository {
     @Override
     public Certificate create(Certificate certificate) {
         entityManager.persist(certificate);
-        long certificateId = certificate.getId();
-        Optional<Certificate> optionalCertificate = findById(certificateId);
-        return optionalCertificate.orElse(certificate);
+        entityManager.flush();
+        return certificate;
     }
 
     @Transactional
