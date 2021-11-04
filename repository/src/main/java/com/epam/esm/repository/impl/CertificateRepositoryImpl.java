@@ -2,6 +2,7 @@ package com.epam.esm.repository.impl;
 
 import com.epam.esm.entity.Certificate;
 import com.epam.esm.exception.DataException;
+import com.epam.esm.repository.PaginationContext;
 import com.epam.esm.repository.SearchCriteria;
 import com.epam.esm.repository.builder.QueryBuilder;
 import com.epam.esm.repository.repositoryinterfaces.CertificateRepository;
@@ -24,18 +25,23 @@ public class CertificateRepositoryImpl implements CertificateRepository {
     @PersistenceContext
     private EntityManager entityManager;
     private final QueryBuilder queryBuilder;
+    private final PaginationContext paginationContext;
 
     @Autowired
-    public CertificateRepositoryImpl(EntityManager entityManager, QueryBuilder queryBuilder) {
+    public CertificateRepositoryImpl(EntityManager entityManager, QueryBuilder queryBuilder, PaginationContext paginationContext) {
         this.entityManager = entityManager;
         this.queryBuilder = queryBuilder;
+        this.paginationContext = paginationContext;
     }
 
     @Override
     public List<Certificate> find(SearchCriteria searchCriteria) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Certificate> query = queryBuilder.queryBuild(criteriaBuilder, searchCriteria);
-        return entityManager.createQuery(query).getResultList();
+        return entityManager.createQuery(query)
+                .setFirstResult(paginationContext.getStartPage())
+                .setMaxResults(paginationContext.getLengthOfContext())
+                .getResultList();
     }
 
     @Override
