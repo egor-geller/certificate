@@ -1,6 +1,6 @@
 package com.epam.esm;
 
-public enum ErrorType {
+public enum PaginationErrorType {
     INVALID_PAGE_NUMBER,
     INVALID_PAGE_SIZE
 }

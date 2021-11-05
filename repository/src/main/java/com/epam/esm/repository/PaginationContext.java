@@ -1,10 +1,10 @@
 package com.epam.esm.repository;
 
-import com.epam.esm.exception.InvalidPageContextException;
+import com.epam.esm.exception.PaginationException;
 import org.springframework.stereotype.Component;
 
-import static com.epam.esm.ErrorType.INVALID_PAGE_NUMBER;
-import static com.epam.esm.ErrorType.INVALID_PAGE_SIZE;
+import static com.epam.esm.PaginationErrorType.INVALID_PAGE_NUMBER;
+import static com.epam.esm.PaginationErrorType.INVALID_PAGE_SIZE;
 
 @Component
 public class PaginationContext {
@@ -33,11 +33,11 @@ public class PaginationContext {
         this.pageSize = pageSize;
 
         if (page < MIN_PAGE) {
-            throw new InvalidPageContextException(INVALID_PAGE_NUMBER, page);
+            throw new PaginationException(INVALID_PAGE_NUMBER, page);
         }
 
         if (pageSize < MIN_PAGE_SIZE || pageSize > MAX_PAGE_SIZE) {
-            throw new InvalidPageContextException(INVALID_PAGE_SIZE, pageSize);
+            throw new PaginationException(INVALID_PAGE_SIZE, pageSize);
         }
 
         return this;
