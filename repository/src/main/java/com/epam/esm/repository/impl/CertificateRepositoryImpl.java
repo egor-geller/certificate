@@ -48,11 +48,6 @@ public class CertificateRepositoryImpl implements CertificateRepository, CreateR
     }
 
     @Override
-    public List<Certificate> findAll() {
-        return null;
-    }
-
-    @Override
     public Optional<Certificate> findById(Long id) {
         return Optional.ofNullable(entityManager.find(Certificate.class, id));
     }

@@ -1,5 +1,7 @@
 package com.epam.esm.repository.repositoryinterfaces;
 
+import com.epam.esm.repository.SearchCriteria;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -15,7 +17,13 @@ public interface Repository<T> {
      *
      * @return {@link List} of entities
      */
-    List<T> findAll();
+    default List<T> findAll() {
+        return List.of();
+    }
+
+    default List<T> find(SearchCriteria searchCriteria) {
+        return List.of();
+    }
 
     /**
      * Fina a tag or certificate by its unique Id
