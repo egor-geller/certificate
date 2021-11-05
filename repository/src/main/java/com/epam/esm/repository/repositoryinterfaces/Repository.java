@@ -1,10 +1,9 @@
 package com.epam.esm.repository.repositoryinterfaces;
 
 import com.epam.esm.entity.Certificate;
-import com.epam.esm.entity.Order;
 import com.epam.esm.entity.Tag;
-import com.epam.esm.entity.User;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -15,18 +14,25 @@ import java.util.Optional;
 public interface Repository<T> {
 
     /**
+     * Fina all entities
+     *
+     * @return {@link List} of entities
+     */
+    List<T> findAll();
+
+    /**
      * Fina a tag or certificate by its unique Id
      *
-     * @param id id of a tag or certificate
-     * @return {@link Optional} of {@link Tag}, {@link Certificate}, {@link Order} or {@link User} entity.
+     * @param id id of a tan entity
+     * @return {@link Optional} of an entity
      */
     Optional<T> findById(Long id);
 
     /**
      * Create a new certificate or tag.
      *
-     * @param t {@link Certificate}, {@link Tag} or {@link Order} instance
-     * @return entity of {@link Certificate}, {@link Tag} or {@link Order}
+     * @param t an entity instance
+     * @return entity
      */
     T create(T t);
 

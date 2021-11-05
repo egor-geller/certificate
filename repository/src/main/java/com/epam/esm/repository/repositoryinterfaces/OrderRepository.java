@@ -12,13 +12,6 @@ import java.util.List;
 public interface OrderRepository extends Repository<Order> {
 
     /**
-     * Finds all stored orders
-     *
-     * @return list of {@link Order} entity.
-     */
-    List<Order> findAll();
-
-    /**
      * Find an order by its user id
      *
      * @param id of the a user

@@ -13,13 +13,6 @@ import java.util.Optional;
 public interface TagRepository extends Repository<Tag> {
 
     /**
-     * Finds all stored tags
-     *
-     * @return list of {@link Tag} entity.
-     */
-    List<Tag> findAll();
-
-    /**
      * Find a tag by its name
      *
      * @param tagName name of the tag
