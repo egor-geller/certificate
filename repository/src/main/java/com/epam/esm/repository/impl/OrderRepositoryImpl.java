@@ -2,6 +2,7 @@ package com.epam.esm.repository.impl;
 
 import com.epam.esm.entity.Order;
 import com.epam.esm.repository.PaginationContext;
+import com.epam.esm.repository.repositoryinterfaces.CreateRepository;
 import com.epam.esm.repository.repositoryinterfaces.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -16,7 +17,7 @@ import static com.epam.esm.repository.builder.OrderQueries.SELECT_ALL_ORDERS;
 import static com.epam.esm.repository.builder.OrderQueries.SELECT_ORDER_BY_USER_ID;
 
 @Repository
-public class OrderRepositoryImpl implements OrderRepository {
+public class OrderRepositoryImpl implements OrderRepository, CreateRepository<Order> {
 
     private static final String ID = "id";
 
@@ -58,11 +59,5 @@ public class OrderRepositoryImpl implements OrderRepository {
         entityManager.persist(order);
         entityManager.flush();
         return order;
-    }
-
-    @Transactional
-    @Override
-    public void delete(Order order) {
-        throw new UnsupportedOperationException();
     }
 }

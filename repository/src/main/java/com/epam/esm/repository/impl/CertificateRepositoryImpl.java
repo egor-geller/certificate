@@ -1,11 +1,14 @@
 package com.epam.esm.repository.impl;
 
 import com.epam.esm.entity.Certificate;
+import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.DataException;
 import com.epam.esm.repository.PaginationContext;
 import com.epam.esm.repository.SearchCriteria;
 import com.epam.esm.repository.builder.QueryBuilder;
 import com.epam.esm.repository.repositoryinterfaces.CertificateRepository;
+import com.epam.esm.repository.repositoryinterfaces.CreateRepository;
+import com.epam.esm.repository.repositoryinterfaces.DeleteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Repository;
@@ -20,7 +23,7 @@ import static com.epam.esm.repository.builder.CertificateQueries.DELETE_TAG_FROM
 import static com.epam.esm.repository.builder.CertificateQueries.INSERT_TAG_TO_CERTIFICATE;
 
 @Repository
-public class CertificateRepositoryImpl implements CertificateRepository {
+public class CertificateRepositoryImpl implements CertificateRepository, CreateRepository<Certificate>, DeleteRepository<Certificate> {
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -42,6 +45,11 @@ public class CertificateRepositoryImpl implements CertificateRepository {
                 .setFirstResult(paginationContext.getStartPage())
                 .setMaxResults(paginationContext.getLengthOfContext())
                 .getResultList();
+    }
+
+    @Override
+    public List<Certificate> findAll() {
+        return null;
     }
 
     @Override

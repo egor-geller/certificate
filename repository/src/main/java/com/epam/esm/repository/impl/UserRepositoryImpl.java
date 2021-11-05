@@ -39,16 +39,4 @@ public class UserRepositoryImpl implements UserRepository {
     public Optional<User> findById(Long id) {
         return Optional.ofNullable(entityManager.find(User.class, id));
     }
-
-    @Transactional
-    @Override
-    public User create(User user) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Transactional
-    @Override
-    public void delete(User user) {
-        throw new UnsupportedOperationException();
-    }
 }
