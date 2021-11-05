@@ -1,7 +1,6 @@
 package com.epam.esm.repository.impl;
 
 import com.epam.esm.entity.Certificate;
-import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.DataException;
 import com.epam.esm.repository.PaginationContext;
 import com.epam.esm.repository.SearchCriteria;
@@ -19,8 +18,8 @@ import javax.persistence.criteria.*;
 import java.util.List;
 import java.util.Optional;
 
-import static com.epam.esm.repository.builder.CertificateQueries.DELETE_TAG_FROM_CERTIFICATE;
-import static com.epam.esm.repository.builder.CertificateQueries.INSERT_TAG_TO_CERTIFICATE;
+import static com.epam.esm.repository.query.CertificateQueries.DELETE_TAG_FROM_CERTIFICATE;
+import static com.epam.esm.repository.query.CertificateQueries.INSERT_TAG_TO_CERTIFICATE;
 
 @Repository
 public class CertificateRepositoryImpl implements CertificateRepository, CreateRepository<Certificate>, DeleteRepository<Certificate> {

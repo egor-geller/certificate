@@ -13,8 +13,8 @@ import javax.persistence.PersistenceContext;
 import java.util.List;
 import java.util.Optional;
 
-import static com.epam.esm.repository.builder.OrderQueries.SELECT_ALL_ORDERS;
-import static com.epam.esm.repository.builder.OrderQueries.SELECT_ORDER_BY_USER_ID;
+import static com.epam.esm.repository.query.OrderQueries.SELECT_ALL_ORDERS;
+import static com.epam.esm.repository.query.OrderQueries.SELECT_ORDER_BY_USER_ID;
 
 @Repository
 public class OrderRepositoryImpl implements OrderRepository, CreateRepository<Order> {

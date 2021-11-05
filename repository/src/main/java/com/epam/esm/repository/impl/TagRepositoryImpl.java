@@ -13,7 +13,7 @@ import javax.persistence.PersistenceContext;
 import java.util.List;
 import java.util.Optional;
 
-import static com.epam.esm.repository.builder.TagQueries.*;
+import static com.epam.esm.repository.query.TagQueries.*;
 
 @Repository
 public class TagRepositoryImpl implements TagRepository, CreateRepository<Tag>, DeleteRepository<Tag> {
