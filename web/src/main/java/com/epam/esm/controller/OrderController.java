@@ -1,16 +1,13 @@
 package com.epam.esm.controller;
 
 import com.epam.esm.dto.OrderDto;
+import com.epam.esm.entity.Order;
 import com.epam.esm.repository.PaginationContext;
 import com.epam.esm.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -71,4 +68,16 @@ public class OrderController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @PostMapping
+    public ResponseEntity<OrderDto> makeOrder(@RequestBody OrderDto orderDto) {
+        OrderDto checkout = orderService.makeOrderService(orderDto);
+        if (checkout != null) {
+            checkout.add(linkTo(
+                    methodOn(OrderController.class)
+                            .getOrderById(orderDto.getId()))
+                    .withSelfRel()
+            );
+        }
+        return new ResponseEntity<>(checkout, HttpStatus.OK);
+    }
 }
