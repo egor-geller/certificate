@@ -20,6 +20,7 @@ allprojects {
         implementation group: 'org.springframework', name: 'spring-orm', version: springHibernate
 
         implementation group: 'org.springframework.boot', name: 'spring-boot-starter', version: bootVersion
+        implementation group: 'org.springframework.boot', name: 'spring-boot-starter-hateoas', version: bootVersion
 
         testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: bootVersion
         testImplementation group: 'org.springframework.boot', name: 'spring-boot-test-autoconfigure', version: bootVersion
