@@ -78,6 +78,6 @@ public class OrderController {
                     .withSelfRel()
             );
         }
-        return new ResponseEntity<>(checkout, HttpStatus.OK);
+        return new ResponseEntity<>(checkout, HttpStatus.CREATED);
     }
 }
