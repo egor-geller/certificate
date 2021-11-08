@@ -1,21 +1,20 @@
 package com.epam.esm.repository;
 
-import com.epam.esm.exception.PaginationException;
 import com.epam.esm.validation.PaginationValidator;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import static com.epam.esm.PaginationErrorType.INVALID_PAGE_NUMBER;
-import static com.epam.esm.PaginationErrorType.INVALID_PAGE_SIZE;
 
 @Component
 public class PaginationContext {
 
-    private PaginationValidator paginationValidator;
+    private final PaginationValidator paginationValidator;
 
     private int page;
     private int pageSize;
 
-    private PaginationContext(){
+    @Autowired
+    public PaginationContext(PaginationValidator paginationValidator) {
+        this.paginationValidator = paginationValidator;
     }
 
     public PaginationContext createPagination(Integer page, Integer pageSize) {

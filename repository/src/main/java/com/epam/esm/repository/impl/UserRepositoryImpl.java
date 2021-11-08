@@ -18,16 +18,14 @@ public class UserRepositoryImpl implements UserRepository {
 
     @PersistenceContext
     private EntityManager entityManager;
-    private final PaginationContext paginationContext;
 
     @Autowired
-    public UserRepositoryImpl(EntityManager entityManager, PaginationContext paginationContext) {
-        this.paginationContext = paginationContext;
+    public UserRepositoryImpl(EntityManager entityManager) {
         this.entityManager = entityManager;
     }
 
     @Override
-    public List<User> findAll() {
+    public List<User> findAll(PaginationContext paginationContext) {
         return entityManager.createQuery(FIND_ALL_USERS, User.class)
                 .setFirstResult(paginationContext.getStartPage())
                 .setMaxResults(paginationContext.getLengthOfContext())

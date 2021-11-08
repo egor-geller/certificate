@@ -1,5 +1,6 @@
 package com.epam.esm.repository.repositoryinterfaces;
 
+import com.epam.esm.repository.PaginationContext;
 import com.epam.esm.repository.SearchCriteria;
 
 import java.util.List;
@@ -17,11 +18,11 @@ public interface Repository<T> {
      *
      * @return {@link List} of entities
      */
-    default List<T> findAll() {
+    default List<T> findAll(PaginationContext paginationContext) {
         return List.of();
     }
 
-    default List<T> find(SearchCriteria searchCriteria) {
+    default List<T> find(PaginationContext paginationContext, SearchCriteria searchCriteria) {
         return List.of();
     }
 

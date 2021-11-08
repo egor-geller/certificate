@@ -27,17 +27,15 @@ public class CertificateRepositoryImpl implements CertificateRepository, CreateR
     @PersistenceContext
     private EntityManager entityManager;
     private final QueryBuilder queryBuilder;
-    private final PaginationContext paginationContext;
 
     @Autowired
-    public CertificateRepositoryImpl(EntityManager entityManager, QueryBuilder queryBuilder, PaginationContext paginationContext) {
+    public CertificateRepositoryImpl(EntityManager entityManager, QueryBuilder queryBuilder) {
         this.entityManager = entityManager;
         this.queryBuilder = queryBuilder;
-        this.paginationContext = paginationContext;
     }
 
     @Override
-    public List<Certificate> find(SearchCriteria searchCriteria) {
+    public List<Certificate> find(PaginationContext paginationContext, SearchCriteria searchCriteria) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Certificate> query = queryBuilder.queryBuild(criteriaBuilder, searchCriteria);
         return entityManager.createQuery(query)

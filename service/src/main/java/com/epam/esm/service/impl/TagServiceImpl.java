@@ -7,9 +7,10 @@ import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.AttachedTagException;
 import com.epam.esm.exception.EntityAlreadyExistsException;
 import com.epam.esm.exception.EntityNotFoundException;
+import com.epam.esm.repository.PaginationContext;
 import com.epam.esm.repository.SearchCriteria;
-import com.epam.esm.repository.repositoryinterfaces.CertificateRepository;
-import com.epam.esm.repository.repositoryinterfaces.TagRepository;
+import com.epam.esm.repository.impl.CertificateRepositoryImpl;
+import com.epam.esm.repository.impl.TagRepositoryImpl;
 import com.epam.esm.service.TagService;
 import com.epam.esm.validator.TagValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,24 +23,28 @@ import java.util.stream.Collectors;
 @Service
 public class TagServiceImpl implements TagService {
 
-    private final CertificateRepository certificateRepository;
-    private final TagRepository tagRepository;
+    private final CertificateRepositoryImpl certificateRepository;
+    private final TagRepositoryImpl tagRepository;
     private final TagValidator tagValidator;
     private final TagServiceMapper tagServiceMapper;
+    private final PaginationContext paginationContext;
 
-    public TagServiceImpl(TagRepository tagRepository,
-                          CertificateRepository certificateRepository,
+    @Autowired
+    public TagServiceImpl(TagRepositoryImpl tagRepository,
+                          CertificateRepositoryImpl certificateRepository,
                           TagValidator tagValidator,
-                          @Autowired TagServiceMapper tagServiceMapper) {
+                          TagServiceMapper tagServiceMapper,
+                          PaginationContext paginationContext) {
         this.tagRepository = tagRepository;
         this.certificateRepository = certificateRepository;
         this.tagValidator = tagValidator;
         this.tagServiceMapper = tagServiceMapper;
+        this.paginationContext = paginationContext;
     }
 
     @Override
     public List<TagDto> findAllTags() {
-        return tagRepository.findAll().stream()
+        return tagRepository.findAll(paginationContext).stream()
                 .map(tagServiceMapper::convertTagToDto)
                 .collect(Collectors.toList());
     }
@@ -96,7 +101,7 @@ public class TagServiceImpl implements TagService {
             throw new EntityNotFoundException(id);
         }
         tagById.ifPresent(tag -> searchCriteria.setTagList(List.of(tag.getName())));
-        List<Certificate> certificateList = certificateRepository.find(searchCriteria);
+        List<Certificate> certificateList = certificateRepository.find(paginationContext, searchCriteria);
 
         if (!certificateList.isEmpty()) {
             throw new AttachedTagException(tagById.get().getId(), tagById.get().getName());

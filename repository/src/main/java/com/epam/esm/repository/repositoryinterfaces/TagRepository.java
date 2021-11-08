@@ -1,6 +1,7 @@
 package com.epam.esm.repository.repositoryinterfaces;
 
 import com.epam.esm.entity.Tag;
+import com.epam.esm.repository.PaginationContext;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,5 +27,5 @@ public interface TagRepository extends Repository<Tag> {
      * @param id id of the certificate
      * @return list of {@link Tag} entity.
      */
-    List<Tag> findByCertificateId(Long id);
+    List<Tag> findByCertificateId(PaginationContext paginationContext, Long id);
 }

@@ -20,15 +20,13 @@ public class TagRepositoryImpl implements TagRepository, CreateRepository<Tag>, 
 
     @PersistenceContext
     private EntityManager entityManager;
-    private final PaginationContext paginationContext;
 
-    public TagRepositoryImpl(EntityManager entityManager, PaginationContext paginationContext) {
+    public TagRepositoryImpl(EntityManager entityManager) {
         this.entityManager = entityManager;
-        this.paginationContext = paginationContext;
     }
 
     @Override
-    public List<Tag> findAll() {
+    public List<Tag> findAll(PaginationContext paginationContext) {
         return entityManager.createQuery(SELECT_ALL_TAGS, Tag.class)
                 .setFirstResult(paginationContext.getStartPage())
                 .setMaxResults(paginationContext.getLengthOfContext())
@@ -51,7 +49,7 @@ public class TagRepositoryImpl implements TagRepository, CreateRepository<Tag>, 
     }
 
     @Override
-    public List<Tag> findByCertificateId(Long id) {
+    public List<Tag> findByCertificateId(PaginationContext paginationContext, Long id) {
         return entityManager.createQuery(SELECT_TAG_BY_CERTIFICATE, Tag.class)
                 .setFirstResult(paginationContext.getStartPage())
                 .setMaxResults(paginationContext.getLengthOfContext())

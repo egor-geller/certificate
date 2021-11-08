@@ -1,6 +1,7 @@
 package com.epam.esm.repository.repositoryinterfaces;
 
 import com.epam.esm.entity.Certificate;
+import com.epam.esm.repository.PaginationContext;
 import com.epam.esm.repository.SearchCriteria;
 
 import java.util.List;
@@ -19,7 +20,7 @@ public interface CertificateRepository extends Repository<Certificate> {
      * @param searchCriteria {@link SearchCriteria} entity for searching by specific parameter
      * @return list of {@link Certificate}
      */
-    List<Certificate> find(SearchCriteria searchCriteria);
+    List<Certificate> find(PaginationContext paginationContext, SearchCriteria searchCriteria);
 
     /**
      * Attach tag to existing certificate.

@@ -23,16 +23,14 @@ public class OrderRepositoryImpl implements OrderRepository, CreateRepository<Or
 
     @PersistenceContext
     private EntityManager entityManager;
-    private final PaginationContext paginationContext;
 
     @Autowired
-    public OrderRepositoryImpl(EntityManager entityManager, PaginationContext paginationContext) {
+    public OrderRepositoryImpl(EntityManager entityManager) {
         this.entityManager = entityManager;
-        this.paginationContext = paginationContext;
     }
 
     @Override
-    public List<Order> findAll() {
+    public List<Order> findAll(PaginationContext paginationContext) {
         return entityManager.createQuery(SELECT_ALL_ORDERS, Order.class)
                 .setFirstResult(paginationContext.getStartPage())
                 .setMaxResults(paginationContext.getLengthOfContext())
@@ -45,7 +43,7 @@ public class OrderRepositoryImpl implements OrderRepository, CreateRepository<Or
     }
 
     @Override
-    public List<Order> findByUserId(Long id) {
+    public List<Order> findByUserId(PaginationContext paginationContext, Long id) {
         return entityManager.createQuery(SELECT_ORDER_BY_USER_ID, Order.class)
                 .setParameter(ID, id)
                 .setFirstResult(paginationContext.getStartPage())

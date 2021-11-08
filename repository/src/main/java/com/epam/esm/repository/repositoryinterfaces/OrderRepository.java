@@ -1,6 +1,7 @@
 package com.epam.esm.repository.repositoryinterfaces;
 
 import com.epam.esm.entity.Order;
+import com.epam.esm.repository.PaginationContext;
 
 import java.util.List;
 
@@ -17,5 +18,5 @@ public interface OrderRepository extends Repository<Order> {
      * @param id of the a user
      * @return {@link List} of {@link Order} entity.
      */
-    List<Order> findByUserId(Long id);
+    List<Order> findByUserId(PaginationContext paginationContext, Long id);
 }
