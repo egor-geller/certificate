@@ -1,7 +1,7 @@
 package com.epam.esm.dto;
 
-import com.epam.esm.dto.mapper.DayDurationDeserializer;
-import com.epam.esm.dto.mapper.DayDurationSerializer;
+import com.epam.esm.dto.mapper.serializer.DayDurationDeserializer;
+import com.epam.esm.dto.mapper.serializer.DayDurationSerializer;
 import com.epam.esm.entity.Certificate;
 import com.epam.esm.entity.Tag;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Objects;
 
 public class CertificateDto {
 
@@ -36,7 +37,7 @@ public class CertificateDto {
 
     private List<Tag> tagList;
 
-    public CertificateDto(){}
+    public CertificateDto() {}
 
     public CertificateDto(Certificate certificate, List<Tag> tagList) {
         this.id = certificate.getId();
@@ -111,6 +112,23 @@ public class CertificateDto {
 
     public void setTagList(List<Tag> tagList) {
         this.tagList = tagList;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        CertificateDto that = (CertificateDto) o;
+        return Objects.equals(id, that.id) && Objects.equals(name, that.name)
+                && Objects.equals(description, that.description) && Objects.equals(price, that.price)
+                && Objects.equals(duration, that.duration) && Objects.equals(createDate, that.createDate)
+                && Objects.equals(lastUpdateDate, that.lastUpdateDate) && Objects.equals(tagList, that.tagList);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), id, name, description, price, duration, createDate, lastUpdateDate, tagList);
     }
 
     @Override
