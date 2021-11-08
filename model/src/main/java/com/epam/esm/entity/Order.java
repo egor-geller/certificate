@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Entity
-@Table(name = "order")
+@Table(name = "cert_order")
 public class Order {
 
     @Id
@@ -34,14 +34,14 @@ public class Order {
     private ZonedDateTime purchaseDate;
 
     @ManyToOne
-    @JoinColumn(name = "id_user", referencedColumnName = "id")
+    @JoinColumn(name = "cert_user_id", referencedColumnName = "id")
     private User user;
 
     @ManyToMany
     @JoinTable(
             name = "order_has_certificate",
-            joinColumns = @JoinColumn(name = "id_order"),
-            inverseJoinColumns = @JoinColumn(name = "id certificate")
+            joinColumns = @JoinColumn(name = "cert_order_id"),
+            inverseJoinColumns = @JoinColumn(name = "gift_certificate_id")
     )
     private List<Certificate> certificateList;
 
