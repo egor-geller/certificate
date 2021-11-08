@@ -112,6 +112,12 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         return buildErrorResponseEntity(HttpStatus.UNSUPPORTED_MEDIA_TYPE, errorMessage, CODE_ERROR_415);
     }
 
+    @ExceptionHandler(EmptyOrderException.class)
+    public ResponseEntity<Object> emptyOrderExceptionHandle() {
+        String errorMessage = getErrorMessage(EMPTY_ORDER_ERROR_MESSAGE);
+        return buildErrorResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, errorMessage, CODE_ERROR_500);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> defaultHandle() {
         String errorMessage = getErrorMessage(INTERNAL_SERVER_ERROR_MESSAGE);
