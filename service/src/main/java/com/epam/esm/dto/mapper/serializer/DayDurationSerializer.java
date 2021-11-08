@@ -1,4 +1,4 @@
-package com.epam.esm.dto.mapper;
+package com.epam.esm.dto.mapper.serializer;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
