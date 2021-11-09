@@ -1,10 +1,12 @@
 package com.epam.esm.entity;
 
+import com.epam.esm.audit.AuditListener;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.GeneratedValue;
@@ -23,6 +25,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "gift_certificate")
+@EntityListeners(AuditListener.class)
 public class Certificate {
 
     @Id

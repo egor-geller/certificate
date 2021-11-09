@@ -1,9 +1,12 @@
 package com.epam.esm.entity;
 
+import com.epam.esm.audit.AuditListener;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -12,7 +15,6 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -20,6 +22,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "cert_order")
+@EntityListeners(AuditListener.class)
 public class Order {
 
     @Id
@@ -29,6 +32,9 @@ public class Order {
     @Column(name = "cost")
     private BigDecimal cost;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING,
+            pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX",
+            timezone = "UTC")
     @Column(name = "purchase_date", updatable = false, columnDefinition = "TIMESTAMP() default CURRENT_TIMESTAMP() on update CURRENT_TIMESTAMP()")
     @CreationTimestamp
     private ZonedDateTime purchaseDate;
@@ -91,13 +97,12 @@ public class Order {
         if (o == null || getClass() != o.getClass()) return false;
         Order order = (Order) o;
         return Objects.equals(id, order.id) && Objects.equals(cost, order.cost)
-                && Objects.equals(purchaseDate, order.purchaseDate) && Objects.equals(user, order.user)
-                && Objects.equals(certificateList, order.certificateList);
+                && Objects.equals(purchaseDate, order.purchaseDate);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, cost, purchaseDate, user, certificateList);
+        return Objects.hash(id, cost, purchaseDate);
     }
 
     @Override
@@ -106,8 +111,6 @@ public class Order {
                 "id=" + id +
                 ", cost=" + cost +
                 ", purchaseDate=" + purchaseDate +
-                ", user=" + user +
-                ", certificateList=" + certificateList +
                 '}';
     }
 }

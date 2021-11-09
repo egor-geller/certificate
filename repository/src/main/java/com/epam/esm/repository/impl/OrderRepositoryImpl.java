@@ -19,8 +19,6 @@ import static com.epam.esm.repository.query.OrderQueries.SELECT_ORDER_BY_USER_ID
 @Repository
 public class OrderRepositoryImpl implements OrderRepository, CreateRepository<Order> {
 
-    private static final String ID = "id";
-
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -42,10 +40,11 @@ public class OrderRepositoryImpl implements OrderRepository, CreateRepository<Or
         return Optional.ofNullable(entityManager.find(Order.class, id));
     }
 
+    //TODO: how to get o.user.id?
     @Override
     public List<Order> findByUserId(PaginationContext paginationContext, Long id) {
-        return entityManager.createQuery(SELECT_ORDER_BY_USER_ID, Order.class)
-                .setParameter(ID, id)
+        return entityManager.createQuery("SELECT o FROM Order o WHERE o.user.id = ?1", Order.class)
+                .setParameter(1, id)
                 .setFirstResult(paginationContext.getStartPage())
                 .setMaxResults(paginationContext.getLengthOfContext())
                 .getResultList();

@@ -27,5 +27,5 @@ public interface TagRepository extends Repository<Tag> {
      * @param id id of the certificate
      * @return list of {@link Tag} entity.
      */
-    List<Tag> findByCertificateId(PaginationContext paginationContext, Long id);
+    List<Tag> findByCertificateId(Long id);
 }

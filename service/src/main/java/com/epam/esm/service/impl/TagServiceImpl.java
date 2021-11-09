@@ -27,23 +27,20 @@ public class TagServiceImpl implements TagService {
     private final TagRepositoryImpl tagRepository;
     private final TagValidator tagValidator;
     private final TagServiceMapper tagServiceMapper;
-    private final PaginationContext paginationContext;
 
     @Autowired
     public TagServiceImpl(TagRepositoryImpl tagRepository,
                           CertificateRepositoryImpl certificateRepository,
                           TagValidator tagValidator,
-                          TagServiceMapper tagServiceMapper,
-                          PaginationContext paginationContext) {
+                          TagServiceMapper tagServiceMapper) {
         this.tagRepository = tagRepository;
         this.certificateRepository = certificateRepository;
         this.tagValidator = tagValidator;
         this.tagServiceMapper = tagServiceMapper;
-        this.paginationContext = paginationContext;
     }
 
     @Override
-    public List<TagDto> findAllTags() {
+    public List<TagDto> findAllTags(PaginationContext paginationContext) {
         return tagRepository.findAll(paginationContext).stream()
                 .map(tagServiceMapper::convertTagToDto)
                 .collect(Collectors.toList());
@@ -68,7 +65,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public TagDto create(TagDto tagDto) {
+    public TagDto create(PaginationContext paginationContext, TagDto tagDto) {
         tagValidator.validateTagValid(tagDto.getName());
 
         Tag fromTagDto = tagServiceMapper.convertTagFromDto(tagDto);
@@ -92,7 +89,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public boolean delete(Long id) {
+    public boolean delete(Long id, PaginationContext paginationContext) {
         tagValidator.validateId(id);
 
         SearchCriteria searchCriteria = new SearchCriteria();

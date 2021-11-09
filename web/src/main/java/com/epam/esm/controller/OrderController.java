@@ -46,22 +46,20 @@ public class OrderController {
     public ResponseEntity<OrderDto> getOrderById(@PathVariable("id") Long id) {
         OrderDto orderDto = orderService.findOrderByIdService(id);
         if (orderDto != null) {
-            orderDto.add(linkTo(
-                    methodOn(OrderController.class)
-                            .getAllOrders(paginationContext.getStartPage(), paginationContext.getLengthOfContext()))
-                    .withSelfRel()
-            );
+            orderDto.add(linkTo(methodOn(OrderController.class).getOrderById(id)).withSelfRel());
         }
         return new ResponseEntity<>(orderDto, HttpStatus.OK);
     }
 
     @GetMapping("/user/{id}")
-    public ResponseEntity<Collection<OrderDto>> getOrdersOfUserByItsId(@PathVariable("id") Long id) {
-        List<OrderDto> orderDtoList = orderService.findByOrderByUserService(id, paginationContext);
+    public ResponseEntity<Collection<OrderDto>> getOrdersOfUserByItsId(@RequestParam(required = false) Integer page,
+                                                                       @RequestParam(required = false) Integer pageSize,
+                                                                       @PathVariable("id") Long id) {
+        List<OrderDto> orderDtoList = orderService.findByOrderByUserService(id, paginationContext.createPagination(page, pageSize));
         List<OrderDto> response = new ArrayList<>();
-        if (orderDtoList != null) {
+        if (!orderDtoList.isEmpty()) {
             orderDtoList.forEach(order -> {
-                order.add(linkTo(methodOn(OrderController.class).getOrderById(id)).withSelfRel());
+                order.add(linkTo(methodOn(OrderController.class).getOrderById(order.getId())).withSelfRel());
                 response.add(order);
             });
         }
@@ -72,11 +70,7 @@ public class OrderController {
     public ResponseEntity<OrderDto> makeOrder(@RequestBody OrderDto orderDto) {
         OrderDto checkout = orderService.makeOrderService(orderDto);
         if (checkout != null) {
-            checkout.add(linkTo(
-                    methodOn(OrderController.class)
-                            .getOrderById(orderDto.getId()))
-                    .withSelfRel()
-            );
+            checkout.add(linkTo(methodOn(OrderController.class).getOrderById(orderDto.getId())).withSelfRel());
         }
         return new ResponseEntity<>(checkout, HttpStatus.CREATED);
     }

@@ -2,14 +2,13 @@ package com.epam.esm.dto;
 
 import com.epam.esm.entity.Certificate;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import org.springframework.hateoas.RepresentationModel;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Objects;
 
-public class OrderDto extends RepresentationModel<OrderDto> {
+public class OrderDto extends IdDto {
 
     private Long id;
     private Long userId;

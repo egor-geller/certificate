@@ -3,7 +3,6 @@ package com.epam.esm.dto.mapper;
 import com.epam.esm.dto.OrderDto;
 import com.epam.esm.entity.Certificate;
 import com.epam.esm.entity.Order;
-import org.springframework.hateoas.RepresentationModel;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;

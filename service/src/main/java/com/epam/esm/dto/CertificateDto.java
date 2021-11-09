@@ -14,7 +14,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Objects;
 
-public class CertificateDto {
+public class CertificateDto extends IdDto {
 
     private Long id;
     private String name;
@@ -37,7 +37,8 @@ public class CertificateDto {
 
     private List<Tag> tagList;
 
-    public CertificateDto() {}
+    public CertificateDto() {
+    }
 
     public CertificateDto(Certificate certificate, List<Tag> tagList) {
         this.id = certificate.getId();

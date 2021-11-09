@@ -1,6 +1,9 @@
 package com.epam.esm.entity;
 
+import com.epam.esm.audit.AuditListener;
+
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.GeneratedValue;
@@ -11,6 +14,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "tag")
+@EntityListeners(AuditListener.class)
 public class Tag {
 
     @Id

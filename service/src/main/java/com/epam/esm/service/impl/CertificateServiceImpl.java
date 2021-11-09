@@ -28,22 +28,22 @@ public class CertificateServiceImpl implements CertificateService {
     private final TagRepositoryImpl tagRepository;
     private final CertificateServiceMapper certificateServiceMapper;
     private final CertificateValidator certificateValidator;
-    private final PaginationContext paginationContext;
+    private final PaginationContext newPaginationContext;
 
     public CertificateServiceImpl(CertificateRepositoryImpl certificateRepository,
                                   TagRepositoryImpl tagRepository,
                                   CertificateServiceMapper certificateServiceMapper,
                                   CertificateValidator certificateValidator,
-                                  PaginationContext paginationContext) {
+                                  PaginationContext newPaginationContext) {
         this.certificateRepository = certificateRepository;
         this.tagRepository = tagRepository;
         this.certificateServiceMapper = certificateServiceMapper;
         this.certificateValidator = certificateValidator;
-        this.paginationContext = paginationContext;
+        this.newPaginationContext = newPaginationContext;
     }
 
     @Override
-    public List<CertificateDto> findCertificateByCriteria(SearchCriteria searchCriteria) {
+    public List<CertificateDto> findCertificateByCriteria(PaginationContext paginationContext, SearchCriteria searchCriteria) {
         certificateValidator.validateSearchCriteriaEmpty(searchCriteria);
         List<Certificate> certificateList = certificateRepository.find(paginationContext, searchCriteria).stream()
                 .distinct()
@@ -51,7 +51,7 @@ public class CertificateServiceImpl implements CertificateService {
 
         return certificateList.stream().map(certificate -> {
             long id = certificate.getId();
-            List<Tag> byCertificateId = tagRepository.findByCertificateId(paginationContext, id);
+            List<Tag> byCertificateId = tagRepository.findByCertificateId(id);
             return certificateServiceMapper.convertCertificateToDto(certificate, byCertificateId);
         }).collect(Collectors.toList());
     }
@@ -61,7 +61,7 @@ public class CertificateServiceImpl implements CertificateService {
         certificateValidator.validateId(id);
         Certificate certificate = certificateRepository.findById(id).orElseThrow(() ->
                 new EntityNotFoundException(id));
-        List<Tag> byCertificateId = tagRepository.findByCertificateId(paginationContext, id);
+        List<Tag> byCertificateId = tagRepository.findByCertificateId(id);
         return certificateServiceMapper.convertCertificateToDto(certificate, byCertificateId);
     }
 
@@ -78,7 +78,7 @@ public class CertificateServiceImpl implements CertificateService {
     }
 
     @Override
-    public CertificateDto detachTagFromCertificate(long certificateId, long tagId) {
+    public CertificateDto detachTagFromCertificate(PaginationContext paginationContext, long certificateId, long tagId) {
         certificateValidator.validateId(certificateId, tagId);
 
         SearchCriteria searchCriteria = new SearchCriteria();
@@ -99,7 +99,7 @@ public class CertificateServiceImpl implements CertificateService {
     }
 
     @Override
-    public CertificateDto create(CertificateDto certificate) {
+    public CertificateDto create(PaginationContext paginationContext, CertificateDto certificate) {
         if (certificate == null) {
             throw new EntityNotFoundException();
         }
@@ -134,7 +134,7 @@ public class CertificateServiceImpl implements CertificateService {
             });
         }
         Optional<Certificate> createdCertificate = certificateRepository.findById(certificate1.getId());
-        List<Tag> updatedTagList = tagRepository.findByCertificateId(paginationContext, certificate1.getId());
+        List<Tag> updatedTagList = tagRepository.findByCertificateId(certificate1.getId());
         return certificateServiceMapper.convertCertificateToDto(certificate1.getId(), createdCertificate, updatedTagList);
     }
 
@@ -157,7 +157,7 @@ public class CertificateServiceImpl implements CertificateService {
 
         List<Tag> tagList = certificate.getTagList();
         if (CollectionUtils.isNotEmpty(tagList)) {
-            List<Tag> byCertificateId = tagRepository.findByCertificateId(paginationContext, checkedCertificate.getId());
+            List<Tag> byCertificateId = tagRepository.findByCertificateId(checkedCertificate.getId());
             if (CollectionUtils.isNotEmpty(byCertificateId)) {
                 boolean allMatch = tagList.stream()
                         .allMatch(tag -> (byCertificateId.stream()
@@ -165,7 +165,7 @@ public class CertificateServiceImpl implements CertificateService {
                 if (allMatch && allParametersAreTheSame) {
                     throw new EntityAlreadyExistsException();
                 }
-                byCertificateId.forEach(tag -> detachTagFromCertificate(checkedCertificate.getId(), tag.getId()));
+                byCertificateId.forEach(tag -> detachTagFromCertificate(newPaginationContext, checkedCertificate.getId(), tag.getId()));
             }
             certificate.getTagList().forEach(tagName -> {
                 Optional<Tag> tagIdByName = tagRepository.findByName(tagName.getName());
@@ -181,43 +181,43 @@ public class CertificateServiceImpl implements CertificateService {
         }
 
         Optional<Certificate> updatedCertificate = certificateRepository.findById(certificate.getId());
-        List<Tag> updatedTagList = tagRepository.findByCertificateId(paginationContext, certificate.getId());
+        List<Tag> updatedTagList = tagRepository.findByCertificateId(certificate.getId());
         return certificateServiceMapper.convertCertificateToDto(certificate.getId(), updatedCertificate, updatedTagList);
     }
 
     @Override
-    public boolean delete(Long id) {
+    public boolean delete(Long id, PaginationContext paginationContext) {
         certificateValidator.validateId(id);
         Optional<Certificate> certificateById = certificateRepository.findById(id);
         if (certificateById.isEmpty()) {
             throw new EntityNotFoundException(id);
         }
-        List<Tag> byCertificateId = tagRepository.findByCertificateId(paginationContext, id);
-        byCertificateId.forEach(tag -> detachTagFromCertificate(id, tag.getId()));
+        List<Tag> byCertificateId = tagRepository.findByCertificateId(id);
+        byCertificateId.forEach(tag -> detachTagFromCertificate(newPaginationContext, id, tag.getId()));
 
         certificateRepository.delete(certificateById.get());
         return true;
     }
 
-    @Scheduled(cron = "0 30 9-17 * * MON-FRI")
+    /*@Scheduled(cron = "0 30 9-17 * * MON-FRI")
     public void scheduleDeletionOfDetachedTag() {
-        List<Tag> allTagsList = tagRepository.findAll(paginationContext);
+        List<Tag> allTagsList = tagRepository.findAll();
         SearchCriteria searchCriteria = new SearchCriteria();
         for (Tag tag : allTagsList) {
             searchCriteria.setTagList(List.of(tag.getName()));
-            List<Certificate> certificateList = certificateRepository.find(paginationContext, searchCriteria);
+            List<Certificate> certificateList = certificateRepository.find(searchCriteria);
             if (certificateList == null || certificateList.isEmpty()) {
                 tagRepository.delete(tag);
             }
         }
-    }
+    }*/
 
     private CertificateDto getCertificateDto(long certificateId, long tagId) {
         Optional<Certificate> updatedCertificate = certificateRepository.findById(certificateId);
         if (updatedCertificate.isEmpty()) {
             throw new EntityNotFoundException(tagId, certificateId);
         }
-        List<Tag> tagsOfCurrentCertificate = tagRepository.findByCertificateId(paginationContext, certificateId);
+        List<Tag> tagsOfCurrentCertificate = tagRepository.findByCertificateId(certificateId);
         return certificateServiceMapper.convertCertificateToDto(updatedCertificate.get(), tagsOfCurrentCertificate);
     }
 }

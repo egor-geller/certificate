@@ -1,5 +1,7 @@
 package com.epam.esm.service;
 
+import com.epam.esm.repository.PaginationContext;
+
 /**
  * Generic interface for Entity service.
  *
@@ -13,7 +15,7 @@ public interface EntityService<T> {
      * @param t generic param
      * @return generic param
      */
-    T create(T t);
+    T create(PaginationContext paginationContext, T t);
 
     /**
      * Generic update of an entity
@@ -29,5 +31,5 @@ public interface EntityService<T> {
      * @param id the id
      * @return {@code True} if delete was successful, otherwise {@code False}
      */
-    boolean delete(Long id);
+    boolean delete(Long id, PaginationContext paginationContext);
 }

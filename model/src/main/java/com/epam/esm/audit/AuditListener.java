@@ -2,15 +2,14 @@ package com.epam.esm.audit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import javax.persistence.PostPersist;
 import javax.persistence.PostRemove;
 import javax.persistence.PostUpdate;
-
 import java.time.ZonedDateTime;
 
 import static com.epam.esm.audit.Operation.*;
@@ -25,10 +24,9 @@ public class AuditListener {
     private static final String UPDATED_MESSAGE = "ENTITY UPDATED: %s";
     private static final String DELETED_MESSAGE = "ENTITY DELETED: %s";
 
-    @PersistenceContext
     private EntityManager entityManager;
 
-    public AuditListener(EntityManager entityManager) {
+    public AuditListener(@Lazy EntityManager entityManager) {
         this.entityManager = entityManager;
     }
 

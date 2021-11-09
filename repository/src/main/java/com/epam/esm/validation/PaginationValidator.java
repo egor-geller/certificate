@@ -10,7 +10,7 @@ import static com.epam.esm.PaginationErrorType.INVALID_PAGE_SIZE;
 public class PaginationValidator {
 
     private static final int MIN_PAGE = 1;
-    private static final int MIN_PAGE_SIZE = 0;
+    private static final int MIN_PAGE_SIZE = 1;
     private static final int MAX_PAGE_SIZE = 50;
     private static final int DEFAULT_PAGE = 1;
     private static final int DEFAULT_PAGE_SIZE = 10;

@@ -2,7 +2,7 @@ package com.epam.esm.dto;
 
 import java.util.Objects;
 
-public class TagDto {
+public class TagDto extends IdDto {
 
     private Long id;
     private String name;

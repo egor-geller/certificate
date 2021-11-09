@@ -49,10 +49,8 @@ public class TagRepositoryImpl implements TagRepository, CreateRepository<Tag>, 
     }
 
     @Override
-    public List<Tag> findByCertificateId(PaginationContext paginationContext, Long id) {
+    public List<Tag> findByCertificateId(Long id) {
         return entityManager.createQuery(SELECT_TAG_BY_CERTIFICATE, Tag.class)
-                .setFirstResult(paginationContext.getStartPage())
-                .setMaxResults(paginationContext.getLengthOfContext())
                 .setParameter(1, id)
                 .getResultList();
     }
