@@ -40,7 +40,7 @@ public class Order {
     private ZonedDateTime purchaseDate;
 
     @ManyToOne
-    @JoinColumn(name = "cert_user_id", referencedColumnName = "id")
+    //@JoinColumn(name = "cert_user_id", referencedColumnName = "id")
     private User user;
 
     @ManyToMany
