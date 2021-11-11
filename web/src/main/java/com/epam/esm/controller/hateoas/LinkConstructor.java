@@ -26,4 +26,9 @@ public class LinkConstructor {
                 .slash(id)
                 .withRel(rel);
     }
+    public static Link constructPageLink(Class<?> controllerClass, int page, int pageSize, String rel) {
+        return linkTo(controllerClass)
+                .slash("?page="+page+"&pageSize="+pageSize)
+                .withRel(rel);
+    }
 }

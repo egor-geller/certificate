@@ -27,4 +27,9 @@ public class UserHateoasProvider extends ModelHateoasProvider<UserDto> {
     protected String getAllResourcesRel() {
         return ALL_USERS_REL;
     }
+
+    @Override
+    protected Long getCurrentId(UserDto userDto) {
+        return userDto.getId();
+    }
 }

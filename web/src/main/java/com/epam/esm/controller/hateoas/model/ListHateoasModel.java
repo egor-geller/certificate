@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class ListHateoasModel<T extends IdDto> extends RepresentationModel<ListHateoasModel<T>> {
+
     private List<T> data;
 
     public ListHateoasModel(List<T> data) {
@@ -23,7 +24,7 @@ public class ListHateoasModel<T extends IdDto> extends RepresentationModel<ListH
         this.data = data;
     }
 
-    public static <T extends IdDto> ListHateoasModel<T> build(HateoasProvider<List<T>> hateoasProvider,
+    public <T extends IdDto> ListHateoasModel<T> build(HateoasProvider<List<T>> hateoasProvider,
                                                                         List<T> list) {
         ListHateoasModel<T> hateoasModel = new ListHateoasModel<>(list);
         List<Link> links = hateoasProvider.provide(list);
