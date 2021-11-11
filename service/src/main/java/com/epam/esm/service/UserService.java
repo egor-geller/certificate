@@ -28,4 +28,6 @@ public interface UserService {
      * @return {@link UserDto} entity.
      */
     UserDto findUserByIdService(Long id);
+
+    Long count();
 }

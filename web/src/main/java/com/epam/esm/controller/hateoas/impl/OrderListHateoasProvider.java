@@ -1,30 +1,30 @@
 package com.epam.esm.controller.hateoas.impl;
 
-import com.epam.esm.controller.UserController;
+import com.epam.esm.controller.OrderController;
 import com.epam.esm.controller.hateoas.ListHateoasProvider;
-import com.epam.esm.dto.UserDto;
+import com.epam.esm.dto.OrderDto;
 import com.epam.esm.repository.PaginationContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import static com.epam.esm.controller.hateoas.impl.ResourceRelName.ALL_USERS_REL;
+import static com.epam.esm.controller.hateoas.impl.ResourceRelName.ALL_ORDERS_REL;
 
 @Component
-public class UserListHateoasProvider extends ListHateoasProvider<UserDto> {
+public class OrderListHateoasProvider extends ListHateoasProvider<OrderDto> {
 
     @Autowired
-    public UserListHateoasProvider(PaginationContext paginationContext) {
+    protected OrderListHateoasProvider(PaginationContext paginationContext) {
         super(paginationContext);
     }
 
     @Override
     protected Class<?> getControllerClass() {
-        return UserController.class;
+        return OrderController.class;
     }
 
     @Override
     protected String getAllResourcesRel() {
-        return ALL_USERS_REL;
+        return ALL_ORDERS_REL;
     }
 
     @Override
@@ -36,5 +36,4 @@ public class UserListHateoasProvider extends ListHateoasProvider<UserDto> {
     protected int getPageSize(PaginationContext paginationContext) {
         return paginationContext.getLengthOfContext();
     }
-
 }

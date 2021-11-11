@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface HateoasProvider<T> {
 
-    List<Link> provide(T object);
+    List<Link> provide(T object, Long numberOfRecords);
 }

@@ -57,4 +57,6 @@ public interface CertificateService extends EntityService<CertificateDto> {
      * @throws InvalidEntityException when id is not correctly written
      */
     CertificateDto detachTagFromCertificate(PaginationContext paginationContext, long certificateId, long tagId);
+
+    Long countByCriteria(SearchCriteria searchCriteria);
 }

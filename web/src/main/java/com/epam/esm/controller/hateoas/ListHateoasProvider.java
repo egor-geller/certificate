@@ -6,6 +6,12 @@ import org.springframework.hateoas.Link;
 
 import java.util.List;
 
+import static com.epam.esm.controller.hateoas.impl.ResourceRelName.CURRENT_PAGE_REL;
+import static com.epam.esm.controller.hateoas.impl.ResourceRelName.FIRST_PAGE_REL;
+import static com.epam.esm.controller.hateoas.impl.ResourceRelName.LAST_PAGE_REL;
+import static com.epam.esm.controller.hateoas.impl.ResourceRelName.NEXT_PAGE_REL;
+import static com.epam.esm.controller.hateoas.impl.ResourceRelName.PREV_PAGE_REL;
+
 public abstract class ListHateoasProvider<T extends IdDto> implements HateoasProvider<List<T>> {
 
     private final PaginationContext paginationContext;
@@ -15,25 +21,34 @@ public abstract class ListHateoasProvider<T extends IdDto> implements HateoasPro
     }
 
     @Override
-    public List<Link> provide(List<T> object) {
+    public List<Link> provide(List<T> object, Long numberOfRecords) {
         Class<?> controllerClass = getControllerClass();
         String allResourcesRel = getAllResourcesRel();
 
         int currentPage = getCurrentPage(paginationContext);
         int pageSize = getPageSize(paginationContext);
 
+        int nextPage = (currentPage / pageSize) + 2;
+        int lastPageNumber = (int) ((numberOfRecords / pageSize) + 1);
+        int prevPage = (currentPage / pageSize);
+
         Link allResourcesLink = LinkConstructor.constructControllerLink(controllerClass, allResourcesRel);
-        Link next = LinkConstructor.constructPageLink(controllerClass, (currentPage / pageSize) + 2, pageSize, "Next page");
+        Link firstPage = createPageLink(1, pageSize, FIRST_PAGE_REL);
+        Link lastPage = createPageLink(lastPageNumber, pageSize, LAST_PAGE_REL);
+
         Link prev;
         if (currentPage > 2) {
-            prev = LinkConstructor.constructPageLink(controllerClass, (currentPage / pageSize), pageSize, "Prev page");
+            prev = createPageLink(prevPage, pageSize, PREV_PAGE_REL);
         } else {
-            prev = LinkConstructor.constructPageLink(controllerClass, currentPage + 1, pageSize, "This page");
+            prev = createPageLink(currentPage + 1, pageSize, CURRENT_PAGE_REL);
         }
-        Link firstPage = LinkConstructor.constructPageLink(controllerClass, 1, pageSize, "First page");
 
-        //TODO: how to find last page?
-        Link lastPage = LinkConstructor.constructPageLink(controllerClass, pageSize, pageSize, "Last Page");
+        Link next;
+        if (nextPage < lastPageNumber + 1) {
+            next = createPageLink(nextPage, pageSize, NEXT_PAGE_REL);
+        }else {
+            return List.of(allResourcesLink, firstPage, lastPage);
+        }
 
         return List.of(allResourcesLink, next, prev, firstPage, lastPage);
     }
@@ -46,7 +61,8 @@ public abstract class ListHateoasProvider<T extends IdDto> implements HateoasPro
 
     protected abstract int getPageSize(PaginationContext paginationContext);
 
-    private int sizeOfList() {
-        return 18*50;
+    private Link createPageLink(int pageNumber, int pageSize, String rel) {
+        Class<?> controllerClass = getControllerClass();
+        return LinkConstructor.constructPageLink(controllerClass, pageNumber, pageSize, rel);
     }
 }

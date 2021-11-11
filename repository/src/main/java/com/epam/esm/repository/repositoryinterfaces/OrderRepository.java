@@ -19,4 +19,6 @@ public interface OrderRepository extends Repository<Order> {
      * @return {@link List} of {@link Order} entity.
      */
     List<Order> findByUserId(PaginationContext paginationContext, Long id);
+
+    Long countByUser();
 }

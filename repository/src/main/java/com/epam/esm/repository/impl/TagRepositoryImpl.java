@@ -10,10 +10,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
 import java.util.List;
 import java.util.Optional;
 
-import static com.epam.esm.repository.query.TagQueries.*;
+import static com.epam.esm.repository.query.TagQueries.SELECT_ALL_TAGS;
+import static com.epam.esm.repository.query.TagQueries.SELECT_TAG_BY_CERTIFICATE;
+import static com.epam.esm.repository.query.TagQueries.SELECT_TAG_BY_NAME;
 
 @Repository
 public class TagRepositoryImpl implements TagRepository, CreateRepository<Tag>, DeleteRepository<Tag> {
@@ -36,6 +40,14 @@ public class TagRepositoryImpl implements TagRepository, CreateRepository<Tag>, 
     @Override
     public Optional<Tag> findById(Long id) {
         return Optional.ofNullable(entityManager.find(Tag.class, id));
+    }
+
+    @Override
+    public Long count() {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Long> query = criteriaBuilder.createQuery(Long.class);
+        query.select(criteriaBuilder.count(query.from(Tag.class)));
+        return entityManager.createQuery(query).getSingleResult();
     }
 
     @Override

@@ -13,8 +13,10 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.*;
-import javax.persistence.criteria.*;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,6 +49,21 @@ public class CertificateRepositoryImpl implements CertificateRepository, CreateR
     @Override
     public Optional<Certificate> findById(Long id) {
         return Optional.ofNullable(entityManager.find(Certificate.class, id));
+    }
+
+    @Override
+    public Long count() {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Long> query = criteriaBuilder.createQuery(Long.class);
+        query.select(criteriaBuilder.count(query.from(Certificate.class)));
+        return entityManager.createQuery(query).getSingleResult();
+    }
+
+    @Override
+    public Long countByCriteria(SearchCriteria searchCriteria) {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Certificate> query = queryBuilder.queryBuild(criteriaBuilder, searchCriteria);
+        return entityManager.createQuery(query).getResultStream().count();
     }
 
     @Transactional

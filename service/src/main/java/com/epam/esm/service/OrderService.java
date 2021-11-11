@@ -46,4 +46,8 @@ public interface OrderService {
      * @return {@link OrderDto} object that represents created order
      */
     OrderDto makeOrderService(OrderDto orderDto);
+
+    Long count();
+
+    Long countByUser();
 }

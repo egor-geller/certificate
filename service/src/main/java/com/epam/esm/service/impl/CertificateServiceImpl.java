@@ -99,6 +99,11 @@ public class CertificateServiceImpl implements CertificateService {
     }
 
     @Override
+    public Long countByCriteria(SearchCriteria searchCriteria) {
+        return certificateRepository.countByCriteria(searchCriteria);
+    }
+
+    @Override
     public CertificateDto create(PaginationContext paginationContext, CertificateDto certificate) {
         if (certificate == null) {
             throw new EntityNotFoundException();
@@ -186,7 +191,7 @@ public class CertificateServiceImpl implements CertificateService {
     }
 
     @Override
-    public boolean delete(Long id, PaginationContext paginationContext) {
+    public void delete(Long id, PaginationContext paginationContext) {
         certificateValidator.validateId(id);
         Optional<Certificate> certificateById = certificateRepository.findById(id);
         if (certificateById.isEmpty()) {
@@ -196,21 +201,25 @@ public class CertificateServiceImpl implements CertificateService {
         byCertificateId.forEach(tag -> detachTagFromCertificate(newPaginationContext, id, tag.getId()));
 
         certificateRepository.delete(certificateById.get());
-        return true;
     }
 
-    /*@Scheduled(cron = "0 30 9-17 * * MON-FRI")
+    @Override
+    public Long count() {
+        return certificateRepository.count();
+    }
+
+    @Scheduled(cron = "0 30 9-17 * * MON-FRI")
     public void scheduleDeletionOfDetachedTag() {
-        List<Tag> allTagsList = tagRepository.findAll();
+        List<Tag> allTagsList = tagRepository.findAll(newPaginationContext);
         SearchCriteria searchCriteria = new SearchCriteria();
         for (Tag tag : allTagsList) {
             searchCriteria.setTagList(List.of(tag.getName()));
-            List<Certificate> certificateList = certificateRepository.find(searchCriteria);
+            List<Certificate> certificateList = certificateRepository.find(newPaginationContext, searchCriteria);
             if (certificateList == null || certificateList.isEmpty()) {
                 tagRepository.delete(tag);
             }
         }
-    }*/
+    }
 
     private CertificateDto getCertificateDto(long certificateId, long tagId) {
         Optional<Certificate> updatedCertificate = certificateRepository.findById(certificateId);

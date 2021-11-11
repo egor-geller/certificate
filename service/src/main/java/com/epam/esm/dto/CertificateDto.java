@@ -51,10 +51,12 @@ public class CertificateDto extends IdDto {
         this.tagList = tagList;
     }
 
+    @Override
     public Long getId() {
         return id;
     }
 
+    @Override
     public void setId(Long id) {
         this.id = id;
     }

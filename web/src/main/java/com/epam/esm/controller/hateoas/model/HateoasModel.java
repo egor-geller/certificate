@@ -24,9 +24,9 @@ public class HateoasModel <T extends IdDto> extends RepresentationModel<HateoasM
         this.data = data;
     }
 
-    public static <T extends IdDto> HateoasModel<T> build(HateoasProvider<T> hateoasProvider, T object) {
+    public <T extends IdDto> HateoasModel<T> build(HateoasProvider<T> hateoasProvider, T object, Long numberOfRecords) {
         HateoasModel<T> hateoasModel = new HateoasModel<>(object);
-        List<Link> links = hateoasProvider.provide(object);
+        List<Link> links = hateoasProvider.provide(object, numberOfRecords);
         hateoasModel.add(links);
 
         return hateoasModel;

@@ -73,6 +73,16 @@ public class OrderServiceImpl implements OrderService {
         return orderServiceMapper.convertOrderToDto(createdOrder);
     }
 
+    @Override
+    public Long count() {
+        return orderRepository.count();
+    }
+
+    @Override
+    public Long countByUser() {
+        return orderRepository.countByUser();
+    }
+
     private Order prepareOrder(List<Certificate> certificates, User user) {
         ZonedDateTime purchaseDate = ZonedDateTime.now();
         BigDecimal cost = certificates.stream()

@@ -14,7 +14,7 @@ import java.util.Optional;
 public interface Repository<T> {
 
     /**
-     * Fina all entities
+     * Find all entities
      *
      * @return {@link List} of entities
      */
@@ -27,10 +27,17 @@ public interface Repository<T> {
     }
 
     /**
-     * Fina a tag or certificate by its unique Id
+     * Find a tag or certificate by its unique Id
      *
      * @param id id of a tan entity
      * @return {@link Optional} of an entity
      */
     Optional<T> findById(Long id);
+
+    /**
+     * Retrieves the total size of all objects from database
+     *
+     * @return {@code Long} total number of entities
+     */
+    Long count();
 }

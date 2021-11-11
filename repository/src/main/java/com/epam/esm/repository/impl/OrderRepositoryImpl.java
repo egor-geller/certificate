@@ -10,6 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,12 +43,27 @@ public class OrderRepositoryImpl implements OrderRepository, CreateRepository<Or
     }
 
     @Override
+    public Long count() {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Long> query = criteriaBuilder.createQuery(Long.class);
+        query.select(criteriaBuilder.count(query.from(Order.class)));
+        return entityManager.createQuery(query).getSingleResult();
+    }
+
+    @Override
     public List<Order> findByUserId(PaginationContext paginationContext, Long id) {
         return entityManager.createQuery(SELECT_ORDER_BY_USER_ID, Order.class)
                 .setParameter(1, id)
                 .setFirstResult(paginationContext.getStartPage())
                 .setMaxResults(paginationContext.getLengthOfContext())
                 .getResultList();
+    }
+
+    @Override
+    public Long countByUser() {
+        return entityManager.createQuery(SELECT_ORDER_BY_USER_ID, Order.class)
+                .getResultStream()
+                .count();
     }
 
     @Transactional

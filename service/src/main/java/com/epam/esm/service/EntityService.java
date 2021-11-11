@@ -29,7 +29,13 @@ public interface EntityService<T> {
      * Delete an entity.
      *
      * @param id the id
-     * @return {@code True} if delete was successful, otherwise {@code False}
      */
-    boolean delete(Long id, PaginationContext paginationContext);
+    void delete(Long id, PaginationContext paginationContext);
+
+    /**
+     * Count total of all entities.
+     *
+     * @return {@code Long} total number of entities
+     */
+    Long count();
 }

@@ -20,6 +20,7 @@ public interface CertificateRepository extends Repository<Certificate> {
      * @param searchCriteria {@link SearchCriteria} entity for searching by specific parameter
      * @return list of {@link Certificate}
      */
+    @Override
     List<Certificate> find(PaginationContext paginationContext, SearchCriteria searchCriteria);
 
     /**
@@ -45,4 +46,12 @@ public interface CertificateRepository extends Repository<Certificate> {
      * @return id of {@link Certificate}
      */
     Certificate update(Certificate certificate);
+
+    /**
+     * Count total of searched entities.
+     *
+     * @param searchCriteria {@link SearchCriteria} entity for searching by specific parameter
+     * @return {@code Long} total number of searched entities
+     */
+    Long countByCriteria(SearchCriteria searchCriteria);
 }

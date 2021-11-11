@@ -31,11 +31,17 @@ public class UserServiceImpl implements UserService {
                 .stream()
                 .map(userServiceMapper::convertUserToDto)
                 .collect(Collectors.toList());
+
     }
 
     @Override
     public UserDto findUserByIdService(Long id) {
-        User user = userRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+        User user = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(id));
         return userServiceMapper.convertUserToDto(user);
+    }
+
+    @Override
+    public Long count(){
+        return userRepository.count();
     }
 }

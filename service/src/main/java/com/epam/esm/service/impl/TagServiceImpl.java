@@ -89,7 +89,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public boolean delete(Long id, PaginationContext paginationContext) {
+    public void delete(Long id, PaginationContext paginationContext) {
         tagValidator.validateId(id);
 
         SearchCriteria searchCriteria = new SearchCriteria();
@@ -105,6 +105,10 @@ public class TagServiceImpl implements TagService {
         }
 
         tagRepository.delete(tagById.get());
-        return true;
+    }
+
+    @Override
+    public Long count() {
+        return tagRepository.count();
     }
 }
