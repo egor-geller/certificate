@@ -30,9 +30,4 @@ public class GenerateController {
     public void generateCertificates() {
         generateData.generateCertificate();
     }
-
-    @PostMapping("/certificatewithtag")
-    public void generateCertificatesWithTags() {
-        generateData.generateCertificatesToTags();
-    }
 }
