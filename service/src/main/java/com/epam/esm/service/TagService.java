@@ -42,4 +42,11 @@ public interface TagService extends EntityService<TagDto> {
      * @throws InvalidEntityException  when the name of the tag is not correctly written
      */
     TagDto findTagByName(String tagName);
+
+    /**
+     * Find most widely used tag
+     *
+     * @return {@link TagDto} entity.
+     */
+    TagDto findMostWidelyUsedTag();
 }

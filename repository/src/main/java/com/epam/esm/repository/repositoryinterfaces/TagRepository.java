@@ -1,7 +1,6 @@
 package com.epam.esm.repository.repositoryinterfaces;
 
 import com.epam.esm.entity.Tag;
-import com.epam.esm.repository.PaginationContext;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,4 +27,11 @@ public interface TagRepository extends Repository<Tag> {
      * @return list of {@link Tag} entity.
      */
     List<Tag> findByCertificateId(Long id);
+
+    /**
+     * Find most widely used tag
+     *
+     * @return {@link Optional} of {@link Tag} entity.
+     */
+    Optional<Tag> findMostWidelyUsedTag();
 }

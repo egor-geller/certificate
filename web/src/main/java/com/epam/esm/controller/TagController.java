@@ -86,6 +86,12 @@ public class TagController {
         return createPagination(tagById, HttpStatus.OK);
     }
 
+    @GetMapping("/mostusedtag")
+    public ResponseEntity<HateoasModel<TagDto>> getMostWidelyTag() {
+        TagDto tagDto = tagService.findMostWidelyUsedTag();
+        return createPagination(tagDto, HttpStatus.OK);
+    }
+
     /**
      * Create new tag entity.
      *

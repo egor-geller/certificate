@@ -15,9 +15,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import java.util.List;
 import java.util.Optional;
 
-import static com.epam.esm.repository.query.TagQueries.SELECT_ALL_TAGS;
-import static com.epam.esm.repository.query.TagQueries.SELECT_TAG_BY_CERTIFICATE;
-import static com.epam.esm.repository.query.TagQueries.SELECT_TAG_BY_NAME;
+import static com.epam.esm.repository.query.TagQueries.*;
 
 @Repository
 public class TagRepositoryImpl implements TagRepository, CreateRepository<Tag>, DeleteRepository<Tag> {
@@ -65,6 +63,12 @@ public class TagRepositoryImpl implements TagRepository, CreateRepository<Tag>, 
         return entityManager.createQuery(SELECT_TAG_BY_CERTIFICATE, Tag.class)
                 .setParameter(1, id)
                 .getResultList();
+    }
+
+    @Override
+    public Optional<Tag> findMostWidelyUsedTag() {
+        Tag tag = (Tag) entityManager.createNativeQuery(MOST_WIDELY_USED_TAG).getSingleResult();
+        return Optional.ofNullable(tag);
     }
 
     @Transactional

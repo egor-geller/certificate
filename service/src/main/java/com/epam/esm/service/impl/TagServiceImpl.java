@@ -65,6 +65,13 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
+    public TagDto findMostWidelyUsedTag() {
+        Tag tag = tagRepository.findMostWidelyUsedTag()
+                .orElseThrow(EntityNotFoundException::new);
+        return tagServiceMapper.convertTagToDto(tag);
+    }
+
+    @Override
     public TagDto create(PaginationContext paginationContext, TagDto tagDto) {
         tagValidator.validateTagValid(tagDto.getName());
 
