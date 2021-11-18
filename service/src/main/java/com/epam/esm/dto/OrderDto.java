@@ -1,6 +1,5 @@
 package com.epam.esm.dto;
 
-import com.epam.esm.entity.Certificate;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.math.BigDecimal;
@@ -12,7 +11,7 @@ public class OrderDto extends IdDto {
 
     private Long id;
     private Long userId;
-    private List<Certificate> certificateList;
+    private List<Long> certificateList;
     private BigDecimal cost;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING,
@@ -23,7 +22,12 @@ public class OrderDto extends IdDto {
     public OrderDto() {
     }
 
-    public OrderDto(Long id, Long userId, List<Certificate> certificateList, BigDecimal cost, ZonedDateTime purchaseDate) {
+    public OrderDto(Long userId, List<Long> certificateList) {
+        this.userId = userId;
+        this.certificateList = certificateList;
+    }
+
+    public OrderDto(Long id, Long userId, List<Long> certificateList, BigDecimal cost, ZonedDateTime purchaseDate) {
         this.id = id;
         this.userId = userId;
         this.certificateList = certificateList;
@@ -49,11 +53,11 @@ public class OrderDto extends IdDto {
         this.userId = userId;
     }
 
-    public List<Certificate> getCertificateList() {
+    public List<Long> getCertificateList() {
         return certificateList;
     }
 
-    public void setCertificateList(List<Certificate> certificateList) {
+    public void setCertificateList(List<Long> certificateList) {
         this.certificateList = certificateList;
     }
 

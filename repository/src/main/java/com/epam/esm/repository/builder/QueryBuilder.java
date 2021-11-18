@@ -26,7 +26,8 @@ public final class QueryBuilder {
     private static final String CREATE_DATE_EXPRESSION = "create_date";
     private static final String PARTIAL_STRING = "%%%s%%";
 
-    private QueryBuilder(){}
+    private QueryBuilder() {
+    }
 
     public CriteriaQuery<Certificate> queryBuild(CriteriaBuilder criteriaBuilder, SearchCriteria searchCriteria) {
         CriteriaQuery<Certificate> query = criteriaBuilder.createQuery(Certificate.class);

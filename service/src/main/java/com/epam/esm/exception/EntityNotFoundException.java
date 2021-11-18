@@ -9,7 +9,6 @@ public class EntityNotFoundException extends RuntimeException {
     private Long[] id;
 
     public EntityNotFoundException() {
-        super();
     }
 
     public EntityNotFoundException(Long... id) {

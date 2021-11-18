@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class OrderServiceMapper {
@@ -20,12 +21,15 @@ public class OrderServiceMapper {
         Long userId = order.getUser().getId();
         BigDecimal orderCost = order.getCost();
         ZonedDateTime purchaseDate = order.getPurchaseDate();
-        List<Certificate> certificateIds = order.getCertificateList();
+        List<Long> certificateIds = order.getCertificateList()
+                .stream()
+                .map(Certificate::getId)
+                .collect(Collectors.toList());
 
         return new OrderDto(id, userId, certificateIds, orderCost, purchaseDate);
     }
 
-    public Order convertOrderFromDto(OrderDto orderDto) {
+    /*public Order convertOrderFromDto(OrderDto orderDto) {
         Order order = new Order();
         order.setId(orderDto.getId());
         order.setUser(order.getUser());
@@ -34,5 +38,5 @@ public class OrderServiceMapper {
         order.setCertificateList(orderDto.getCertificateList());
 
         return order;
-    }
+    }*/
 }

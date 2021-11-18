@@ -14,9 +14,12 @@ import com.epam.esm.repository.impl.TagRepositoryImpl;
 import com.epam.esm.service.CertificateService;
 import com.epam.esm.validator.CertificateValidator;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -80,7 +83,6 @@ public class CertificateServiceImpl implements CertificateService {
     @Override
     public CertificateDto detachTagFromCertificate(PaginationContext paginationContext, long certificateId, long tagId) {
         certificateValidator.validateId(certificateId, tagId);
-
         SearchCriteria searchCriteria = new SearchCriteria();
         Optional<Tag> tag = tagRepository.findById(tagId);
         Optional<Certificate> certificate = certificateRepository.findById(certificateId);
@@ -89,10 +91,12 @@ public class CertificateServiceImpl implements CertificateService {
         }
 
         searchCriteria.setTagList(List.of(tag.get().getName()));
-        List<Certificate> certificateList = certificateRepository.find(paginationContext, searchCriteria);
+        List<CertificateDto> certificateList =
+                findCertificateByCriteria(paginationContext.createPagination(1, 10), searchCriteria);
         if (CollectionUtils.isEmpty(certificateList)) {
             tagRepository.delete(tag.get());
         }
+
 
         certificateRepository.detachTag(certificateId, tagId);
         return getCertificateDto(certificateId, tagId);
@@ -128,14 +132,7 @@ public class CertificateServiceImpl implements CertificateService {
         if (tagList != null) {
             tagList.forEach(tagName -> {
                 Optional<Tag> tagByName = tagRepository.findByName(tagName.getName());
-                if (tagByName.isEmpty()) {
-                    Tag createTag = new Tag();
-                    createTag.setName(tagName.getName());
-                    Tag tag = tagRepository.create(createTag);
-                    attachTagToCertificate(certificate1.getId(), tag.getId());
-                } else {
-                    attachTagToCertificate(certificate1.getId(), tagByName.get().getId());
-                }
+                attach(tagByName, tagName, certificate1);
             });
         }
         Optional<Certificate> createdCertificate = certificateRepository.findById(certificate1.getId());
@@ -154,6 +151,7 @@ public class CertificateServiceImpl implements CertificateService {
         if (certificateById.isEmpty()) {
             throw new EntityNotFoundException(certificate.getId());
         }
+        ZonedDateTime createDate = certificateById.get().getCreateDate();
         certificateValidator.isParamsRegexValid(certificate.getName(),
                 certificate.getDescription(), certificate.getPrice(), certificate.getDuration());
         Certificate checkedCertificate = certificateValidator.checkForUpdatedFields(certificate, certificateById);
@@ -161,6 +159,9 @@ public class CertificateServiceImpl implements CertificateService {
         allParametersAreTheSame = certificateValidator.areAllParametersTheSame(certificateById, checkedCertificate);
 
         List<Tag> tagList = certificate.getTagList();
+        List<Tag> currentTagsInCertificate = tagRepository.findByCertificateId(checkedCertificate.getId());
+        Certificate updatedCertificate = certificateRepository.update(checkedCertificate);
+        updatedCertificate.setCreateDate(createDate);
         if (CollectionUtils.isNotEmpty(tagList)) {
             List<Tag> byCertificateId = tagRepository.findByCertificateId(checkedCertificate.getId());
             if (CollectionUtils.isNotEmpty(byCertificateId)) {
@@ -174,20 +175,14 @@ public class CertificateServiceImpl implements CertificateService {
             }
             certificate.getTagList().forEach(tagName -> {
                 Optional<Tag> tagIdByName = tagRepository.findByName(tagName.getName());
-                if (tagIdByName.isEmpty()) {
-                    Tag createTag = new Tag();
-                    createTag.setName(tagName.getName());
-                    Tag tag = tagRepository.create(createTag);
-                    attachTagToCertificate(checkedCertificate.getId(), tag.getId());
-                } else {
-                    attachTagToCertificate(checkedCertificate.getId(), tagIdByName.get().getId());
-                }
+                attach(tagIdByName, tagName, checkedCertificate);
             });
+        } else if (CollectionUtils.isEmpty(tagList) && CollectionUtils.isNotEmpty(currentTagsInCertificate)) {
+            currentTagsInCertificate.forEach(tag -> attachTagToCertificate(updatedCertificate.getId(), tag.getId()));
         }
 
-        Optional<Certificate> updatedCertificate = certificateRepository.findById(certificate.getId());
-        List<Tag> updatedTagList = tagRepository.findByCertificateId(certificate.getId());
-        return certificateServiceMapper.convertCertificateToDto(certificate.getId(), updatedCertificate, updatedTagList);
+        List<Tag> updatedTagList = tagRepository.findByCertificateId(updatedCertificate.getId());
+        return certificateServiceMapper.convertCertificateToDto(certificate.getId(), Optional.of(updatedCertificate), updatedTagList);
     }
 
     @Override
@@ -218,6 +213,17 @@ public class CertificateServiceImpl implements CertificateService {
             if (certificateList == null || certificateList.isEmpty()) {
                 tagRepository.delete(tag);
             }
+        }
+    }
+
+    private void attach(Optional<Tag> tagIdByName,Tag tagName, Certificate certificateId) {
+        if (tagIdByName.isEmpty()) {
+            Tag createTag = new Tag();
+            createTag.setName(tagName.getName());
+            Tag tag = tagRepository.create(createTag);
+            attachTagToCertificate(certificateId.getId(), tag.getId());
+        } else {
+            attachTagToCertificate(certificateId.getId(), tagIdByName.get().getId());
         }
     }
 

@@ -8,6 +8,7 @@ import com.epam.esm.entity.User;
 import com.epam.esm.exception.EmptyOrderException;
 import com.epam.esm.exception.EntityNotFoundException;
 import com.epam.esm.repository.PaginationContext;
+import com.epam.esm.repository.impl.CertificateRepositoryImpl;
 import com.epam.esm.repository.impl.OrderRepositoryImpl;
 import com.epam.esm.repository.impl.UserRepositoryImpl;
 import com.epam.esm.service.OrderService;
@@ -25,14 +26,17 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepositoryImpl orderRepository;
     private final UserRepositoryImpl userRepository;
     private final OrderServiceMapper orderServiceMapper;
+    private final CertificateRepositoryImpl certificateRepository;
 
     @Autowired
     public OrderServiceImpl(OrderRepositoryImpl orderRepository,
                             UserRepositoryImpl userRepository,
-                            OrderServiceMapper orderServiceMapper) {
+                            OrderServiceMapper orderServiceMapper,
+                            CertificateRepositoryImpl certificateRepository) {
         this.orderRepository = orderRepository;
         this.userRepository = userRepository;
         this.orderServiceMapper = orderServiceMapper;
+        this.certificateRepository = certificateRepository;
     }
 
     @Override
@@ -60,15 +64,15 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderDto makeOrderService(OrderDto orderDto) {
         long userId = orderDto.getUserId();
-        List<Certificate> certificateList = orderDto.getCertificateList();
+        List<Long> certificateIdList = orderDto.getCertificateList();
 
-        if (certificateList.isEmpty()) {
+        if (certificateIdList.isEmpty()) {
             throw new EmptyOrderException();
         }
 
-        User user = userRepository.findById(userId).orElseThrow(EntityNotFoundException::new);
+        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(userId));
 
-        Order preparedOrder = prepareOrder(certificateList, user);
+        Order preparedOrder = prepareOrder(certificateIdList, user);
         Order createdOrder = orderRepository.create(preparedOrder);
         return orderServiceMapper.convertOrderToDto(createdOrder);
     }
@@ -83,9 +87,29 @@ public class OrderServiceImpl implements OrderService {
         return orderRepository.countByUser();
     }
 
-    private Order prepareOrder(List<Certificate> certificates, User user) {
+    private Order prepareOrder(List<Long> certificates, User user) {
         ZonedDateTime purchaseDate = ZonedDateTime.now();
-        BigDecimal cost = certificates.stream()
+
+        List<Certificate> certificateList = certificates
+                .stream()
+                .map(certificateRepository::findById)
+                .map(certificate -> {
+                    if (certificate.isEmpty()) {
+                        throw new EntityNotFoundException();
+                    }
+                    Certificate cert = new Certificate();
+                    cert.setId(certificate.get().getId());
+                    cert.setName(certificate.get().getName());
+                    cert.setDescription(certificate.get().getDescription());
+                    cert.setDuration(certificate.get().getDuration());
+                    cert.setPrice(certificate.get().getPrice());
+                    cert.setCreateDate(certificate.get().getCreateDate());
+                    cert.setLastUpdateDate(certificate.get().getLastUpdateDate());
+                    return cert;
+                })
+                .collect(Collectors.toList());
+
+        BigDecimal cost = certificateList.stream()
                 .map(Certificate::getPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
@@ -93,7 +117,7 @@ public class OrderServiceImpl implements OrderService {
         order.setPurchaseDate(purchaseDate);
         order.setCost(cost);
         order.setUser(user);
-        order.setCertificateList(certificates);
+        order.setCertificateList(certificateList);
 
         return order;
     }
