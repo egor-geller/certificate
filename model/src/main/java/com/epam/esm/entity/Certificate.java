@@ -44,6 +44,9 @@ public class Certificate {
     @UpdateTimestamp
     private ZonedDateTime lastUpdateDate;
 
+    @OneToMany(mappedBy = "certificate")
+    private List<SavedOrder> savedOrders;
+
     @ManyToMany
     @JoinTable(name = "gift_certificate_has_tag",
             joinColumns = @JoinColumn(name = "gift_certificate_id", referencedColumnName = "id"),

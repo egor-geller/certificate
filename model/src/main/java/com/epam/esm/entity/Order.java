@@ -14,6 +14,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
@@ -42,6 +43,9 @@ public class Order {
     @ManyToOne
     @JoinColumn(name = "cert_user_id", referencedColumnName = "id")
     private User user;
+
+    @OneToMany(mappedBy = "order")
+    private List<SavedOrder> savedOrders;
 
     @ManyToMany
     @JoinTable(
