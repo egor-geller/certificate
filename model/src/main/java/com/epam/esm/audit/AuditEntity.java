@@ -10,7 +10,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
 import java.time.ZonedDateTime;
 import java.util.Objects;
 
@@ -29,7 +28,7 @@ public class AuditEntity {
     @Column(name = "entity_name")
     private String entityName;
 
-    @Column(name = "date")
+    @Column(name = "date", updatable = false, columnDefinition = "TIMESTAMP() default CURRENT_TIMESTAMP() on update CURRENT_TIMESTAMP()")
     @CreationTimestamp
     private ZonedDateTime date;
 

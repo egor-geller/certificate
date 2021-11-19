@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -49,7 +50,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderDto findOrderByIdService(Long id) {
-        Order order = orderRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+        Order order = orderRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(String.valueOf(id)));
         return orderServiceMapper.convertOrderToDto(order);
     }
 
@@ -64,16 +65,17 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderDto makeOrderService(OrderDto orderDto) {
         long userId = orderDto.getUserId();
-        List<Long> certificateIdList = orderDto.getCertificateList();
+        List<Certificate> certificateIdList = orderDto.getCertificateList();
 
         if (certificateIdList.isEmpty()) {
             throw new EmptyOrderException();
         }
 
-        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(userId));
-
-        Order preparedOrder = prepareOrder(certificateIdList, user);
+        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(String.valueOf(userId)));
+        List<Long> certificateIds = certificateIdList.stream().map(Certificate::getId).collect(Collectors.toList());
+        Order preparedOrder = prepareOrder(certificateIds, user);
         Order createdOrder = orderRepository.create(preparedOrder);
+
         return orderServiceMapper.convertOrderToDto(createdOrder);
     }
 
@@ -83,8 +85,8 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Long countByUser() {
-        return orderRepository.countByUser();
+    public Long countByUser(Long id) {
+        return orderRepository.countByUser(id);
     }
 
     private Order prepareOrder(List<Long> certificates, User user) {
@@ -92,19 +94,19 @@ public class OrderServiceImpl implements OrderService {
 
         List<Certificate> certificateList = certificates
                 .stream()
-                .map(certificateRepository::findById)
                 .map(certificate -> {
-                    if (certificate.isEmpty()) {
-                        throw new EntityNotFoundException();
+                    Optional<Certificate> optionalCertificate = certificateRepository.findById(certificate);
+                    if (optionalCertificate.isEmpty()) {
+                        throw new EntityNotFoundException(String.valueOf(certificate));
                     }
                     Certificate cert = new Certificate();
-                    cert.setId(certificate.get().getId());
-                    cert.setName(certificate.get().getName());
-                    cert.setDescription(certificate.get().getDescription());
-                    cert.setDuration(certificate.get().getDuration());
-                    cert.setPrice(certificate.get().getPrice());
-                    cert.setCreateDate(certificate.get().getCreateDate());
-                    cert.setLastUpdateDate(certificate.get().getLastUpdateDate());
+                    cert.setId(optionalCertificate.get().getId());
+                    cert.setName(optionalCertificate.get().getName());
+                    cert.setDescription(optionalCertificate.get().getDescription());
+                    cert.setDuration(optionalCertificate.get().getDuration());
+                    cert.setPrice(optionalCertificate.get().getPrice());
+                    cert.setCreateDate(optionalCertificate.get().getCreateDate());
+                    cert.setLastUpdateDate(optionalCertificate.get().getLastUpdateDate());
                     return cert;
                 })
                 .collect(Collectors.toList());

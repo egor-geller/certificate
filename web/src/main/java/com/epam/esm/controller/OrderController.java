@@ -95,7 +95,7 @@ public class OrderController {
                                                                              @RequestParam(required = false) Integer pageSize,
                                                                              @PathVariable("id") Long id) {
         List<OrderDto> orderDtoList = orderService.findByOrderByUserService(id, paginationContext.createPagination(page, pageSize));
-        Long count = orderService.countByUser();
+        Long count = orderService.countByUser(id);
         return createListPagination(orderDtoList, count);
     }
 

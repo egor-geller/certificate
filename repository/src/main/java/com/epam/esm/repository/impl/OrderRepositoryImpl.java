@@ -54,14 +54,13 @@ public class OrderRepositoryImpl implements OrderRepository, CreateRepository<Or
     public List<Order> findByUserId(PaginationContext paginationContext, Long id) {
         return entityManager.createQuery(SELECT_ORDER_BY_USER_ID, Order.class)
                 .setParameter(1, id)
-                .setFirstResult(paginationContext.getStartPage())
-                .setMaxResults(paginationContext.getLengthOfContext())
                 .getResultList();
     }
 
     @Override
-    public Long countByUser() {
+    public Long countByUser(Long id) {
         return entityManager.createQuery(SELECT_ORDER_BY_USER_ID, Order.class)
+                .setParameter(1, id)
                 .getResultStream()
                 .count();
     }

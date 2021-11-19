@@ -14,8 +14,6 @@ import com.epam.esm.repository.impl.TagRepositoryImpl;
 import com.epam.esm.service.CertificateService;
 import com.epam.esm.validator.CertificateValidator;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -63,7 +61,7 @@ public class CertificateServiceImpl implements CertificateService {
     public CertificateDto findCertificateById(long id) {
         certificateValidator.validateId(id);
         Certificate certificate = certificateRepository.findById(id).orElseThrow(() ->
-                new EntityNotFoundException(id));
+                new EntityNotFoundException(String.valueOf(id)));
         List<Tag> byCertificateId = tagRepository.findByCertificateId(id);
         return certificateServiceMapper.convertCertificateToDto(certificate, byCertificateId);
     }
@@ -74,7 +72,7 @@ public class CertificateServiceImpl implements CertificateService {
         Optional<Tag> tag = tagRepository.findById(tagId);
         Optional<Certificate> certificate = certificateRepository.findById(certificateId);
         if (tag.isEmpty() || certificate.isEmpty()) {
-            throw new EntityNotFoundException(tagId, certificateId);
+            throw new EntityNotFoundException(String.valueOf(tagId), String.valueOf(certificateId));
         }
         certificateRepository.attachTag(certificateId, tagId);
         return getCertificateDto(certificateId, tagId);
@@ -87,7 +85,7 @@ public class CertificateServiceImpl implements CertificateService {
         Optional<Tag> tag = tagRepository.findById(tagId);
         Optional<Certificate> certificate = certificateRepository.findById(certificateId);
         if (tag.isEmpty() || certificate.isEmpty()) {
-            throw new EntityNotFoundException(tagId, certificateId);
+            throw new EntityNotFoundException(String.valueOf(tagId), String.valueOf(certificateId));
         }
 
         searchCriteria.setTagList(List.of(tag.get().getName()));
@@ -149,7 +147,7 @@ public class CertificateServiceImpl implements CertificateService {
 
         Optional<Certificate> certificateById = certificateRepository.findById(certificate.getId());
         if (certificateById.isEmpty()) {
-            throw new EntityNotFoundException(certificate.getId());
+            throw new EntityNotFoundException(String.valueOf(certificate.getId()));
         }
         ZonedDateTime createDate = certificateById.get().getCreateDate();
         certificateValidator.isParamsRegexValid(certificate.getName(),
@@ -190,7 +188,7 @@ public class CertificateServiceImpl implements CertificateService {
         certificateValidator.validateId(id);
         Optional<Certificate> certificateById = certificateRepository.findById(id);
         if (certificateById.isEmpty()) {
-            throw new EntityNotFoundException(id);
+            throw new EntityNotFoundException(String.valueOf(id));
         }
         List<Tag> byCertificateId = tagRepository.findByCertificateId(id);
         byCertificateId.forEach(tag -> detachTagFromCertificate(newPaginationContext, id, tag.getId()));
@@ -216,7 +214,7 @@ public class CertificateServiceImpl implements CertificateService {
         }
     }
 
-    private void attach(Optional<Tag> tagIdByName,Tag tagName, Certificate certificateId) {
+    private void attach(Optional<Tag> tagIdByName, Tag tagName, Certificate certificateId) {
         if (tagIdByName.isEmpty()) {
             Tag createTag = new Tag();
             createTag.setName(tagName.getName());
@@ -230,7 +228,7 @@ public class CertificateServiceImpl implements CertificateService {
     private CertificateDto getCertificateDto(long certificateId, long tagId) {
         Optional<Certificate> updatedCertificate = certificateRepository.findById(certificateId);
         if (updatedCertificate.isEmpty()) {
-            throw new EntityNotFoundException(tagId, certificateId);
+            throw new EntityNotFoundException(String.valueOf(tagId), String.valueOf(certificateId));
         }
         List<Tag> tagsOfCurrentCertificate = tagRepository.findByCertificateId(certificateId);
         return certificateServiceMapper.convertCertificateToDto(updatedCertificate.get(), tagsOfCurrentCertificate);

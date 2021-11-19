@@ -20,5 +20,5 @@ public interface OrderRepository extends Repository<Order> {
      */
     List<Order> findByUserId(PaginationContext paginationContext, Long id);
 
-    Long countByUser();
+    Long countByUser(Long id);
 }

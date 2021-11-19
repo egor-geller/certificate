@@ -49,5 +49,5 @@ public interface OrderService {
 
     Long count();
 
-    Long countByUser();
+    Long countByUser(Long id);
 }

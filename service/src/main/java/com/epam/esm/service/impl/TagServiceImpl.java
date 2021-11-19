@@ -13,8 +13,6 @@ import com.epam.esm.repository.impl.CertificateRepositoryImpl;
 import com.epam.esm.repository.impl.TagRepositoryImpl;
 import com.epam.esm.service.TagService;
 import com.epam.esm.validator.TagValidator;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -52,7 +50,7 @@ public class TagServiceImpl implements TagService {
     public TagDto findTagById(Long id) {
         tagValidator.validateId(id);
         Tag tag = tagRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(id));
+                .orElseThrow(() -> new EntityNotFoundException(String.valueOf(id)));
         return tagServiceMapper.convertTagToDto(tag);
     }
 
@@ -87,7 +85,7 @@ public class TagServiceImpl implements TagService {
         Tag newTag = tagRepository.create(fromTagDto);
         Optional<Tag> tag = tagRepository.findById(newTag.getId());
         if (tag.isEmpty()) {
-            throw new EntityNotFoundException(newTag.getId());
+            throw new EntityNotFoundException(String.valueOf(newTag.getId()));
         }
         return tagServiceMapper.convertTagToDto(tag.get());
     }
@@ -104,7 +102,7 @@ public class TagServiceImpl implements TagService {
         SearchCriteria searchCriteria = new SearchCriteria();
         Optional<Tag> tagById = tagRepository.findById(id);
         if (tagById.isEmpty()) {
-            throw new EntityNotFoundException(id);
+            throw new EntityNotFoundException(String.valueOf(id));
         }
         tagById.ifPresent(tag -> searchCriteria.setTagList(List.of(tag.getName())));
         List<Certificate> certificateList = certificateRepository.find(paginationContext, searchCriteria);
