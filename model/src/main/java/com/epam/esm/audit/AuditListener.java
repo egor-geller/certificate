@@ -6,11 +6,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceException;
-import javax.persistence.PostPersist;
-import javax.persistence.PostRemove;
-import javax.persistence.PostUpdate;
+import javax.persistence.*;
 import java.time.ZonedDateTime;
 
 import static com.epam.esm.audit.Operation.CREATE;
@@ -18,7 +14,6 @@ import static com.epam.esm.audit.Operation.DELETE;
 import static com.epam.esm.audit.Operation.UPDATE;
 import static java.time.ZoneOffset.UTC;
 
-//TODO: check why persist doesnt work?
 @Transactional(propagation = Propagation.REQUIRES_NEW)
 public class AuditListener {
 
@@ -40,8 +35,7 @@ public class AuditListener {
         String auditMessage = String.format(CREATED_MESSAGE, entity);
         logger.info(auditMessage);
 
-        AuditEntity auditRecord = createRecord(entity, CREATE);
-        entityManager.persist(auditRecord);
+        createRecord(entity, CREATE);
     }
 
     @PostUpdate
@@ -49,15 +43,7 @@ public class AuditListener {
         String auditMessage = String.format(UPDATED_MESSAGE, entity);
         logger.info(auditMessage);
 
-        AuditEntity auditRecord = createRecord(entity, UPDATE);
-        try {
-            entityManager.persist(auditRecord);
-            entityManager.flush();
-        } catch (PersistenceException | IllegalArgumentException | IllegalStateException e) {
-            logger.error("AuditListener exception: {}, class: {}", e.getMessage(), e.getClass());
-        }
-
-        logger.info("AuditListener - after flush created record: {}", auditRecord);
+        createRecord(entity, UPDATE);
     }
 
     @PostRemove
@@ -65,17 +51,22 @@ public class AuditListener {
         String auditMessage = String.format(DELETED_MESSAGE, entity);
         logger.info(auditMessage);
 
-        AuditEntity auditRecord = createRecord(entity, DELETE);
-        entityManager.persist(auditRecord);
+        createRecord(entity, DELETE);
     }
 
-    private AuditEntity createRecord(Object entity, Operation operation) {
+    private void createRecord(Object entity, Operation operation) {
+        entityManager.getTransaction().begin();
         AuditEntity auditEntity = new AuditEntity();
         auditEntity.setEntityName(entity.getClass().getSimpleName());
         auditEntity.setDate(ZonedDateTime.now(UTC));
         auditEntity.setOperation(operation);
-        logger.info("AuditListener - create record: {}", auditEntity);
 
-        return auditEntity;
+        try {
+            this.entityManager.persist(auditEntity);
+            entityManager.getTransaction().commit();
+            this.entityManager.close();
+        } catch (PersistenceException | IllegalStateException e) {
+            logger.error("AuditListener exception: {}, class: {}", e.getMessage(), e.getClass());
+        }
     }
 }

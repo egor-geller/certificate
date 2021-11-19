@@ -25,10 +25,10 @@ public class AuditEntity {
     @Enumerated(EnumType.STRING)
     private Operation operation;
 
-    @Column(name = "entity_name")
+    @Column(name = "entity_name", nullable = false)
     private String entityName;
 
-    @Column(name = "date", updatable = false, columnDefinition = "TIMESTAMP() default CURRENT_TIMESTAMP() on update CURRENT_TIMESTAMP()")
+    @Column(name = "date", nullable = false, columnDefinition = "TIMESTAMP() default CURRENT_TIMESTAMP() on update CURRENT_TIMESTAMP()")
     @CreationTimestamp
     private ZonedDateTime date;
 
