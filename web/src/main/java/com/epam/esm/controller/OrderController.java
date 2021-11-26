@@ -5,10 +5,12 @@ import com.epam.esm.controller.hateoas.ListHateoasProvider;
 import com.epam.esm.controller.hateoas.model.HateoasModel;
 import com.epam.esm.controller.hateoas.model.ListHateoasModel;
 import com.epam.esm.dto.OrderDto;
+import com.epam.esm.dto.SavedOrderDto;
 import com.epam.esm.entity.Order;
 import com.epam.esm.entity.User;
 import com.epam.esm.repository.PaginationContext;
 import com.epam.esm.service.OrderService;
+import com.epam.esm.service.SavedOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,9 +34,10 @@ import java.util.List;
 public class OrderController {
 
     private final OrderService orderService;
+    private final SavedOrderService savedOrderService;
     private final PaginationContext paginationContext;
     private final HateoasProvider<OrderDto> modelHateoasProvider;
-    private final ListHateoasProvider<OrderDto> listHateoasProvider;
+    private final ListHateoasProvider<SavedOrderDto> listHateoasProvider;
 
     /**
      * Instantiates a new Order controller.
@@ -46,10 +49,12 @@ public class OrderController {
      */
     @Autowired
     public OrderController(OrderService orderService,
+                           SavedOrderService savedOrderService,
                            PaginationContext paginationContext,
                            HateoasProvider<OrderDto> modelHateoasProvider,
-                           ListHateoasProvider<OrderDto> listHateoasProvider) {
+                           ListHateoasProvider<SavedOrderDto> listHateoasProvider) {
         this.orderService = orderService;
+        this.savedOrderService = savedOrderService;
         this.paginationContext = paginationContext;
         this.modelHateoasProvider = modelHateoasProvider;
         this.listHateoasProvider = listHateoasProvider;
@@ -63,11 +68,13 @@ public class OrderController {
      * @return JSON {@link ResponseEntity} object that contains list {@link ListHateoasModel} of {@link OrderDto}
      */
     @GetMapping
-    public ResponseEntity<ListHateoasModel<OrderDto>> getAllOrders(@RequestParam(required = false) Integer page,
+    public ResponseEntity<ListHateoasModel<SavedOrderDto>> getAllOrders(@RequestParam(required = false) Integer page,
                                                                    @RequestParam(required = false) Integer pageSize) {
-        List<OrderDto> orderDtoList = orderService.findAllOrdersService(paginationContext.createPagination(page, pageSize));
-        Long count = orderService.count();
-        return createListPagination(orderDtoList, count);
+        /*List<OrderDto> orderDtoList = orderService.findAllOrdersService(paginationContext.createPagination(page, pageSize));
+        Long count = orderService.count();*/
+        List<SavedOrderDto> savedOrderServiceAll = savedOrderService.findAll(paginationContext.createPagination(page, pageSize));
+        Long savedOrdersCount = savedOrderService.count();
+        return createListPagination(savedOrderServiceAll, savedOrdersCount);
     }
 
     /**
@@ -90,14 +97,14 @@ public class OrderController {
      * @param id       id of the {@link User} entity
      * @return JSON {@link ResponseEntity} object that contains list {@link ListHateoasModel} of {@link OrderDto}
      */
-    @GetMapping("/user/{id}")
+    /*@GetMapping("/user/{id}")
     public ResponseEntity<ListHateoasModel<OrderDto>> getOrdersOfUserByItsId(@RequestParam(required = false) Integer page,
                                                                              @RequestParam(required = false) Integer pageSize,
                                                                              @PathVariable("id") Long id) {
         List<OrderDto> orderDtoList = orderService.findByOrderByUserService(id, paginationContext.createPagination(page, pageSize));
         Long count = orderService.countByUser(id);
         return createListPagination(orderDtoList, count);
-    }
+    }*/
 
     /**
      * Create new {@link Order}.
@@ -117,10 +124,10 @@ public class OrderController {
         return new ResponseEntity<>(build, status);
     }
 
-    private ResponseEntity<ListHateoasModel<OrderDto>> createListPagination(List<OrderDto> orderDtoList,
+    private ResponseEntity<ListHateoasModel<SavedOrderDto>> createListPagination(List<SavedOrderDto> orderDtoList,
                                                                             Long count) {
-        ListHateoasModel<OrderDto> model = new ListHateoasModel<>(orderDtoList);
-        ListHateoasModel<OrderDto> build = model.build(listHateoasProvider, orderDtoList, count);
+        ListHateoasModel<SavedOrderDto> model = new ListHateoasModel<>(orderDtoList);
+        ListHateoasModel<SavedOrderDto> build = model.build(listHateoasProvider, orderDtoList, count);
 
         return new ResponseEntity<>(build, HttpStatus.OK);
     }

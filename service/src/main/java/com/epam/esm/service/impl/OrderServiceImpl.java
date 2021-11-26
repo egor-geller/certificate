@@ -1,9 +1,12 @@
 package com.epam.esm.service.impl;
 
 import com.epam.esm.dto.OrderDto;
+import com.epam.esm.dto.SavedOrderDto;
 import com.epam.esm.dto.mapper.OrderServiceMapper;
+import com.epam.esm.dto.mapper.SavedOrderServiceMapper;
 import com.epam.esm.entity.Certificate;
 import com.epam.esm.entity.Order;
+import com.epam.esm.entity.SavedOrder;
 import com.epam.esm.entity.User;
 import com.epam.esm.exception.EmptyOrderException;
 import com.epam.esm.exception.EntityNotFoundException;
@@ -12,6 +15,7 @@ import com.epam.esm.repository.impl.CertificateRepositoryImpl;
 import com.epam.esm.repository.impl.OrderRepositoryImpl;
 import com.epam.esm.repository.impl.UserRepositoryImpl;
 import com.epam.esm.service.OrderService;
+import com.epam.esm.service.SavedOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,16 +32,22 @@ public class OrderServiceImpl implements OrderService {
     private final UserRepositoryImpl userRepository;
     private final OrderServiceMapper orderServiceMapper;
     private final CertificateRepositoryImpl certificateRepository;
+    private final SavedOrderService savedOrderService;
+    private final SavedOrderServiceMapper savedOrderServiceMapper;
 
     @Autowired
     public OrderServiceImpl(OrderRepositoryImpl orderRepository,
                             UserRepositoryImpl userRepository,
                             OrderServiceMapper orderServiceMapper,
-                            CertificateRepositoryImpl certificateRepository) {
+                            CertificateRepositoryImpl certificateRepository,
+                            SavedOrderService savedOrderService,
+                            SavedOrderServiceMapper savedOrderServiceMapper) {
         this.orderRepository = orderRepository;
         this.userRepository = userRepository;
         this.orderServiceMapper = orderServiceMapper;
         this.certificateRepository = certificateRepository;
+        this.savedOrderService = savedOrderService;
+        this.savedOrderServiceMapper = savedOrderServiceMapper;
     }
 
     @Override
@@ -75,6 +85,21 @@ public class OrderServiceImpl implements OrderService {
         List<Long> certificateIds = certificateIdList.stream().map(Certificate::getId).collect(Collectors.toList());
         Order preparedOrder = prepareOrder(certificateIds, user);
         Order createdOrder = orderRepository.create(preparedOrder);
+        List<SavedOrder> savedOrders = certificateIdList
+                .stream()
+                .filter(certificate -> certificateRepository.findById(certificate.getId()).isPresent())
+                .map(certificate -> {
+                    SavedOrder savedOrder = new SavedOrder();
+                    savedOrder.setCertificate(certificate);
+                    savedOrder.setCertificateCost(certificate.getPrice());
+                    return savedOrder;
+                })
+                .collect(Collectors.toList());
+        savedOrders.forEach(savedOrder -> savedOrder.setOrder(createdOrder));
+        savedOrders.forEach(savedOrder -> {
+            SavedOrderDto savedOrderDto = savedOrderServiceMapper.convertSavedOrderToDto(savedOrder);
+            savedOrderService.create(savedOrderDto);
+        });
 
         return orderServiceMapper.convertOrderToDto(createdOrder);
     }

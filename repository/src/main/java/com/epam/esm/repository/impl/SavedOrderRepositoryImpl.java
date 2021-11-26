@@ -10,6 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,7 +38,7 @@ public class SavedOrderRepositoryImpl implements SavedOrderRepository, CreateRep
 
     @Override
     public Optional<SavedOrder> findById(Long id) {
-        return Optional.empty();
+        return Optional.ofNullable(entityManager.find(SavedOrder.class, id));
     }
 
     @Transactional
@@ -49,6 +51,9 @@ public class SavedOrderRepositoryImpl implements SavedOrderRepository, CreateRep
 
     @Override
     public Long count() {
-        return null;
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Long> query = criteriaBuilder.createQuery(Long.class);
+        query.select(criteriaBuilder.count(query.from(SavedOrder.class)));
+        return entityManager.createQuery(query).getSingleResult();
     }
 }

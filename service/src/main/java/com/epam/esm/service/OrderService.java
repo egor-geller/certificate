@@ -33,7 +33,7 @@ public interface OrderService {
     /**
      * Finds all orders of specified user.
      *
-     * @param userId user id
+     * @param userId            user id
      * @param paginationContext {@link PaginationContext} object with pagination logic
      * @return list of {@link OrderDto}
      */
@@ -47,7 +47,18 @@ public interface OrderService {
      */
     OrderDto makeOrderService(OrderDto orderDto);
 
+    /**
+     * Count all saved orders.
+     *
+     * @return {@code Long} sum of all records
+     */
     Long count();
 
+    /**
+     * Count all saved orders by user id.
+     *
+     * @param id user id
+     * @return {@code Long} sum of all records
+     */
     Long countByUser(Long id);
 }
