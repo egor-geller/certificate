@@ -8,5 +8,6 @@ dependencies {
     implementation project(":service")
 
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: bootVersion
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-hateoas', version: bootVersion
+
+    implementation group: 'com.github.javafaker', name: 'javafaker', version: '1.0.2'
 }

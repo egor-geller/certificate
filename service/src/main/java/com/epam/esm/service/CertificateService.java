@@ -2,9 +2,9 @@ package com.epam.esm.service;
 
 import com.epam.esm.dto.CertificateDto;
 import com.epam.esm.entity.Certificate;
-import com.epam.esm.exception.EntityAlreadyExistsException;
 import com.epam.esm.exception.EntityNotFoundException;
 import com.epam.esm.exception.InvalidEntityException;
+import com.epam.esm.repository.PaginationContext;
 import com.epam.esm.repository.SearchCriteria;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +26,7 @@ public interface CertificateService extends EntityService<CertificateDto> {
      * @param searchCriteria {@link SearchCriteria} class for searching by specific parameter
      * @return list of {@link Certificate}
      */
-    List<CertificateDto> findCertificateByCriteria(SearchCriteria searchCriteria);
+    List<CertificateDto> findCertificateByCriteria(PaginationContext paginationContext, SearchCriteria searchCriteria);
 
     /**
      * Find certificate by its id
@@ -56,32 +56,7 @@ public interface CertificateService extends EntityService<CertificateDto> {
      * @return {@code true} if {@link Certificate} was detached, otherwise {@code false}
      * @throws InvalidEntityException when id is not correctly written
      */
-    CertificateDto detachTagFromCertificate(long certificateId, long tagId);
+    CertificateDto detachTagFromCertificate(PaginationContext paginationContext, long certificateId, long tagId);
 
-    /**
-     * Create a new certificate.
-     *
-     * @param certificate {@link Certificate} instance
-     * @throws EntityAlreadyExistsException when {@link Certificate} already exists
-     * @throws InvalidEntityException       when {@link Certificate} is not correctly written
-     */
-    CertificateDto create(CertificateDto certificate);
-
-    /**
-     * Update an existing certificate.
-     *
-     * @param certificate {@link Certificate} entity.
-     * @return {@code true} if {@link Certificate} was updated, otherwise {@code false}
-     * @throws InvalidEntityException when {@link Certificate} is not correctly written
-     */
-    CertificateDto update(CertificateDto certificate);
-
-    /**
-     * Delete an existing certificate.
-     *
-     * @param id certificate id
-     * @return {@code true} if {@link Certificate} was deleted, otherwise {@code false}
-     * @throws InvalidEntityException when id is not correctly written
-     */
-    boolean delete(Long id);
+    Long countByCriteria(SearchCriteria searchCriteria);
 }

@@ -1,6 +1,14 @@
 package com.epam.esm.controller;
 
-import com.epam.esm.exception.*;
+import com.epam.esm.exception.AttachedTagException;
+import com.epam.esm.exception.DataException;
+import com.epam.esm.exception.EmptyOrderException;
+import com.epam.esm.exception.EntityAlreadyExistsException;
+import com.epam.esm.exception.EntityNotFoundException;
+import com.epam.esm.exception.InvalidEntityException;
+import com.epam.esm.exception.InvalidJsonException;
+import com.epam.esm.exception.PaginationException;
+import com.epam.esm.exception.QueryBuildException;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -20,8 +28,25 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import static com.epam.esm.controller.ErrorCode.*;
-import static com.epam.esm.controller.ErrorMessages.*;
+import static com.epam.esm.controller.ErrorCode.CODE_ERROR_400;
+import static com.epam.esm.controller.ErrorCode.CODE_ERROR_404;
+import static com.epam.esm.controller.ErrorCode.CODE_ERROR_415;
+import static com.epam.esm.controller.ErrorCode.CODE_ERROR_500;
+import static com.epam.esm.controller.ErrorMessages.ATTACH_DETACH_ERROR_MESSAGE;
+import static com.epam.esm.controller.ErrorMessages.DELETE_ATTACHED_TAG_ERROR_MESSAGE;
+import static com.epam.esm.controller.ErrorMessages.EMPTY_ORDER_ERROR_MESSAGE;
+import static com.epam.esm.controller.ErrorMessages.ENTITY_ALREADY_EXISTS_MESSAGE;
+import static com.epam.esm.controller.ErrorMessages.ENTITY_NOT_FOUND_MESSAGE;
+import static com.epam.esm.controller.ErrorMessages.ERROR_CODE;
+import static com.epam.esm.controller.ErrorMessages.ERROR_MESSAGE;
+import static com.epam.esm.controller.ErrorMessages.INTERNAL_SERVER_ERROR_MESSAGE;
+import static com.epam.esm.controller.ErrorMessages.INVALID_MESSAGE;
+import static com.epam.esm.controller.ErrorMessages.NOT_JSON_FORMAT_ERROR_MESSAGE;
+import static com.epam.esm.controller.ErrorMessages.PAGINATION_ERROR_MESSAGE;
+import static com.epam.esm.controller.ErrorMessages.PROBLEM_BUILDING_QUERY_ERROR_MESSAGE;
+import static com.epam.esm.controller.ErrorMessages.REQUEST_NOT_VALID_ERROR_MESSAGE;
+import static com.epam.esm.controller.ErrorMessages.REQUEST_PARAMETER_NOT_VALID_ERROR_MESSAGE;
+import static com.epam.esm.controller.ErrorMessages.RESOURCE_NOT_FOUND_MESSAGE;
 
 @RestControllerAdvice
 public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
@@ -110,6 +135,19 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<Object> invalidJsonExceptionHandle() {
         String errorMessage = getErrorMessage(NOT_JSON_FORMAT_ERROR_MESSAGE);
         return buildErrorResponseEntity(HttpStatus.UNSUPPORTED_MEDIA_TYPE, errorMessage, CODE_ERROR_415);
+    }
+
+    @ExceptionHandler(EmptyOrderException.class)
+    public ResponseEntity<Object> emptyOrderExceptionHandle() {
+        String errorMessage = getErrorMessage(EMPTY_ORDER_ERROR_MESSAGE);
+        return buildErrorResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, errorMessage, CODE_ERROR_500);
+    }
+
+    @ExceptionHandler(PaginationException.class)
+    public ResponseEntity<Object> paginationExceptionHandle(PaginationException e) {
+        String errorMessage = String.format(getErrorMessage(PAGINATION_ERROR_MESSAGE),
+                e.getErrorType(), e.getInvalidValue());
+        return buildErrorResponseEntity(HttpStatus.BAD_REQUEST, errorMessage, CODE_ERROR_400);
     }
 
     @ExceptionHandler(Exception.class)

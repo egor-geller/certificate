@@ -2,9 +2,9 @@ package com.epam.esm.service;
 
 import com.epam.esm.dto.TagDto;
 import com.epam.esm.entity.Tag;
-import com.epam.esm.exception.EntityAlreadyExistsException;
 import com.epam.esm.exception.EntityNotFoundException;
 import com.epam.esm.exception.InvalidEntityException;
+import com.epam.esm.repository.PaginationContext;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,7 +22,7 @@ public interface TagService extends EntityService<TagDto> {
      *
      * @return list of {@link Tag} entity.
      */
-    List<TagDto> findAllTags();
+    List<TagDto> findAllTags(PaginationContext paginationContext);
 
     /**
      * Fina a tag by its unique Id
@@ -44,21 +44,9 @@ public interface TagService extends EntityService<TagDto> {
     TagDto findTagByName(String tagName);
 
     /**
-     * Create a new tag
+     * Find most widely used tag
      *
-     * @param tag {@link Tag} entity.
      * @return {@link TagDto} entity.
-     * @throws EntityAlreadyExistsException when {@link Tag} already exists
-     * @throws InvalidEntityException       when {@link Tag} is not correctly written
      */
-    TagDto create(TagDto tag);
-
-    /**
-     * Delete a tag
-     *
-     * @param id id of the tag
-     * @return {@code true} if {@link Tag} was deleted, otherwise {@code false}
-     * @throws InvalidEntityException when id is not correctly written
-     */
-    boolean delete(Long id);
+    TagDto findMostWidelyUsedTag();
 }

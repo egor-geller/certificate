@@ -1,4 +1,4 @@
-package com.epam.esm.repository.builder;
+package com.epam.esm.repository.query;
 
 public final class CertificateQueries {
 

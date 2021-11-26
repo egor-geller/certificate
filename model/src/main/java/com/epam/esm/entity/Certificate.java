@@ -1,19 +1,11 @@
 package com.epam.esm.entity;
 
+import com.epam.esm.audit.AuditListener;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Column;
-import javax.persistence.ManyToMany;
-import javax.persistence.JoinTable;
-import javax.persistence.JoinColumn;
-
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.ZonedDateTime;
@@ -23,6 +15,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "gift_certificate")
+@EntityListeners(AuditListener.class)
 public class Certificate {
 
     @Id
@@ -50,6 +43,9 @@ public class Certificate {
     @Column(name = "last_update_date", nullable = false, columnDefinition = "TIMESTAMP default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP")
     @UpdateTimestamp
     private ZonedDateTime lastUpdateDate;
+
+    @OneToMany(mappedBy = "certificate")
+    private List<SavedOrder> savedOrders;
 
     @ManyToMany
     @JoinTable(name = "gift_certificate_has_tag",

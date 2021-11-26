@@ -6,21 +6,13 @@ import java.util.stream.Collectors;
 
 public class EntityNotFoundException extends RuntimeException {
 
-    private Long[] id;
+    private final String[] id;
 
-    public EntityNotFoundException() {
-        super();
-    }
-
-    public EntityNotFoundException(Long... id) {
+    public EntityNotFoundException(String... id) {
         this.id = id;
     }
 
-    public EntityNotFoundException(String tagName) {
-        super(tagName);
-    }
-
-    public List<Long> getEntityId() {
+    public List<String> getEntityId() {
         return Arrays.stream(id).collect(Collectors.toList());
     }
 }

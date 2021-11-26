@@ -7,9 +7,10 @@ import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.AttachedTagException;
 import com.epam.esm.exception.EntityAlreadyExistsException;
 import com.epam.esm.exception.EntityNotFoundException;
+import com.epam.esm.repository.PaginationContext;
 import com.epam.esm.repository.SearchCriteria;
-import com.epam.esm.repository.repositoryinterfaces.CertificateRepository;
-import com.epam.esm.repository.repositoryinterfaces.TagRepository;
+import com.epam.esm.repository.impl.CertificateRepositoryImpl;
+import com.epam.esm.repository.impl.TagRepositoryImpl;
 import com.epam.esm.service.TagService;
 import com.epam.esm.validator.TagValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,15 +23,16 @@ import java.util.stream.Collectors;
 @Service
 public class TagServiceImpl implements TagService {
 
-    private final CertificateRepository certificateRepository;
-    private final TagRepository tagRepository;
+    private final CertificateRepositoryImpl certificateRepository;
+    private final TagRepositoryImpl tagRepository;
     private final TagValidator tagValidator;
     private final TagServiceMapper tagServiceMapper;
 
-    public TagServiceImpl(TagRepository tagRepository,
-                          CertificateRepository certificateRepository,
+    @Autowired
+    public TagServiceImpl(TagRepositoryImpl tagRepository,
+                          CertificateRepositoryImpl certificateRepository,
                           TagValidator tagValidator,
-                          @Autowired TagServiceMapper tagServiceMapper) {
+                          TagServiceMapper tagServiceMapper) {
         this.tagRepository = tagRepository;
         this.certificateRepository = certificateRepository;
         this.tagValidator = tagValidator;
@@ -38,8 +40,8 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public List<TagDto> findAllTags() {
-        return tagRepository.findAll().stream()
+    public List<TagDto> findAllTags(PaginationContext paginationContext) {
+        return tagRepository.findAll(paginationContext).stream()
                 .map(tagServiceMapper::convertTagToDto)
                 .collect(Collectors.toList());
     }
@@ -48,7 +50,7 @@ public class TagServiceImpl implements TagService {
     public TagDto findTagById(Long id) {
         tagValidator.validateId(id);
         Tag tag = tagRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(id));
+                .orElseThrow(() -> new EntityNotFoundException(String.valueOf(id)));
         return tagServiceMapper.convertTagToDto(tag);
     }
 
@@ -63,7 +65,14 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public TagDto create(TagDto tagDto) {
+    public TagDto findMostWidelyUsedTag() {
+        Tag tag = tagRepository.findMostWidelyUsedTag()
+                .orElseThrow(EntityNotFoundException::new);
+        return tagServiceMapper.convertTagToDto(tag);
+    }
+
+    @Override
+    public TagDto create(PaginationContext paginationContext, TagDto tagDto) {
         tagValidator.validateTagValid(tagDto.getName());
 
         Tag fromTagDto = tagServiceMapper.convertTagFromDto(tagDto);
@@ -76,7 +85,7 @@ public class TagServiceImpl implements TagService {
         Tag newTag = tagRepository.create(fromTagDto);
         Optional<Tag> tag = tagRepository.findById(newTag.getId());
         if (tag.isEmpty()) {
-            throw new EntityNotFoundException(newTag.getId());
+            throw new EntityNotFoundException(String.valueOf(newTag.getId()));
         }
         return tagServiceMapper.convertTagToDto(tag.get());
     }
@@ -87,22 +96,26 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public boolean delete(Long id) {
+    public void delete(Long id, PaginationContext paginationContext) {
         tagValidator.validateId(id);
 
         SearchCriteria searchCriteria = new SearchCriteria();
         Optional<Tag> tagById = tagRepository.findById(id);
         if (tagById.isEmpty()) {
-            throw new EntityNotFoundException(id);
+            throw new EntityNotFoundException(String.valueOf(id));
         }
         tagById.ifPresent(tag -> searchCriteria.setTagList(List.of(tag.getName())));
-        List<Certificate> certificateList = certificateRepository.find(searchCriteria);
+        List<Certificate> certificateList = certificateRepository.find(paginationContext, searchCriteria);
 
         if (!certificateList.isEmpty()) {
             throw new AttachedTagException(tagById.get().getId(), tagById.get().getName());
         }
 
         tagRepository.delete(tagById.get());
-        return true;
+    }
+
+    @Override
+    public Long count() {
+        return tagRepository.count();
     }
 }

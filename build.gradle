@@ -15,8 +15,12 @@ allprojects {
 
         //Dependency to convert Duration to string and vice versa, CreationTimestamp and UpdateTimestamp annotations
         implementation group: 'org.hibernate', name: 'hibernate-core', version: hibernateVersion
+        //Dependency for javax.persistence.EntityManagerFactory which required for init an EntityManager Bean
+        //also for Transactional and Propagation in AuditListener
+        implementation group: 'org.springframework', name: 'spring-orm', version: springHibernate
 
         implementation group: 'org.springframework.boot', name: 'spring-boot-starter', version: bootVersion
+        implementation group: 'org.springframework.boot', name: 'spring-boot-starter-hateoas', version: bootVersion
 
         testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: bootVersion
         testImplementation group: 'org.springframework.boot', name: 'spring-boot-test-autoconfigure', version: bootVersion

@@ -1,4 +1,4 @@
-package com.epam.esm.dto.mapper;
+package com.epam.esm.dto.mapper.serializer;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
