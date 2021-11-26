@@ -6,7 +6,11 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.*;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceException;
+import javax.persistence.PostPersist;
+import javax.persistence.PostRemove;
+import javax.persistence.PostUpdate;
 import java.time.ZonedDateTime;
 
 import static com.epam.esm.audit.Operation.CREATE;
@@ -33,38 +37,36 @@ public class AuditListener {
     @PostPersist
     public void postPersist(Object entity) {
         String auditMessage = String.format(CREATED_MESSAGE, entity);
-        logger.info(auditMessage);
-
-        createRecord(entity, CREATE);
+        createRecord(entity, CREATE, auditMessage);
     }
 
     @PostUpdate
     public void postUpdate(Object entity) {
         String auditMessage = String.format(UPDATED_MESSAGE, entity);
-        logger.info(auditMessage);
-
-        createRecord(entity, UPDATE);
+        createRecord(entity, UPDATE, auditMessage);
     }
 
     @PostRemove
     public void postRemove(Object entity) {
         String auditMessage = String.format(DELETED_MESSAGE, entity);
-        logger.info(auditMessage);
-
-        createRecord(entity, DELETE);
+        createRecord(entity, DELETE, auditMessage);
     }
 
-    private void createRecord(Object entity, Operation operation) {
-        entityManager.getTransaction().begin();
+    private void createRecord(Object entity, Operation operation, String auditMessage) {
         AuditEntity auditEntity = new AuditEntity();
         auditEntity.setEntityName(entity.getClass().getSimpleName());
         auditEntity.setDate(ZonedDateTime.now(UTC));
         auditEntity.setOperation(operation);
 
         try {
+            entityManager.getTransaction().begin();
             this.entityManager.persist(auditEntity);
             entityManager.getTransaction().commit();
-            this.entityManager.close();
+            if (auditEntity.getId() != null) {
+                logger.info(auditMessage);
+            } else {
+                logger.warn("Operation {} is not registered", operation);
+            }
         } catch (PersistenceException | IllegalStateException e) {
             logger.error("AuditListener exception: {}, class: {}", e.getMessage(), e.getClass());
         }
