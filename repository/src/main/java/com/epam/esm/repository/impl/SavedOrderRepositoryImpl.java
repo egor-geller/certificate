@@ -17,6 +17,7 @@ import java.util.Optional;
 
 import static com.epam.esm.repository.query.SavedOrderQueries.SELECT_ALL_SAVED_ORDERS;
 import static com.epam.esm.repository.query.SavedOrderQueries.SELECT_BY_ORDER_ID;
+import static com.epam.esm.repository.query.SavedOrderQueries.SELECT_BY_USER_ID;
 
 @Repository
 public class SavedOrderRepositoryImpl implements SavedOrderRepository, CreateRepository<SavedOrder> {
@@ -67,7 +68,7 @@ public class SavedOrderRepositoryImpl implements SavedOrderRepository, CreateRep
 
     @Override
     public List<SavedOrder> findByUserId(Long id) {
-        return entityManager.createQuery("SELECT u FROM SavedOrder u WHERE u.order.user.id = ?1", SavedOrder.class)
+        return entityManager.createQuery(SELECT_BY_USER_ID, SavedOrder.class)
                 .setParameter(1, id)
                 .getResultList();
     }

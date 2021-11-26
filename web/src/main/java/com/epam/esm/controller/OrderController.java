@@ -12,8 +12,6 @@ import com.epam.esm.entity.User;
 import com.epam.esm.repository.PaginationContext;
 import com.epam.esm.service.OrderService;
 import com.epam.esm.service.SavedOrderService;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,35 +37,30 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/v1/orders")
 public class OrderController {
 
-    private static final Logger logger = LogManager.getLogger();
-
     private final OrderService orderService;
     private final SavedOrderService savedOrderService;
     private final PaginationContext paginationContext;
     private final HateoasProvider<OrderDto> modelHateoasProvider;
-    private final ListHateoasProvider<SavedOrderDto> savedOrderListHateoasProvider;
     private final ListHateoasProvider<OrderDto> listHateoasProvider;
 
     /**
      * Instantiates a new Order controller.
      *
-     * @param orderService                  {@link OrderService} order service
-     * @param paginationContext             {@link PaginationContext} pagination context
-     * @param modelHateoasProvider          {@link HateoasProvider} model hateoas provider
-     * @param savedOrderListHateoasProvider {@link ListHateoasProvider} list hateoas provider
+     * @param orderService         {@link OrderService} order service
+     * @param paginationContext    {@link PaginationContext} pagination context
+     * @param modelHateoasProvider {@link HateoasProvider} model hateoas provider
+     * @param listHateoasProvider  {@link ListHateoasProvider} list hateoas provider
      */
     @Autowired
     public OrderController(OrderService orderService,
                            SavedOrderService savedOrderService,
                            PaginationContext paginationContext,
                            HateoasProvider<OrderDto> modelHateoasProvider,
-                           ListHateoasProvider<SavedOrderDto> savedOrderListHateoasProvider,
                            ListHateoasProvider<OrderDto> listHateoasProvider) {
         this.orderService = orderService;
         this.savedOrderService = savedOrderService;
         this.paginationContext = paginationContext;
         this.modelHateoasProvider = modelHateoasProvider;
-        this.savedOrderListHateoasProvider = savedOrderListHateoasProvider;
         this.listHateoasProvider = listHateoasProvider;
     }
 
@@ -84,23 +77,7 @@ public class OrderController {
         List<OrderDto> orderDtoList = orderService.findAllOrdersService(paginationContext.createPagination(page, pageSize));
         Long count = orderService.count();
         List<SavedOrderDto> savedOrderServiceAll = savedOrderService.findAll(paginationContext.createPagination(page, pageSize));
-        List<OrderDto> orderDtos = orderDtoList.stream().map(orderDto -> {
-            List<Certificate> certificateList = orderDto.getCertificateList().stream().map(certificate -> {
-                long certificateId = certificate.getId();
-                Optional<BigDecimal> opPrice = savedOrderServiceAll
-                        .stream()
-                        .filter(savedOrderDto -> savedOrderDto.getCertificate().getId() == certificateId)
-                        .map(SavedOrderDto::getCost)
-                        .findFirst();
-                if (opPrice.isEmpty()) {
-                    return certificate;
-                }
-                certificate.setPrice(opPrice.get());
-                return certificate;
-            }).collect(Collectors.toList());
-            orderDto.setCertificateList(certificateList);
-            return orderDto;
-        }).collect(Collectors.toList());
+        List<OrderDto> orderDtos = getOrdersWithCorrectPrice(orderDtoList, savedOrderServiceAll);
         return createListPagination(orderDtos, count);
     }
 
@@ -166,19 +143,31 @@ public class OrderController {
         return new ResponseEntity<>(build, status);
     }
 
-    private ResponseEntity<ListHateoasModel<SavedOrderDto>> createListPaginationSaved(List<SavedOrderDto> orderDtoList,
-                                                                                      Long count) {
-        ListHateoasModel<SavedOrderDto> model = new ListHateoasModel<>(orderDtoList);
-        ListHateoasModel<SavedOrderDto> build = model.build(savedOrderListHateoasProvider, orderDtoList, count);
-
-        return new ResponseEntity<>(build, HttpStatus.OK);
-    }
-
     private ResponseEntity<ListHateoasModel<OrderDto>> createListPagination(List<OrderDto> orderDtoList,
                                                                             Long count) {
         ListHateoasModel<OrderDto> model = new ListHateoasModel<>(orderDtoList);
         ListHateoasModel<OrderDto> build = model.build(listHateoasProvider, orderDtoList, count);
 
         return new ResponseEntity<>(build, HttpStatus.OK);
+    }
+
+    private List<OrderDto> getOrdersWithCorrectPrice(List<OrderDto> orderDtoList, List<SavedOrderDto> savedOrderServiceAll) {
+        return orderDtoList.stream().map(orderDto -> {
+            List<Certificate> certificateList = orderDto.getCertificateList().stream().map(certificate -> {
+                long certificateId = certificate.getId();
+                Optional<BigDecimal> opPrice = savedOrderServiceAll
+                        .stream()
+                        .filter(savedOrderDto -> savedOrderDto.getCertificate().getId() == certificateId)
+                        .map(SavedOrderDto::getCost)
+                        .findFirst();
+                if (opPrice.isEmpty()) {
+                    return certificate;
+                }
+                certificate.setPrice(opPrice.get());
+                return certificate;
+            }).collect(Collectors.toList());
+            orderDto.setCertificateList(certificateList);
+            return orderDto;
+        }).collect(Collectors.toList());
     }
 }
