@@ -16,6 +16,8 @@ import com.epam.esm.repository.impl.OrderRepositoryImpl;
 import com.epam.esm.repository.impl.UserRepositoryImpl;
 import com.epam.esm.service.OrderService;
 import com.epam.esm.service.SavedOrderService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +29,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class OrderServiceImpl implements OrderService {
+
+    private static final Logger logger = LogManager.getLogger();
 
     private final OrderRepositoryImpl orderRepository;
     private final UserRepositoryImpl userRepository;
@@ -85,23 +89,33 @@ public class OrderServiceImpl implements OrderService {
         List<Long> certificateIds = certificateIdList.stream().map(Certificate::getId).collect(Collectors.toList());
         Order preparedOrder = prepareOrder(certificateIds, user);
         Order createdOrder = orderRepository.create(preparedOrder);
+        logger.info("OrderService - createdOrder: {}", createdOrder);
         List<SavedOrder> savedOrders = certificateIdList
                 .stream()
-                .filter(certificate -> certificateRepository.findById(certificate.getId()).isPresent())
                 .map(certificate -> {
+                    Optional<Certificate> opCertificate = certificateRepository.findById(certificate.getId());
+                    if (opCertificate.isEmpty()) {
+                        throw new EntityNotFoundException(String.valueOf(certificate.getId()));
+                    }
+                    logger.info("Certificate: {}", opCertificate.get());
                     SavedOrder savedOrder = new SavedOrder();
-                    savedOrder.setCertificate(certificate);
-                    savedOrder.setCertificateCost(certificate.getPrice());
+                    savedOrder.setCertificate(opCertificate.get());
+                    savedOrder.setCertificateCost(opCertificate.get().getPrice());
+                    logger.info("Saved order with certificate: {}", savedOrder);
                     return savedOrder;
                 })
                 .collect(Collectors.toList());
         savedOrders.forEach(savedOrder -> savedOrder.setOrder(createdOrder));
         savedOrders.forEach(savedOrder -> {
             SavedOrderDto savedOrderDto = savedOrderServiceMapper.convertSavedOrderToDto(savedOrder);
-            savedOrderService.create(savedOrderDto);
+            logger.info("SavedOrderDto: {}", savedOrderDto);
+            SavedOrderDto savedOrderDto1 = savedOrderService.create(savedOrderDto);
+            logger.info("Saved order: {}", savedOrderDto1);
         });
 
-        return orderServiceMapper.convertOrderToDto(createdOrder);
+        OrderDto orderDto1 = orderServiceMapper.convertOrderToDto(createdOrder);
+        logger.info("Finished order: {}", orderDto1);
+        return orderDto1;
     }
 
     @Override

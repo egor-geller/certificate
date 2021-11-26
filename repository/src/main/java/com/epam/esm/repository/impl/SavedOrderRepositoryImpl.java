@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.epam.esm.repository.query.SavedOrderQueries.SELECT_ALL_SAVED_ORDERS;
+import static com.epam.esm.repository.query.SavedOrderQueries.SELECT_BY_ORDER_ID;
 
 @Repository
 public class SavedOrderRepositoryImpl implements SavedOrderRepository, CreateRepository<SavedOrder> {
@@ -55,5 +56,19 @@ public class SavedOrderRepositoryImpl implements SavedOrderRepository, CreateRep
         CriteriaQuery<Long> query = criteriaBuilder.createQuery(Long.class);
         query.select(criteriaBuilder.count(query.from(SavedOrder.class)));
         return entityManager.createQuery(query).getSingleResult();
+    }
+
+    @Override
+    public List<SavedOrder> findByOrderId(Long id) {
+        return entityManager.createQuery(SELECT_BY_ORDER_ID, SavedOrder.class)
+                .setParameter(1, id)
+                .getResultList();
+    }
+
+    @Override
+    public List<SavedOrder> findByUserId(Long id) {
+        return entityManager.createQuery("SELECT u FROM SavedOrder u WHERE u.order.user.id = ?1", SavedOrder.class)
+                .setParameter(1, id)
+                .getResultList();
     }
 }

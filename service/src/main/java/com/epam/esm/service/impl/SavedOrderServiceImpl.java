@@ -10,6 +10,8 @@ import com.epam.esm.exception.EntityNotFoundException;
 import com.epam.esm.repository.PaginationContext;
 import com.epam.esm.repository.impl.SavedOrderRepositoryImpl;
 import com.epam.esm.service.SavedOrderService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +21,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class SavedOrderServiceImpl implements SavedOrderService {
+
+    private static final Logger logger = LogManager.getLogger();
 
     private final SavedOrderRepositoryImpl savedOrderRepository;
     private final SavedOrderServiceMapper savedOrderServiceMapper;
@@ -56,17 +60,61 @@ public class SavedOrderServiceImpl implements SavedOrderService {
     }
 
     @Override
+    public List<SavedOrderDto> findByOrderId(Long id) {
+        List<SavedOrder> savedOrders = savedOrderRepository.findByOrderId(id);
+        return savedOrders
+                .stream()
+                .map(savedOrder -> {
+                    SavedOrder so = new SavedOrder();
+                    so.setId(savedOrder.getId());
+                    so.setOrder(savedOrder.getOrder());
+                    Certificate certificate = savedOrder.getCertificate();
+                    certificate.setPrice(savedOrder.getCertificateCost());
+                    so.setCertificate(certificate);
+                    so.setCertificateCost(savedOrder.getCertificateCost());
+                    return so;
+                })
+                .map(savedOrderServiceMapper::convertSavedOrderToDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<SavedOrderDto> findByUserId(Long id) {
+        List<SavedOrder> savedOrders = savedOrderRepository.findByUserId(id);
+        return savedOrders
+                .stream()
+                .map(savedOrder -> {
+                    SavedOrder so = new SavedOrder();
+                    so.setId(savedOrder.getId());
+                    so.setOrder(savedOrder.getOrder());
+                    Certificate certificate = savedOrder.getCertificate();
+                    certificate.setPrice(savedOrder.getCertificateCost());
+                    so.setCertificate(certificate);
+                    so.setCertificateCost(savedOrder.getCertificateCost());
+                    return so;
+                })
+                .map(savedOrderServiceMapper::convertSavedOrderToDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public SavedOrderDto create(SavedOrderDto savedOrderDto) {
         if (savedOrderDto == null) {
             throw new EmptyOrderException();
         }
         SavedOrder savedOrder = savedOrderServiceMapper.convertSavedOrderFromDto(savedOrderDto);
-        Optional<SavedOrder> savedOrderId = savedOrderRepository.findById(savedOrder.getId());
+        logger.info("SavedOrderService - savedOrder: {}", savedOrder);
+        long id = savedOrder.getId() == null ? 0L : savedOrder.getId();
+        Optional<SavedOrder> savedOrderId = savedOrderRepository.findById(id);
+        logger.info("SavedOrderService - savedOrderId: {}", savedOrderId);
         if (savedOrderId.isPresent()) {
             throw new EntityAlreadyExistsException();
         }
         SavedOrder newSavedOrder = savedOrderRepository.create(savedOrder);
-        return savedOrderServiceMapper.convertSavedOrderToDto(newSavedOrder);
+        logger.info("SavedOrderService - new saved order: {}", newSavedOrder);
+        SavedOrderDto savedOrderDto1 = savedOrderServiceMapper.convertSavedOrderToDto(newSavedOrder);
+        logger.info("SavedOrderService - new DTO: {}", savedOrderDto1);
+        return savedOrderDto1;
     }
 
     @Override

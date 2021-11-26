@@ -30,6 +30,9 @@ public interface SavedOrderService {
      */
     SavedOrderDto findById(Long id);
 
+    List<SavedOrderDto> findByOrderId(Long id);
+    List<SavedOrderDto> findByUserId(Long id);
+
     /**
      * Create saved order.
      *
