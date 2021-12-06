@@ -5,6 +5,7 @@ import com.epam.esm.entity.User;
 import com.epam.esm.exception.EntityAlreadyExistsException;
 import com.epam.esm.exception.InvalidEntityException;
 import com.epam.esm.repository.PaginationContext;
+import org.springframework.security.authentication.BadCredentialsException;
 
 import java.util.List;
 

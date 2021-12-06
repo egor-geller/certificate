@@ -16,7 +16,7 @@ public class ResponseUtil {
 
     private static final String ERROR_MESSAGE = "errorMessage";
 
-    private ResourceBundleMessageSource messageSource;
+    private final ResourceBundleMessageSource messageSource;
 
     @Autowired
     public ResponseUtil(ResourceBundleMessageSource messageSource) {
