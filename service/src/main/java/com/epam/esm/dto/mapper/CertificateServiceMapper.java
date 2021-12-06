@@ -21,7 +21,7 @@ public class CertificateServiceMapper {
 
     public CertificateDto convertCertificateToDto(Long updatedId, Optional<Certificate> updatedCertificate, List<Tag> byCertificateId) {
         if (updatedCertificate.isEmpty()) {
-            throw new EntityNotFoundException(updatedId);
+            throw new EntityNotFoundException(String.valueOf(updatedId));
         }
         return convertCertificateToDto(updatedCertificate.get(), byCertificateId);
     }

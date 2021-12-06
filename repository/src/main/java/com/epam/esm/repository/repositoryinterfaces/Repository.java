@@ -1,8 +1,9 @@
 package com.epam.esm.repository.repositoryinterfaces;
 
-import com.epam.esm.entity.Certificate;
-import com.epam.esm.entity.Tag;
+import com.epam.esm.repository.PaginationContext;
+import com.epam.esm.repository.SearchCriteria;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -13,26 +14,30 @@ import java.util.Optional;
 public interface Repository<T> {
 
     /**
-     * Fina a tag or certificate by its unique Id
+     * Find all entities
      *
-     * @param id id of a tag or certificate
-     * @return {@link Optional} of {@link Tag} or {@link Certificate} entity.
+     * @return {@link List} of entities
+     */
+    default List<T> findAll(PaginationContext paginationContext) {
+        return List.of();
+    }
+
+    default List<T> find(PaginationContext paginationContext, SearchCriteria searchCriteria) {
+        return List.of();
+    }
+
+    /**
+     * Find a tag or certificate by its unique Id
+     *
+     * @param id id of a tan entity
+     * @return {@link Optional} of an entity
      */
     Optional<T> findById(Long id);
 
     /**
-     * Create a new certificate or tag.
+     * Retrieves the total size of all objects from database
      *
-     * @param t {@link Certificate} or {@link Tag} instance
-     * @return id of {@link Certificate} or {@link Tag}
+     * @return {@code Long} total number of entities
      */
-    Long create(T t);
-
-    /**
-     * Delete a tag
-     *
-     * @param id id of the tag or certificate
-     * @return {@code true} if {@link Tag} or {@link Certificate} was deleted, otherwise {@code false}
-     */
-    boolean delete(Long id);
+    Long count();
 }

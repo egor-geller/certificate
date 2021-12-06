@@ -2,7 +2,7 @@ package com.epam.esm.dto;
 
 import java.util.Objects;
 
-public class TagDto {
+public class TagDto extends IdDto {
 
     private Long id;
     private String name;
@@ -15,10 +15,12 @@ public class TagDto {
         this.name = name;
     }
 
+    @Override
     public Long getId() {
         return id;
     }
 
+    @Override
     public void setId(Long id) {
         this.id = id;
     }
