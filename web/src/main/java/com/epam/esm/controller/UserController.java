@@ -6,18 +6,25 @@ import com.epam.esm.controller.hateoas.model.HateoasModel;
 import com.epam.esm.controller.hateoas.model.ListHateoasModel;
 import com.epam.esm.dto.UserDto;
 import com.epam.esm.entity.User;
+import com.epam.esm.exception.EntityAlreadyExistsException;
+import com.epam.esm.exception.InvalidEntityException;
 import com.epam.esm.repository.PaginationContext;
 import com.epam.esm.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+
+import static org.springframework.http.HttpStatus.CREATED;
 
 /**
  * Class containing public REST API endpoints related to {@link User} entity.
@@ -83,5 +90,40 @@ public class UserController {
         HateoasModel<UserDto> build = model.build(modelHateoasProvider, userByIdService, 1L);
 
         return new ResponseEntity<>(build, HttpStatus.OK);
+    }
+
+    /**
+     * Create a new user.
+     * Access is allowed to everyone.
+     *
+     * @param userDto {@link UserDto} instance
+     * @throws InvalidEntityException in case when passed DTO object contains invalid data
+     * @throws EntityAlreadyExistsException in case when user with specified username already exists
+     * @return JSON {@link ResponseEntity} with {@link HateoasModel} object that contains {@link UserDto} object
+     */
+    @PostMapping("/signup")
+    public ResponseEntity<HateoasModel<UserDto>> signup(@RequestBody UserDto userDto) {
+        UserDto signup = userService.signup(userDto);
+        HateoasModel<UserDto> model = new HateoasModel<>(signup);
+        HateoasModel<UserDto> build = model.build(modelHateoasProvider, signup, 1L);
+
+        return new ResponseEntity<>(build, CREATED);
+    }
+
+    /**
+     * Authenticate with provided credentials.
+     * Access is allowed to everyone.
+     *
+     * @param userDto {@link UserDto} instance
+     * @throws BadCredentialsException in case when provided credentials are wrong
+     * @return JSON {@link ResponseEntity} with {@link HateoasModel} object that contains {@link UserDto} object
+     */
+    @PostMapping("/login")
+    public ResponseEntity<HateoasModel<UserDto>> login(@RequestBody UserDto userDto) {
+        UserDto login = userService.login(userDto);
+        HateoasModel<UserDto> model = new HateoasModel<>(login);
+        HateoasModel<UserDto> build = model.build(modelHateoasProvider, login, 1L);
+
+        return new ResponseEntity<>(build, CREATED);
     }
 }

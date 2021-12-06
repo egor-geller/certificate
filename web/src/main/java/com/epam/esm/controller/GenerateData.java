@@ -1,6 +1,7 @@
 package com.epam.esm.controller;
 
 import com.epam.esm.entity.Certificate;
+import com.epam.esm.entity.Role;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.entity.User;
 import com.epam.esm.service.impl.CertificateServiceImpl;
@@ -40,7 +41,9 @@ public class GenerateData {
         List<String> fakeUserList = createFakeUserList();
         fakeUserList.forEach(name -> {
             User user = new User();
-            user.setName(name);
+            user.setUsername(name);
+            user.setPassword(faker.internet().password(6, 20, true, true));
+            user.setRole(Role.USER);
             entityManager.persist(user);
         });
     }

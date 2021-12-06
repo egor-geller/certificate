@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.epam.esm.repository.query.UserQueries.FIND_ALL_USERS;
+import static com.epam.esm.repository.query.UserQueries.FIND_BY_USERNAME;
 
 @Repository
 public class UserRepositoryImpl implements UserRepository {
@@ -46,5 +47,20 @@ public class UserRepositoryImpl implements UserRepository {
         CriteriaQuery<Long> query = criteriaBuilder.createQuery(Long.class);
         query.select(criteriaBuilder.count(query.from(User.class)));
         return entityManager.createQuery(query).getSingleResult();
+    }
+
+    @Override
+    public Optional<User> findByUsername(String username) {
+        User user = entityManager.createQuery(FIND_BY_USERNAME, User.class)
+                .setParameter(1, username)
+                .getSingleResult();
+        return Optional.ofNullable(user);
+    }
+
+    @Override
+    public User save(User user) {
+        entityManager.persist(user);
+        entityManager.flush();
+        return user;
     }
 }

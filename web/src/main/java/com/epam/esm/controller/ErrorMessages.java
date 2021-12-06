@@ -17,6 +17,7 @@ public class ErrorMessages {
     public static final String PROBLEM_BUILDING_QUERY_ERROR_MESSAGE = "query_build_problem";
     public static final String EMPTY_ORDER_ERROR_MESSAGE = "empty_order";
     public static final String PAGINATION_ERROR_MESSAGE = "pagination_problem";
+    public static final String INVALID_CREDENTIALS_MESSAGE = "invalid_credentials";
 
     private ErrorMessages() {
     }

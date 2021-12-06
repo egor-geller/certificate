@@ -17,6 +17,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -29,6 +30,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import static com.epam.esm.controller.ErrorCode.CODE_ERROR_400;
+import static com.epam.esm.controller.ErrorCode.CODE_ERROR_401;
 import static com.epam.esm.controller.ErrorCode.CODE_ERROR_404;
 import static com.epam.esm.controller.ErrorCode.CODE_ERROR_415;
 import static com.epam.esm.controller.ErrorCode.CODE_ERROR_500;
@@ -40,6 +42,7 @@ import static com.epam.esm.controller.ErrorMessages.ENTITY_NOT_FOUND_MESSAGE;
 import static com.epam.esm.controller.ErrorMessages.ERROR_CODE;
 import static com.epam.esm.controller.ErrorMessages.ERROR_MESSAGE;
 import static com.epam.esm.controller.ErrorMessages.INTERNAL_SERVER_ERROR_MESSAGE;
+import static com.epam.esm.controller.ErrorMessages.INVALID_CREDENTIALS_MESSAGE;
 import static com.epam.esm.controller.ErrorMessages.INVALID_MESSAGE;
 import static com.epam.esm.controller.ErrorMessages.NOT_JSON_FORMAT_ERROR_MESSAGE;
 import static com.epam.esm.controller.ErrorMessages.PAGINATION_ERROR_MESSAGE;
@@ -148,6 +151,12 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         String errorMessage = String.format(getErrorMessage(PAGINATION_ERROR_MESSAGE),
                 e.getErrorType(), e.getInvalidValue());
         return buildErrorResponseEntity(HttpStatus.BAD_REQUEST, errorMessage, CODE_ERROR_400);
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<Object> badCredentialsExceptionHandle() {
+        String errorMessage = getErrorMessage(INVALID_CREDENTIALS_MESSAGE);
+        return buildErrorResponseEntity(HttpStatus.UNAUTHORIZED, errorMessage, CODE_ERROR_401);
     }
 
     @ExceptionHandler(Exception.class)
