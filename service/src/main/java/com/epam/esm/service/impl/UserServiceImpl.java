@@ -88,10 +88,10 @@ public class UserServiceImpl implements UserService {
         String password = userDto.getPassword();
 
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new BadCredentialsException(StringUtils.EMPTY));
+                .orElseThrow(() -> new BadCredentialsException("User " + username + " not found"));
 
         if (!encoder.matches(password, user.getPassword())) {
-            throw new BadCredentialsException(StringUtils.EMPTY);
+            throw new BadCredentialsException("Login/Password is not correct");
         }
 
         return userDto;
