@@ -1,6 +1,6 @@
 package com.epam.esm.validator;
 
-import com.epam.esm.entity.User;
+import com.epam.esm.dto.UserDto;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -16,17 +16,17 @@ public class UserValidator {
     private static final String USERNAME_REGEX = "^[\\p{LD}_]{8,32}$";
     private static final String PASSWORD_REGEX = "^(?=.*\\p{Alpha})(?=.*\\d)[\\p{Alnum}]{8,32}$";
 
-    public List<ValidationError> validate(User user) {
+    public List<ValidationError> validate(UserDto userDto) {
         List<ValidationError> validationErrors = new ArrayList<>();
-        String username = user.getUsername();
-        String password = user.getPassword();
+        String username = userDto.getUsername();
+        String password = userDto.getPassword();
 
-        boolean usernameIsValid = validateUsername(username);
+        boolean usernameIsValid = validateCredentials(username, USERNAME_REGEX);
         if (!usernameIsValid) {
             validationErrors.add(INVALID_USERNAME);
         }
 
-        boolean passwordIsValid = validatePassword(password);
+        boolean passwordIsValid = validateCredentials(password, PASSWORD_REGEX);
         if (!passwordIsValid) {
             validationErrors.add(INVALID_PASSWORD);
         }
@@ -34,11 +34,7 @@ public class UserValidator {
         return validationErrors;
     }
 
-    private boolean validateUsername(String username) {
-        return Pattern.matches(USERNAME_REGEX, username);
-    }
-
-    private boolean validatePassword(String password) {
-        return Pattern.matches(PASSWORD_REGEX, password);
+    private boolean validateCredentials(String field, String rgx) {
+        return Pattern.matches(rgx, field);
     }
 }

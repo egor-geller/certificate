@@ -59,27 +59,22 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public UserDto signup(UserDto userDto) {
-        User user = userServiceMapper.convertUserFromDto(userDto);
-
-        List<ValidationError> validationErrors = userValidator.validate(user);
+        List<ValidationError> validationErrors = userValidator.validate(userDto);
 
         if (!validationErrors.isEmpty()) {
             throw new InvalidEntityException(User.class);
         }
 
-        if (userRepository.findByUsername(user.getUsername()).isPresent()) {
+        if (userRepository.findByUsername(userDto.getUsername()).isPresent()) {
             throw new EntityAlreadyExistsException();
         }
 
-        String encodedPassword = encoder.encode(user.getPassword());
-        user.setPassword(encodedPassword);
-
+        String encodedPassword = encoder.encode(userDto.getPassword());
+        userDto.setPassword(encodedPassword);
+        User user = userServiceMapper.convertUserFromDto(userDto);
         User savedUser = userRepository.save(user);
-        Optional<User> userById = userRepository.findById(savedUser.getId());
-        if (userById.isEmpty()) {
-            throw new EntityNotFoundException(String.valueOf(savedUser.getId()));
-        }
-        return userServiceMapper.convertUserToDto(userById.get());
+
+        return userServiceMapper.convertUserToDto(savedUser);
     }
 
     @Override
