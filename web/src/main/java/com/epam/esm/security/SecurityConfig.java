@@ -20,8 +20,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private static final String SIGNUP_ENDPOINT = "/api/v1/users/signup";
     private static final String LOGIN_ENDPOINT = "/api/v1/users/login";
+    private static final String USER_ENDPOINT = "/api/v1/users";
+    private static final String TAGS_ENDPOINT = "/api/v1/tags/**";
     private static final String MAIN_ENTITY_ENDPOINT = "/api/v1/certificates/**";
     private static final String GENERATE_ENDPOINT = "/api/v1/generatedata/**";
+
+    private static final String ADMIN_ROLE = "ADMIN";
+    private static final String USER_ROLE = "USER";
 
     private final AuthenticationEntryPoint authenticationEntryPoint;
 
@@ -38,8 +43,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 .antMatchers(SIGNUP_ENDPOINT, LOGIN_ENDPOINT).permitAll()
-                .antMatchers(HttpMethod.GET, MAIN_ENTITY_ENDPOINT).permitAll()
-                .antMatchers(GENERATE_ENDPOINT).permitAll()
+                .antMatchers(HttpMethod.GET, USER_ENDPOINT).hasRole(ADMIN_ROLE)
+                .antMatchers(MAIN_ENTITY_ENDPOINT).hasAnyRole(ADMIN_ROLE, USER_ROLE)
+                .antMatchers(TAGS_ENDPOINT).hasRole(ADMIN_ROLE)
+                .antMatchers(GENERATE_ENDPOINT).hasRole(ADMIN_ROLE)
                 .anyRequest().authenticated()
                 .and()
                 .exceptionHandling()

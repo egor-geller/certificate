@@ -10,12 +10,11 @@ import com.epam.esm.exception.InvalidEntityException;
 import com.epam.esm.repository.PaginationContext;
 import com.epam.esm.repository.SearchCriteria;
 import com.epam.esm.service.CertificateService;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -71,6 +70,7 @@ public class CertificateController {
      * @return JSON {@link ResponseEntity} object that contains list of {@link CertificateDto}
      */
     @GetMapping
+    @PreAuthorize("hasAuthority('read')")
     public ResponseEntity<ListHateoasModel<CertificateDto>> findCertificateBySearchingWithCriteria(@RequestParam(required = false) Integer page,
                                                                                                    @RequestParam(required = false) Integer pageSize,
                                                                                                    @ModelAttribute SearchCriteria searchCriteria) {
@@ -88,6 +88,7 @@ public class CertificateController {
      * @throws InvalidEntityException in case when entered id is not a valid one.
      */
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('read')")
     public ResponseEntity<HateoasModel<CertificateDto>> getCertificateById(@PathVariable("id") Long id) {
         CertificateDto certificateById = certificateService.findCertificateById(id);
         return createModelPagination(certificateById, HttpStatus.OK);
@@ -100,6 +101,7 @@ public class CertificateController {
      * @return JSON {@link ResponseEntity} object that contains created {@link CertificateDto} object
      */
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasAuthority('write')")
     public ResponseEntity<HateoasModel<CertificateDto>> createCertificate(@RequestBody CertificateDto certificateDto) {
         CertificateDto certificate = certificateService.create(paginationContext, certificateDto);
         return createModelPagination(certificate, HttpStatus.CREATED);
@@ -114,6 +116,7 @@ public class CertificateController {
      * @throws InvalidEntityException in case when passed DTO object contains invalid data
      */
     @PatchMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasAuthority('write')")
     public ResponseEntity<HateoasModel<CertificateDto>> updateCertificate(@PathVariable("id") Long id,
                                                                           @RequestBody CertificateDto certificateDto) {
         certificateDto.setId(id);
@@ -129,6 +132,7 @@ public class CertificateController {
      * @return {@code HttpStatus.OK} when entity has been attached
      */
     @PostMapping("/{certId}/tag/{tagId}")
+    @PreAuthorize("hasAuthority('write')")
     public ResponseEntity<HateoasModel<CertificateDto>> attachTagToCertificate(@PathVariable("tagId") Long tagId,
                                                                                @PathVariable("certId") Long certId) {
 
@@ -144,6 +148,7 @@ public class CertificateController {
      * @return {@code HttpStatus.OK} when entity has been detached
      */
     @DeleteMapping("/{certId}/tag/{tagId}")
+    @PreAuthorize("hasAuthority('write')")
     public ResponseEntity<HateoasModel<CertificateDto>> detachTagFromCertificate(@PathVariable("tagId") Long tagId,
                                                                                  @PathVariable("certId") Long certId) {
 
@@ -158,6 +163,7 @@ public class CertificateController {
      * @return {@code HttpStatus.NO_CONTENT} when entity has been deleted
      */
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('write')")
     public ResponseEntity<Boolean> deleteCertificate(@PathVariable("id") Long id) {
         certificateService.delete(id, paginationContext);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);

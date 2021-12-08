@@ -13,6 +13,7 @@ import com.epam.esm.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -67,6 +68,7 @@ public class UserController {
      * @return JSON {@link ResponseEntity} object that contains list {@link ListHateoasModel} of {@link UserDto}
      */
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ListHateoasModel<UserDto>> getAllUsers(@RequestParam(required = false) Integer page,
                                                                  @RequestParam(required = false) Integer pageSize) {
         List<UserDto> userDtoList = userService.findAllUsers(paginationContext.createPagination(page, pageSize));
@@ -84,6 +86,7 @@ public class UserController {
      * @return JSON {@link ResponseEntity} with {@link HateoasModel} object that contains {@link UserDto} object
      */
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<HateoasModel<UserDto>> getUserById(@PathVariable("id") Long id) {
         UserDto userByIdService = userService.findUserByIdService(id);
         HateoasModel<UserDto> model = new HateoasModel<>(userByIdService);
