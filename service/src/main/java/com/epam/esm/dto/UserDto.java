@@ -1,5 +1,6 @@
 package com.epam.esm.dto;
 
+import com.epam.esm.entity.Role;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Objects;
@@ -10,26 +11,16 @@ public class UserDto extends IdDto {
     private String username;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
-    private String role;
+    private Role role;
 
     public UserDto() {
     }
 
-    public UserDto(Long id, String username, String password, String role) {
+    public UserDto(Long id, String username, String password, Role role) {
         this.id = id;
         this.username = username;
         this.password = password;
         this.role = role;
-    }
-
-    @Override
-    public Long getId() {
-        return id;
-    }
-
-    @Override
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getUsername() {
@@ -48,11 +39,11 @@ public class UserDto extends IdDto {
         this.password = password;
     }
 
-    public String getRole() {
+    public Role getRole() {
         return role;
     }
 
-    public void setRole(String role) {
+    public void setRole(Role role) {
         this.role = role;
     }
 
@@ -62,7 +53,7 @@ public class UserDto extends IdDto {
         if (o == null || getClass() != o.getClass()) return false;
         UserDto userDto = (UserDto) o;
         return Objects.equals(id, userDto.id) && Objects.equals(username, userDto.username)
-                && Objects.equals(password, userDto.password) && Objects.equals(role, userDto.role);
+                && Objects.equals(password, userDto.password) && role == userDto.role;
     }
 
     @Override
@@ -76,7 +67,7 @@ public class UserDto extends IdDto {
                 "id=" + id +
                 ", username='" + username + '\'' +
                 ", password='" + password + '\'' +
-                ", role='" + role + '\'' +
+                ", role=" + role +
                 '}';
     }
 }

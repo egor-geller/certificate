@@ -11,7 +11,8 @@ import com.epam.esm.repository.repositoryinterfaces.UserRepository;
 import com.epam.esm.service.UserService;
 import com.epam.esm.validator.UserValidator;
 import com.epam.esm.validator.ValidationError;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,6 +25,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
+
+    private static final Logger logger = LogManager.getLogger();
 
     private final UserRepository userRepository;
     private final UserServiceMapper userServiceMapper;
@@ -59,19 +62,24 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public UserDto signup(UserDto userDto) {
+        logger.info("UserServiceImpl - userDto: {}", userDto);
         List<ValidationError> validationErrors = userValidator.validate(userDto);
 
         if (!validationErrors.isEmpty()) {
             throw new InvalidEntityException(User.class);
         }
 
-        if (userRepository.findByUsername(userDto.getUsername()).isPresent()) {
+        Optional<User> maybeSignuped = userRepository.findByUsername(userDto.getUsername());
+
+        if (maybeSignuped.isEmpty()) {
+            logger.info("UserServiceImpl - maybeSignuped: {}", maybeSignuped);
             throw new EntityAlreadyExistsException();
         }
 
         String encodedPassword = encoder.encode(userDto.getPassword());
         userDto.setPassword(encodedPassword);
         User user = userServiceMapper.convertUserFromDto(userDto);
+        logger.info("UserServiceImpl - user: {}", user);
         User savedUser = userRepository.save(user);
 
         return userServiceMapper.convertUserToDto(savedUser);
@@ -84,7 +92,7 @@ public class UserServiceImpl implements UserService {
 
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new BadCredentialsException("User " + username + " not found"));
-
+        logger.info("UserServiceImpl - user: {}", user);
         if (!encoder.matches(password, user.getPassword())) {
             throw new BadCredentialsException("Login/Password is not correct");
         }

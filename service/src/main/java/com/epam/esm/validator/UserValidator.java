@@ -13,7 +13,9 @@ import static com.epam.esm.validator.ValidationError.INVALID_USERNAME;
 @Component
 public class UserValidator {
 
-    private static final String USERNAME_REGEX = "^[\\p{LD}_]{8,32}$";
+    //private static final String USERNAME_REGEX = "^[\\p{LD}_]{8,32}$";
+    private static final String NAME_REGEX = "[a-zA-Z0-9.,'?!\" ]{5,30}";
+    private static final String PASS_REGEX = "[a-zA-Z0-9.,'?!\" ]{5,30}";
     private static final String PASSWORD_REGEX = "^(?=.*\\p{Alpha})(?=.*\\d)[\\p{Alnum}]{8,32}$";
 
     public List<ValidationError> validate(UserDto userDto) {
@@ -21,12 +23,12 @@ public class UserValidator {
         String username = userDto.getUsername();
         String password = userDto.getPassword();
 
-        boolean usernameIsValid = validateCredentials(username, USERNAME_REGEX);
+        boolean usernameIsValid = validateCredentials(username, NAME_REGEX);
         if (!usernameIsValid) {
             validationErrors.add(INVALID_USERNAME);
         }
 
-        boolean passwordIsValid = validateCredentials(password, PASSWORD_REGEX);
+        boolean passwordIsValid = validateCredentials(password, PASS_REGEX);
         if (!passwordIsValid) {
             validationErrors.add(INVALID_PASSWORD);
         }

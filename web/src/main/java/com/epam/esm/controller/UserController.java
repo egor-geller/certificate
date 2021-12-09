@@ -10,6 +10,8 @@ import com.epam.esm.exception.EntityAlreadyExistsException;
 import com.epam.esm.exception.InvalidEntityException;
 import com.epam.esm.repository.PaginationContext;
 import com.epam.esm.service.UserService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +37,8 @@ import static org.springframework.http.HttpStatus.CREATED;
 @RestController
 @RequestMapping("/api/v1/users")
 public class UserController {
+
+    private static final Logger logger = LogManager.getLogger();
 
     private final UserService userService;
     private final PaginationContext paginationContext;
@@ -123,7 +127,9 @@ public class UserController {
      */
     @PostMapping("/login")
     public ResponseEntity<HateoasModel<UserDto>> login(@RequestBody UserDto userDto) {
+        logger.info("UserController - UserDto: {}", userDto);
         UserDto login = userService.login(userDto);
+        logger.info("UserController - UserDto: {}", login);
         HateoasModel<UserDto> model = new HateoasModel<>(login);
         HateoasModel<UserDto> build = model.build(modelHateoasProvider, login, 1L);
 
