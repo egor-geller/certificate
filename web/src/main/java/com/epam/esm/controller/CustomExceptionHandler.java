@@ -17,6 +17,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -34,6 +35,7 @@ import static com.epam.esm.controller.ErrorCode.CODE_ERROR_401;
 import static com.epam.esm.controller.ErrorCode.CODE_ERROR_404;
 import static com.epam.esm.controller.ErrorCode.CODE_ERROR_415;
 import static com.epam.esm.controller.ErrorCode.CODE_ERROR_500;
+import static com.epam.esm.controller.ErrorMessages.ACCESS_DENIED_MESSAGE;
 import static com.epam.esm.controller.ErrorMessages.ATTACH_DETACH_ERROR_MESSAGE;
 import static com.epam.esm.controller.ErrorMessages.DELETE_ATTACHED_TAG_ERROR_MESSAGE;
 import static com.epam.esm.controller.ErrorMessages.EMPTY_ORDER_ERROR_MESSAGE;
@@ -156,6 +158,12 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<Object> badCredentialsExceptionHandle() {
         String errorMessage = getErrorMessage(INVALID_CREDENTIALS_MESSAGE);
+        return buildErrorResponseEntity(HttpStatus.UNAUTHORIZED, errorMessage, CODE_ERROR_401);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<Object> accessDeniedExceptionHandle() {
+        String errorMessage = getErrorMessage(ACCESS_DENIED_MESSAGE);
         return buildErrorResponseEntity(HttpStatus.UNAUTHORIZED, errorMessage, CODE_ERROR_401);
     }
 
