@@ -1,10 +1,14 @@
 package com.epam.esm.security;
 
+import org.aopalliance.intercept.MethodInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
+import org.springframework.security.access.method.MethodSecurityMetadataSource;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.GlobalMethodSecurityConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -13,10 +17,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 
+import java.util.List;
+
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
+public class SecurityConfig extends GlobalMethodSecurityConfiguration {
 
     private static final String SIGNUP_ENDPOINT = "/api/v1/users/signup";
     private static final String LOGIN_ENDPOINT = "/api/v1/users/login";
@@ -28,14 +34,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private static final String ADMIN_ROLE = "ADMIN";
     private static final String USER_ROLE = "USER";
 
-    private final AuthenticationEntryPoint authenticationEntryPoint;
+    /*private final AuthenticationEntryPoint authenticationEntryPoint;
 
     @Autowired
     public SecurityConfig(AuthenticationEntryPoint authenticationEntryPoint) {
         this.authenticationEntryPoint = authenticationEntryPoint;
-    }
+    }*/
 
-    @Override
+    /*@Override
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable()
                 .httpBasic().disable()
@@ -51,7 +57,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .exceptionHandling()
                 .authenticationEntryPoint(authenticationEntryPoint);
-    }
+    }*/
 
     @Bean
     public PasswordEncoder passwordEncoder() {

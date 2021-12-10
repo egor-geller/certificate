@@ -90,49 +90,12 @@ public class UserController {
      * @return JSON {@link ResponseEntity} with {@link HateoasModel} object that contains {@link UserDto} object
      */
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasPermission(#id,'ADMIN')")
     public ResponseEntity<HateoasModel<UserDto>> getUserById(@PathVariable("id") Long id) {
         UserDto userByIdService = userService.findUserByIdService(id);
         HateoasModel<UserDto> model = new HateoasModel<>(userByIdService);
         HateoasModel<UserDto> build = model.build(modelHateoasProvider, userByIdService, 1L);
 
         return new ResponseEntity<>(build, HttpStatus.OK);
-    }
-
-    /**
-     * Create a new user.
-     * Access is allowed to everyone.
-     *
-     * @param userDto {@link UserDto} instance
-     * @throws InvalidEntityException in case when passed DTO object contains invalid data
-     * @throws EntityAlreadyExistsException in case when user with specified username already exists
-     * @return JSON {@link ResponseEntity} with {@link HateoasModel} object that contains {@link UserDto} object
-     */
-    @PostMapping("/signup")
-    public ResponseEntity<HateoasModel<UserDto>> signup(@RequestBody UserDto userDto) {
-        UserDto signup = userService.signup(userDto);
-        HateoasModel<UserDto> model = new HateoasModel<>(signup);
-        HateoasModel<UserDto> build = model.build(modelHateoasProvider, signup, 1L);
-
-        return new ResponseEntity<>(build, CREATED);
-    }
-
-    /**
-     * Authenticate with provided credentials.
-     * Access is allowed to everyone.
-     *
-     * @param userDto {@link UserDto} instance
-     * @throws BadCredentialsException in case when provided credentials are wrong
-     * @return JSON {@link ResponseEntity} with {@link HateoasModel} object that contains {@link UserDto} object
-     */
-    @PostMapping("/login")
-    public ResponseEntity<HateoasModel<UserDto>> login(@RequestBody UserDto userDto) {
-        logger.info("UserController - UserDto: {}", userDto);
-        UserDto login = userService.login(userDto);
-        logger.info("UserController - UserDto: {}", login);
-        HateoasModel<UserDto> model = new HateoasModel<>(login);
-        HateoasModel<UserDto> build = model.build(modelHateoasProvider, login, 1L);
-
-        return new ResponseEntity<>(build, CREATED);
     }
 }
