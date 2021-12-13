@@ -1,5 +1,6 @@
 package com.epam.esm.service;
 
+import com.epam.esm.dto.TokenDto;
 import com.epam.esm.dto.UserDto;
 import com.epam.esm.entity.User;
 import com.epam.esm.exception.EntityAlreadyExistsException;
@@ -38,18 +39,18 @@ public interface UserService {
      * @param userDto {@link UserDto} instance
      * @throws InvalidEntityException in case when passed DTO object contains invalid data
      * @throws EntityAlreadyExistsException in case when user with specified username already exists
-     * @return {@link UserDto} object
+     * @return {@link TokenDto} object
      */
-    UserDto signup(UserDto userDto);
+    TokenDto signup(UserDto userDto);
 
     /**
      * Authenticate with provided credentials.
      *
      * @param userDto {@link UserDto} instance
      * @throws BadCredentialsException in case when provided credentials are wrong
-     * @return {@link UserDto} object
+     * @return {@link TokenDto} object
      */
-    UserDto login(UserDto userDto);
+    TokenDto login(UserDto userDto);
 
     Long count();
 }

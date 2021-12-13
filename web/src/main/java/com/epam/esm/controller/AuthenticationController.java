@@ -1,5 +1,6 @@
 package com.epam.esm.controller;
 
+import com.epam.esm.dto.TokenDto;
 import com.epam.esm.dto.UserDto;
 import com.epam.esm.exception.EntityAlreadyExistsException;
 import com.epam.esm.exception.InvalidEntityException;
@@ -33,11 +34,11 @@ public class AuthenticationController {
      * @param userDto {@link UserDto} instance
      * @throws InvalidEntityException in case when passed DTO object contains invalid data
      * @throws EntityAlreadyExistsException in case when user with specified username already exists
-     * @return JSON {@link ResponseEntity} object that contains {@link UserDto} object
+     * @return JSON {@link ResponseEntity} object that contains {@link TokenDto} object
      */
     @PostMapping("/signup")
-    public ResponseEntity<UserDto> signup(@RequestBody UserDto userDto) {
-        UserDto signup = userService.signup(userDto);
+    public ResponseEntity<TokenDto> signup(@RequestBody UserDto userDto) {
+        TokenDto signup = userService.signup(userDto);
         return new ResponseEntity<>(signup, CREATED);
     }
 
@@ -47,11 +48,11 @@ public class AuthenticationController {
      *
      * @param userDto {@link UserDto} instance
      * @throws BadCredentialsException in case when provided credentials are wrong
-     * @return JSON {@link ResponseEntity} object that contains {@link UserDto} object
+     * @return JSON {@link ResponseEntity} object that contains {@link TokenDto} object
      */
     @PostMapping("/login")
-    public ResponseEntity<UserDto> login(@RequestBody UserDto userDto) {
-        UserDto login = userService.login(userDto);
+    public ResponseEntity<TokenDto> login(@RequestBody UserDto userDto) {
+        TokenDto login = userService.login(userDto);
         return new ResponseEntity<>(login, CREATED);
     }
 }
