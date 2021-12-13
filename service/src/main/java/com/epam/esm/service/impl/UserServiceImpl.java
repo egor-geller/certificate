@@ -1,5 +1,6 @@
 package com.epam.esm.service.impl;
 
+import com.epam.esm.dto.AuthenticateDto;
 import com.epam.esm.dto.TokenDto;
 import com.epam.esm.dto.UserDto;
 import com.epam.esm.dto.mapper.UserServiceMapper;
@@ -9,7 +10,6 @@ import com.epam.esm.exception.EntityNotFoundException;
 import com.epam.esm.exception.InvalidEntityException;
 import com.epam.esm.repository.PaginationContext;
 import com.epam.esm.repository.repositoryinterfaces.UserRepository;
-import com.epam.esm.security.KeycloakUtil;
 import com.epam.esm.service.UserService;
 import com.epam.esm.validator.UserValidator;
 import com.epam.esm.validator.ValidationError;
@@ -17,22 +17,16 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class UserServiceImpl implements UserService, UserDetailsService {
+public class UserServiceImpl implements UserService {
 
     private static final Logger logger = LogManager.getLogger();
 
@@ -40,19 +34,16 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final UserServiceMapper userServiceMapper;
     private final PasswordEncoder encoder;
     private final UserValidator userValidator;
-    private final KeycloakUtil keycloakUtil;
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository,
                            UserServiceMapper userServiceMapper,
                            PasswordEncoder encoder,
-                           UserValidator userValidator,
-                           KeycloakUtil keycloakUtil) {
+                           UserValidator userValidator) {
         this.userRepository = userRepository;
         this.userServiceMapper = userServiceMapper;
         this.encoder = encoder;
         this.userValidator = userValidator;
-        this.keycloakUtil = keycloakUtil;
     }
 
     @Override
@@ -91,13 +82,13 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         User user = userServiceMapper.convertUserFromDto(userDto);
         User savedUser = userRepository.save(user);
 
-        return buildTokenDto(savedUser);
+        return new TokenDto();
     }
 
     @Override
-    public TokenDto login(UserDto userDto) {
-        String username = userDto.getUsername();
-        String password = userDto.getPassword();
+    public AuthenticateDto login(AuthenticateDto authenticateDto) {
+        String username = authenticateDto.getUsername();
+        String password = authenticateDto.getPassword();
 
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new BadCredentialsException("User " + username + " not found"));
@@ -106,7 +97,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             throw new BadCredentialsException("Login/Password is not correct");
         }
 
-        return buildTokenDto(user);
+        return new AuthenticateDto(user.getUsername(), user.getPassword());
     }
 
     @Override
@@ -114,34 +105,5 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return userRepository.count();
     }
 
-    private TokenDto buildTokenDto(User user) {
-        String username = user.getUsername();
-        String password = user.getPassword();
 
-        if (!keycloakUtil.keycloakUserExists(username)) {
-            String keycloakUserId = keycloakUtil.createKeycloakUser(user);
-            keycloakUtil.attachRoleToUser(user.getRole(), keycloakUserId);
-        } else {
-            keycloakUtil.resetPassword(username, password);
-        }
-
-        String accessToken = keycloakUtil.obtainAccessToken(username, password);
-
-        TokenDto tokenDto = new TokenDto();
-        tokenDto.setAccessToken(accessToken);
-
-        return tokenDto;
-    }
-
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<User> user = userRepository.findByUsername(username);
-        if (user.isEmpty()) {
-            throw new EntityNotFoundException();
-        }
-
-        Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority(user.get().getRole().name()));
-        return new org.springframework.security.core.userdetails.User(user.get().getUsername(), user.get().getPassword(), authorities);
-    }
 }

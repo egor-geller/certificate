@@ -2,6 +2,8 @@ package com.epam.esm.filter;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.epam.esm.dto.AuthenticateDto;
+import com.epam.esm.exception.InvalidJsonException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -33,8 +35,15 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
-        String username = request.getParameter("username");
-        String password = request.getParameter("password");
+        ObjectMapper mapper = new ObjectMapper();
+        AuthenticateDto authenticateDto;
+        try {
+            authenticateDto = mapper.readValue(request.getInputStream(), AuthenticateDto.class);
+        } catch (IOException e) {
+            throw new InvalidJsonException();
+        }
+        String username = authenticateDto.getUsername();
+        String password = authenticateDto.getPassword();
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, password);
         return authenticationManager.authenticate(authenticationToken);
     }

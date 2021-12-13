@@ -1,5 +1,6 @@
 package com.epam.esm.controller;
 
+import com.epam.esm.dto.AuthenticateDto;
 import com.epam.esm.dto.TokenDto;
 import com.epam.esm.dto.UserDto;
 import com.epam.esm.exception.EntityAlreadyExistsException;
@@ -7,7 +8,6 @@ import com.epam.esm.exception.InvalidEntityException;
 import com.epam.esm.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.OK;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -32,9 +33,9 @@ public class AuthenticationController {
      * Access is allowed to everyone.
      *
      * @param userDto {@link UserDto} instance
-     * @throws InvalidEntityException in case when passed DTO object contains invalid data
-     * @throws EntityAlreadyExistsException in case when user with specified username already exists
      * @return JSON {@link ResponseEntity} object that contains {@link TokenDto} object
+     * @throws InvalidEntityException       in case when passed DTO object contains invalid data
+     * @throws EntityAlreadyExistsException in case when user with specified username already exists
      */
     @PostMapping("/signup")
     public ResponseEntity<TokenDto> signup(@RequestBody UserDto userDto) {
@@ -46,13 +47,14 @@ public class AuthenticationController {
      * Authenticate with provided credentials.
      * Access is allowed to everyone.
      *
-     * @param userDto {@link UserDto} instance
-     * @throws BadCredentialsException in case when provided credentials are wrong
+     * @param authenticateDto {@link AuthenticateDto} instance
      * @return JSON {@link ResponseEntity} object that contains {@link TokenDto} object
+     * @throws BadCredentialsException in case when provided credentials are wrong
      */
     @PostMapping("/login")
-    public ResponseEntity<TokenDto> login(@RequestBody UserDto userDto) {
-        TokenDto login = userService.login(userDto);
-        return new ResponseEntity<>(login, CREATED);
+    public ResponseEntity<AuthenticateDto> login(@RequestBody AuthenticateDto authenticateDto) {
+        AuthenticateDto login = userService.login(authenticateDto);
+        return new ResponseEntity<>(login, OK);
     }
+
 }

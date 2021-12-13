@@ -1,5 +1,6 @@
 package com.epam.esm.service;
 
+import com.epam.esm.dto.AuthenticateDto;
 import com.epam.esm.dto.TokenDto;
 import com.epam.esm.dto.UserDto;
 import com.epam.esm.entity.User;
@@ -46,11 +47,11 @@ public interface UserService {
     /**
      * Authenticate with provided credentials.
      *
-     * @param userDto {@link UserDto} instance
+     * @param authenticateDto {@link AuthenticateDto} instance
      * @throws BadCredentialsException in case when provided credentials are wrong
      * @return {@link TokenDto} object
      */
-    TokenDto login(UserDto userDto);
+    AuthenticateDto login(AuthenticateDto authenticateDto);
 
     Long count();
 }
