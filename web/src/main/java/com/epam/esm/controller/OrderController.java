@@ -73,7 +73,7 @@ public class OrderController {
      * @return JSON {@link ResponseEntity} object that contains list {@link ListHateoasModel} of {@link OrderDto}
      */
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<ListHateoasModel<OrderDto>> getAllOrders(@RequestParam(required = false) Integer page,
                                                                    @RequestParam(required = false) Integer pageSize) {
         List<OrderDto> orderDtoList = orderService.findAllOrdersService(paginationContext.createPagination(page, pageSize));
@@ -90,7 +90,7 @@ public class OrderController {
      * @return JSON {@link ResponseEntity} with {@link HateoasModel} object that contains {@link OrderDto} object
      */
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<HateoasModel<OrderDto>> getOrderById(@PathVariable("id") Long id) {
         OrderDto orderDto = orderService.findOrderByIdService(id);
         List<SavedOrderDto> savedOrderDtos = savedOrderService.findByOrderId(id);
@@ -111,7 +111,7 @@ public class OrderController {
      * @return JSON {@link ResponseEntity} object that contains list {@link ListHateoasModel} of {@link OrderDto}
      */
     @GetMapping("/user/{id}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
     public ResponseEntity<ListHateoasModel<OrderDto>> getOrdersOfUserByItsId(@RequestParam(required = false) Integer page,
                                                                              @RequestParam(required = false) Integer pageSize,
                                                                              @PathVariable("id") Long id) {
@@ -136,7 +136,7 @@ public class OrderController {
      * @return JSON {@link ResponseEntity} object with {@link HateoasModel} that contains created {@link OrderDto} object
      */
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
     public ResponseEntity<HateoasModel<OrderDto>> makeOrder(@RequestBody OrderDto orderDto) {
         OrderDto checkout = orderService.makeOrderService(orderDto);
         return createModelPagination(checkout, HttpStatus.CREATED);

@@ -64,7 +64,7 @@ public class TagController {
      * @return JSON {@link ResponseEntity} object that contains list of {@link TagDto}
      */
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<ListHateoasModel<TagDto>> getAllTags(@RequestParam(required = false) Integer page,
                                                                @RequestParam(required = false) Integer pageSize) {
         List<TagDto> tagDtoList = tagService.findAllTags(paginationContext.createPagination(page, pageSize));
@@ -83,14 +83,14 @@ public class TagController {
      * @throws EntityNotFoundException in case certificate with this id doesn't exist
      */
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<HateoasModel<TagDto>> getTag(@PathVariable("id") Long id) {
         TagDto tagById = tagService.findTagById(id);
         return createPagination(tagById, HttpStatus.OK);
     }
 
     @GetMapping("/mostusedtag")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<HateoasModel<TagDto>> getMostWidelyTag() {
         TagDto tagDto = tagService.findMostWidelyUsedTag();
         return createPagination(tagDto, HttpStatus.OK);
@@ -105,7 +105,7 @@ public class TagController {
      * @throws EntityAlreadyExistsException when {@link Tag} entity is already exists
      */
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<HateoasModel<TagDto>> createTag(@RequestBody TagDto tagDto) {
         TagDto tag = tagService.create(paginationContext, tagDto);
         return createPagination(tag, HttpStatus.CREATED);
@@ -119,7 +119,7 @@ public class TagController {
      * @throws InvalidEntityException when id is not written correctly
      */
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Object> deleteTag(@PathVariable("id") Long id) {
         tagService.delete(id, paginationContext);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);

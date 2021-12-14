@@ -21,6 +21,7 @@ public class ErrorMessages {
     public static final String ACCESS_DENIED_MESSAGE = "access_denied";
     public static final String AUTHENTICATION_MESSAGE = "authentication_exception";
 
+
     private ErrorMessages() {
     }
 }

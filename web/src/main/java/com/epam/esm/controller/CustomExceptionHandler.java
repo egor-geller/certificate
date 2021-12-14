@@ -33,6 +33,7 @@ import java.util.Map;
 
 import static com.epam.esm.controller.ErrorCode.CODE_ERROR_400;
 import static com.epam.esm.controller.ErrorCode.CODE_ERROR_401;
+import static com.epam.esm.controller.ErrorCode.CODE_ERROR_403;
 import static com.epam.esm.controller.ErrorCode.CODE_ERROR_404;
 import static com.epam.esm.controller.ErrorCode.CODE_ERROR_415;
 import static com.epam.esm.controller.ErrorCode.CODE_ERROR_500;
@@ -166,13 +167,13 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<Object> accessDeniedExceptionHandle() {
         String errorMessage = getErrorMessage(ACCESS_DENIED_MESSAGE);
-        return buildErrorResponseEntity(HttpStatus.UNAUTHORIZED, errorMessage, CODE_ERROR_401);
+        return buildErrorResponseEntity(HttpStatus.FORBIDDEN, errorMessage, CODE_ERROR_403);
     }
 
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<Object> authenticationExceptionHandle() {
         String errorMessage = getErrorMessage(AUTHENTICATION_MESSAGE);
-        return buildErrorResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, errorMessage, CODE_ERROR_500);
+        return buildErrorResponseEntity(HttpStatus.UNAUTHORIZED, errorMessage, CODE_ERROR_401);
     }
 
     @ExceptionHandler(Exception.class)
