@@ -7,6 +7,7 @@ import com.epam.esm.entity.User;
 import com.epam.esm.service.impl.CertificateServiceImpl;
 import com.github.javafaker.Faker;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,11 +30,13 @@ public class GenerateData {
     @PersistenceContext
     private EntityManager entityManager;
     private final CertificateServiceImpl repository;
+    private final PasswordEncoder encoder;
 
     @Autowired
-    public GenerateData(EntityManager entityManager, CertificateServiceImpl repository) {
+    public GenerateData(EntityManager entityManager, CertificateServiceImpl repository, PasswordEncoder encoder) {
         this.entityManager = entityManager;
         this.repository = repository;
+        this.encoder = encoder;
     }
 
     @Transactional
@@ -42,7 +45,8 @@ public class GenerateData {
         fakeUserList.forEach(name -> {
             User user = new User();
             user.setUsername(name);
-            user.setPassword(faker.internet().password(6, 20, true, true));
+            String password = encoder.encode(name);
+            user.setPassword(password);
             user.setRole(Role.USER);
             entityManager.persist(user);
         });

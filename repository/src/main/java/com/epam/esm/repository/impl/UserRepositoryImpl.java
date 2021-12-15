@@ -56,17 +56,15 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public Optional<User> findByUsername(String username) {
-        logger.info("UserRepoImpl - username: {}", username);
-        User user = new User();
+        User user;
         try {
-            user = entityManager.createQuery("SELECT u FROM User u WHERE u.username = ?1", User.class)
+            user = entityManager.createQuery(FIND_BY_USERNAME, User.class)
                     .setParameter(1, username)
                     .getSingleResult();
-        }catch (PersistenceException | IllegalArgumentException e) {
-            logger.warn("Exception in sql: {}", e.getMessage());
+        } catch (PersistenceException | IllegalArgumentException e) {
+            return Optional.empty();
         }
-        logger.info("UserRepoImpl - User: {}", user);
-        return Optional.ofNullable(user);
+        return Optional.of(user);
     }
 
     @Override
