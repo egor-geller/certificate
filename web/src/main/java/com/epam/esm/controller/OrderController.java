@@ -112,7 +112,7 @@ public class OrderController {
      * @return JSON {@link ResponseEntity} object that contains list {@link ListHateoasModel} of {@link OrderDto}
      */
     @GetMapping("/user/{id}")
-    @PostAuthorize("hasAuthority('ADMIN') or (hasAuthority('USER') and #id eq returnObject.body.data.contains(id))") //TODO: check
+    @PostAuthorize("hasAuthority('ADMIN') or (hasAuthority('USER') and returnObject.body.data.![userId eq #id])")
     public ResponseEntity<ListHateoasModel<OrderDto>> getOrdersOfUserByItsId(@RequestParam(required = false) Integer page,
                                                                              @RequestParam(required = false) Integer pageSize,
                                                                              @PathVariable("id") Long id) {
