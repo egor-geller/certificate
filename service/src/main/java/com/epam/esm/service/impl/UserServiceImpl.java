@@ -1,49 +1,30 @@
 package com.epam.esm.service.impl;
 
-import com.epam.esm.dto.AuthenticateDto;
-import com.epam.esm.dto.TokenDto;
 import com.epam.esm.dto.UserDto;
 import com.epam.esm.dto.mapper.UserServiceMapper;
 import com.epam.esm.entity.User;
-import com.epam.esm.exception.EntityAlreadyExistsException;
 import com.epam.esm.exception.EntityNotFoundException;
-import com.epam.esm.exception.InvalidEntityException;
 import com.epam.esm.repository.PaginationContext;
 import com.epam.esm.repository.repositoryinterfaces.UserRepository;
 import com.epam.esm.service.UserService;
-import com.epam.esm.validator.UserValidator;
-import com.epam.esm.validator.ValidationError;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
 
-    private static final Logger logger = LogManager.getLogger();
-
     private final UserRepository userRepository;
     private final UserServiceMapper userServiceMapper;
-    private final PasswordEncoder encoder;
-    private final UserValidator userValidator;
+
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository,
-                           UserServiceMapper userServiceMapper,
-                           PasswordEncoder encoder,
-                           UserValidator userValidator) {
+                           UserServiceMapper userServiceMapper) {
         this.userRepository = userRepository;
         this.userServiceMapper = userServiceMapper;
-        this.encoder = encoder;
-        this.userValidator = userValidator;
     }
 
     @Override
@@ -61,49 +42,8 @@ public class UserServiceImpl implements UserService {
         return userServiceMapper.convertUserToDto(user);
     }
 
-    @Transactional
-    @Override
-    public TokenDto signup(UserDto userDto) {
-        logger.info("UserServiceImpl - userDto: {}", userDto);
-        List<ValidationError> validationErrors = userValidator.validate(userDto);
-
-        if (!validationErrors.isEmpty()) {
-            throw new InvalidEntityException(User.class);
-        }
-
-        Optional<User> maybeSignuped = userRepository.findByUsername(userDto.getUsername());
-
-        if (maybeSignuped.isPresent()) {
-            throw new EntityAlreadyExistsException();
-        }
-
-        String encodedPassword = encoder.encode(userDto.getPassword());
-        userDto.setPassword(encodedPassword);
-        User user = userServiceMapper.convertUserFromDto(userDto);
-        User savedUser = userRepository.save(user);
-
-        return new TokenDto();
-    }
-
-    @Override
-    public AuthenticateDto login(AuthenticateDto authenticateDto) {
-        String username = authenticateDto.getUsername();
-        String password = authenticateDto.getPassword();
-
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new BadCredentialsException("User " + username + " not found"));
-        logger.info("UserServiceImpl - user: {}", user);
-        if (!encoder.matches(password, user.getPassword())) {
-            throw new BadCredentialsException("Login/Password is not correct");
-        }
-
-        return new AuthenticateDto(user.getUsername(), user.getPassword());
-    }
-
     @Override
     public Long count() {
         return userRepository.count();
     }
-
-
 }

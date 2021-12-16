@@ -5,6 +5,7 @@ import com.epam.esm.dto.TokenDto;
 import com.epam.esm.dto.UserDto;
 import com.epam.esm.exception.EntityAlreadyExistsException;
 import com.epam.esm.exception.InvalidEntityException;
+import com.epam.esm.service.AuthenticationService;
 import com.epam.esm.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -21,11 +22,10 @@ import static org.springframework.http.HttpStatus.OK;
 @RequestMapping("/api/v1")
 public class AuthenticationController {
 
-    private final UserService userService;
+    private final AuthenticationService authenticationService;
 
-    @Autowired
-    public AuthenticationController(UserService userService) {
-        this.userService = userService;
+    public AuthenticationController(AuthenticationService authenticationService) {
+        this.authenticationService = authenticationService;
     }
 
     /**
@@ -39,7 +39,7 @@ public class AuthenticationController {
      */
     @PostMapping("/signup")
     public ResponseEntity<TokenDto> signup(@RequestBody UserDto userDto) {
-        TokenDto signup = userService.signup(userDto);
+        TokenDto signup = authenticationService.signup(userDto);
         return new ResponseEntity<>(signup, CREATED);
     }
 
@@ -53,7 +53,7 @@ public class AuthenticationController {
      */
     @PostMapping("/login")
     public ResponseEntity<AuthenticateDto> login(@RequestBody AuthenticateDto authenticateDto) {
-        AuthenticateDto login = userService.login(authenticateDto);
+        AuthenticateDto login = authenticationService.login(authenticateDto);
         return new ResponseEntity<>(login, OK);
     }
 
