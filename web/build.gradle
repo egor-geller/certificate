@@ -6,9 +6,10 @@ dependencies {
     implementation project(":model")
     implementation project(":repository")
     implementation project(":service")
+    implementation project(":uat")
 
     implementation group: 'com.auth0', name: 'java-jwt', version: auth0jwt
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: bootVersion
 
-    implementation group: 'com.github.javafaker', name: 'javafaker', version: '1.0.2'
+
 }

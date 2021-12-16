@@ -1,4 +1,4 @@
-package com.epam.esm.controller;
+package com.epam.esm;
 
 import com.epam.esm.entity.Certificate;
 import com.epam.esm.entity.Role;
@@ -29,13 +29,13 @@ public class GenerateData {
 
     @PersistenceContext
     private EntityManager entityManager;
-    private final CertificateServiceImpl repository;
+    private final CertificateServiceImpl service;
     private final PasswordEncoder encoder;
 
     @Autowired
-    public GenerateData(EntityManager entityManager, CertificateServiceImpl repository, PasswordEncoder encoder) {
+    public GenerateData(EntityManager entityManager, CertificateServiceImpl service, PasswordEncoder encoder) {
         this.entityManager = entityManager;
-        this.repository = repository;
+        this.service = service;
         this.encoder = encoder;
     }
 
@@ -79,7 +79,7 @@ public class GenerateData {
             entityManager.persist(certificate);
             entityManager.flush();
             long tagNumber = (long) (Math.random() * (1038 - 39)) + 39;
-            repository.attachTagToCertificate(certificate.getId(), tagNumber);
+            service.attachTagToCertificate(certificate.getId(), tagNumber);
             count++;
             if ((count % 30) == 0) { //Done for greater performance
                 entityManager.flush();
