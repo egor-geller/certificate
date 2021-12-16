@@ -4,8 +4,11 @@ import com.epam.esm.filter.CustomAuthenticationFilter;
 import com.epam.esm.filter.CustomAuthorizationFilter;
 import com.epam.esm.service.impl.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.BeanIds;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -28,7 +31,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final CustomUserDetailsService customUserDetailsService;
 
     @Autowired
-    public SecurityConfig(AuthenticationEntryPoint authenticationEntryPoint, CustomUserDetailsService customUserDetailsService) {
+    public SecurityConfig(AuthenticationEntryPoint authenticationEntryPoint,
+                          CustomUserDetailsService customUserDetailsService) {
         this.authenticationEntryPoint = authenticationEntryPoint;
         this.customUserDetailsService = customUserDetailsService;
     }
@@ -40,7 +44,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(authenticationManagerBean());
+        CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter();
+        customAuthenticationFilter.setAuthenticationManager(authenticationManagerBean());
         customAuthenticationFilter.setFilterProcessesUrl("/api/v1/login");
         http.csrf().disable()
                 .httpBasic().disable()
