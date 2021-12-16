@@ -2,7 +2,7 @@ package com.epam.esm.security;
 
 import com.epam.esm.filter.CustomAuthenticationFilter;
 import com.epam.esm.filter.CustomAuthorizationFilter;
-import com.epam.esm.service.impl.MyUserDetailsService;
+import com.epam.esm.service.impl.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,17 +25,17 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final AuthenticationEntryPoint authenticationEntryPoint;
-    private final MyUserDetailsService myUserDetailsService;
+    private final CustomUserDetailsService customUserDetailsService;
 
     @Autowired
-    public SecurityConfig(AuthenticationEntryPoint authenticationEntryPoint, MyUserDetailsService myUserDetailsService) {
+    public SecurityConfig(AuthenticationEntryPoint authenticationEntryPoint, CustomUserDetailsService customUserDetailsService) {
         this.authenticationEntryPoint = authenticationEntryPoint;
-        this.myUserDetailsService = myUserDetailsService;
+        this.customUserDetailsService = customUserDetailsService;
     }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(myUserDetailsService).passwordEncoder(passwordEncoder());
+        auth.userDetailsService(customUserDetailsService).passwordEncoder(passwordEncoder());
     }
 
     @Override

@@ -15,7 +15,7 @@ import java.util.Collection;
 import java.util.Optional;
 
 @Service
-public class MyUserDetailsService implements UserDetailsService {
+public class CustomUserDetailsService implements UserDetailsService {
 
 
     private UserRepository userRepository;
