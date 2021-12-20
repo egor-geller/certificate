@@ -10,6 +10,8 @@ import com.epam.esm.exception.InvalidEntityException;
 import com.epam.esm.repository.PaginationContext;
 import com.epam.esm.repository.SearchCriteria;
 import com.epam.esm.service.CertificateService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -36,6 +38,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/certificates")
 public class CertificateController {
+
+    private static final Logger logger = LogManager.getLogger();
 
     private final CertificateService certificateService;
     private final PaginationContext paginationContext;
@@ -77,6 +81,7 @@ public class CertificateController {
         List<CertificateDto> certificateDtoList = certificateService
                 .findCertificateByCriteria(paginationContext.createPagination(page, pageSize), searchCriteria);
         Long count = certificateService.countByCriteria(searchCriteria);
+        logger.info("CertificateController - certificateList size: {}", (long) certificateDtoList.size());
         return createListPagination(certificateDtoList, count);
     }
 

@@ -17,7 +17,7 @@ public interface AuthenticationService {
      * @throws EntityAlreadyExistsException in case when user with specified username already exists
      * @return {@link TokenDto} object
      */
-    TokenDto signup(UserDto userDto);
+    AuthenticateDto signup(UserDto userDto);
 
     /**
      * Authenticate with provided credentials.

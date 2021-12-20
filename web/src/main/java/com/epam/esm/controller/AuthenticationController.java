@@ -6,8 +6,6 @@ import com.epam.esm.dto.UserDto;
 import com.epam.esm.exception.EntityAlreadyExistsException;
 import com.epam.esm.exception.InvalidEntityException;
 import com.epam.esm.service.AuthenticationService;
-import com.epam.esm.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -38,8 +36,8 @@ public class AuthenticationController {
      * @throws EntityAlreadyExistsException in case when user with specified username already exists
      */
     @PostMapping("/signup")
-    public ResponseEntity<TokenDto> signup(@RequestBody UserDto userDto) {
-        TokenDto signup = authenticationService.signup(userDto);
+    public ResponseEntity<AuthenticateDto> signup(@RequestBody UserDto userDto) {
+        AuthenticateDto signup = authenticationService.signup(userDto);
         return new ResponseEntity<>(signup, CREATED);
     }
 

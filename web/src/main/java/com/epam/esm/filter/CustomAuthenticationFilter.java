@@ -32,9 +32,9 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     @Value("${secret.key}")
-    private String secretKey;
+    private String secretKey = "secret";
     @Value("${claim.role}")
-    private String role;
+    private String role = "role";
 
     private AuthenticationManager authenticationManager;
 
@@ -70,7 +70,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
         Algorithm algorithm = Algorithm.HMAC256(secretKey.getBytes());
         String accessToken = JWT.create()
                 .withSubject(user.getUsername())
-                .withExpiresAt(new Date(System.currentTimeMillis() + 10 * 60 * 1000))
+                .withExpiresAt(new Date(System.currentTimeMillis() + 30 * 60 * 1000))
                 .withIssuer(request.getRequestURL().toString())
                 .withClaim(role, user.getAuthorities()
                         .stream()
@@ -79,7 +79,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
                 .sign(algorithm);
         String refreshedToken = JWT.create()
                 .withSubject(user.getUsername())
-                .withExpiresAt(new Date(System.currentTimeMillis() + 30 * 60 * 1000))
+                .withExpiresAt(new Date(System.currentTimeMillis() + 60 * 60 * 1000))
                 .withIssuer(request.getRequestURL().toString())
                 .sign(algorithm);
         Map<String, String> tokens = new HashMap<>();

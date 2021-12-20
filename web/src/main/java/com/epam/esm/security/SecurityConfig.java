@@ -4,6 +4,7 @@ import com.epam.esm.filter.CustomAuthenticationFilter;
 import com.epam.esm.filter.CustomAuthorizationFilter;
 import com.epam.esm.service.impl.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -41,15 +42,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter();
+        //CustomAuthorizationFilter customAuthorizationFilter = new CustomAuthorizationFilter();
+        /*CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter();
         customAuthenticationFilter.setAuthenticationManager(authenticationManagerBean());
-        customAuthenticationFilter.setFilterProcessesUrl("/api/v1/login");
+        customAuthenticationFilter.setFilterProcessesUrl("/api/v1/*");*/
         http.csrf().disable()
                 .httpBasic().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class)
-                .addFilter(customAuthenticationFilter)
+                //.addFilterBefore(customAuthorizationFilter, UsernamePasswordAuthenticationFilter.class)
+                //.addFilter(customAuthorizationFilter)
                 .exceptionHandling()
                 .authenticationEntryPoint(authenticationEntryPoint);
     }
@@ -63,5 +65,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
+    }
+
+    @Bean
+    public FilterRegistrationBean<CustomAuthorizationFilter> appCustomAuthorizationFilterBean(CustomAuthorizationFilter filter) {
+        FilterRegistrationBean<CustomAuthorizationFilter> frb = new FilterRegistrationBean<>(filter);
+        frb.setEnabled(false);
+        return frb;
     }
 }

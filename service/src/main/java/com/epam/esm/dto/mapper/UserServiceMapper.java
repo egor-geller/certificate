@@ -25,12 +25,18 @@ public class UserServiceMapper {
         return new UserDto(id, username, password, role);
     }
 
+    public UserDto convertUserToDtoInRegistration(User user) {
+        String username = user.getUsername();
+        Role role = user.getRole();
+        return new UserDto(username, role);
+    }
+
     public User convertUserFromDto(UserDto userDto) {
         User user = new User();
         user.setId(userDto.getId());
         user.setUsername(userDto.getUsername());
         user.setPassword(userDto.getPassword());
-        user.setRole(userDto.getRole());
+        user.setRole(Role.USER);
         logger.info("User after mapping is {}", user);
         return user;
     }

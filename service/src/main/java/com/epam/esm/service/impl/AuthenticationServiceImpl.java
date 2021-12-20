@@ -1,7 +1,6 @@
 package com.epam.esm.service.impl;
 
 import com.epam.esm.dto.AuthenticateDto;
-import com.epam.esm.dto.TokenDto;
 import com.epam.esm.dto.UserDto;
 import com.epam.esm.dto.mapper.UserServiceMapper;
 import com.epam.esm.entity.User;
@@ -41,7 +40,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Transactional
     @Override
-    public TokenDto signup(UserDto userDto) {
+    public AuthenticateDto signup(UserDto userDto) {
         List<ValidationError> validationErrors = userValidator.validate(userDto);
 
         if (!validationErrors.isEmpty()) {
@@ -57,9 +56,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         String encodedPassword = encoder.encode(userDto.getPassword());
         userDto.setPassword(encodedPassword);
         User user = userServiceMapper.convertUserFromDto(userDto);
-        userRepository.save(user);
-
-        return new TokenDto();
+        User signUpUser = userRepository.save(user);
+        return new AuthenticateDto(signUpUser.getUsername(), signUpUser.getPassword());
     }
 
     @Override

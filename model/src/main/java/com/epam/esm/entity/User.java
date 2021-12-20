@@ -27,7 +27,7 @@ public class User {
     private String password;
     @Column(name = "role")
     @Enumerated
-    private Role role;
+    private Role role = Role.USER;
 
     public Long getId() {
         return id;

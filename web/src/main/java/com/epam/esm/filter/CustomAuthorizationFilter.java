@@ -34,9 +34,9 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class CustomAuthorizationFilter extends OncePerRequestFilter {
 
     @Value("${secret.key}")
-    private String secretKey;
+    private String secretKey = "secret";
     @Value("${claim.role}")
-    private String roleClaim;
+    private String roleClaim = "role";
 
     private static final String BEARER_KEY = "Bearer ";
     private static final String AUTHORIZATION_MESSAGE = "There is a problem in the authorization process: %s";

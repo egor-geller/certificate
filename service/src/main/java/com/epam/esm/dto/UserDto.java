@@ -23,6 +23,11 @@ public class UserDto extends IdDto {
         this.role = role;
     }
 
+    public UserDto(String username, Role role) {
+        this.username = username;
+        this.role = role;
+    }
+
     public String getUsername() {
         return username;
     }
