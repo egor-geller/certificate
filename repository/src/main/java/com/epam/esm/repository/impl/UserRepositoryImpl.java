@@ -22,8 +22,6 @@ import static com.epam.esm.repository.query.UserQueries.FIND_BY_USERNAME;
 @Repository
 public class UserRepositoryImpl implements UserRepository {
 
-    private static final Logger logger = LogManager.getLogger();
-
     @PersistenceContext
     private EntityManager entityManager;
 
