@@ -8,7 +8,6 @@ dependencies {
     implementation project(":service")
     implementation project(":uat")
 
-    implementation group: 'com.auth0', name: 'java-jwt', version: auth0jwt
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: bootVersion
 
 

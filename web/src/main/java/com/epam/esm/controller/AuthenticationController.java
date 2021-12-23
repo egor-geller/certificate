@@ -50,8 +50,8 @@ public class AuthenticationController {
      * @throws BadCredentialsException in case when provided credentials are wrong
      */
     @PostMapping("/login")
-    public ResponseEntity<AuthenticateDto> login(@RequestBody AuthenticateDto authenticateDto) {
-        AuthenticateDto login = authenticationService.login(authenticateDto);
+    public ResponseEntity<TokenDto> login(@RequestBody AuthenticateDto authenticateDto) {
+        TokenDto login = authenticationService.login(authenticateDto);
         return new ResponseEntity<>(login, OK);
     }
 

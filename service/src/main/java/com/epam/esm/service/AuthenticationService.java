@@ -26,5 +26,5 @@ public interface AuthenticationService {
      * @throws BadCredentialsException in case when provided credentials are wrong
      * @return {@link TokenDto} object
      */
-    AuthenticateDto login(AuthenticateDto authenticateDto);
+    TokenDto login(AuthenticateDto authenticateDto);
 }
