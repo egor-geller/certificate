@@ -1,5 +1,6 @@
 package com.epam.esm.controller;
 
+import com.epam.esm.validator.PermissionValidator;
 import com.epam.esm.controller.hateoas.HateoasProvider;
 import com.epam.esm.controller.hateoas.ListHateoasProvider;
 import com.epam.esm.controller.hateoas.model.HateoasModel;
@@ -39,6 +40,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/v1/orders")
 public class OrderController {
 
+    private final PermissionValidator permissionValidator;
     private final OrderService orderService;
     private final SavedOrderService savedOrderService;
     private final PaginationContext paginationContext;
@@ -55,6 +57,7 @@ public class OrderController {
      */
     @Autowired
     public OrderController(OrderService orderService,
+                           PermissionValidator permissionValidator,
                            SavedOrderService savedOrderService,
                            PaginationContext paginationContext,
                            HateoasProvider<OrderDto> modelHateoasProvider,
@@ -64,6 +67,7 @@ public class OrderController {
         this.paginationContext = paginationContext;
         this.modelHateoasProvider = modelHateoasProvider;
         this.listHateoasProvider = listHateoasProvider;
+        this.permissionValidator = permissionValidator;
     }
 
     /**
@@ -112,7 +116,7 @@ public class OrderController {
      * @return JSON {@link ResponseEntity} object that contains list {@link ListHateoasModel} of {@link OrderDto}
      */
     @GetMapping("/user/{id}")
-    @PostAuthorize("hasAuthority('ADMIN') or (hasAuthority('USER') and returnObject.body.data.![userId eq #id])")
+    @PostAuthorize("hasAuthority('USER') and @permissionValidator.check(#id, returnObject.body.data)")
     public ResponseEntity<ListHateoasModel<OrderDto>> getOrdersOfUserByItsId(@RequestParam(required = false) Integer page,
                                                                              @RequestParam(required = false) Integer pageSize,
                                                                              @PathVariable("id") Long id) {
