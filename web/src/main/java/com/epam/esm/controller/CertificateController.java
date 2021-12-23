@@ -74,7 +74,6 @@ public class CertificateController {
      * @return JSON {@link ResponseEntity} object that contains list of {@link CertificateDto}
      */
     @GetMapping
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
     public ResponseEntity<ListHateoasModel<CertificateDto>> findCertificateBySearchingWithCriteria(@RequestParam(required = false) Integer page,
                                                                                                    @RequestParam(required = false) Integer pageSize,
                                                                                                    @ModelAttribute SearchCriteria searchCriteria) {
