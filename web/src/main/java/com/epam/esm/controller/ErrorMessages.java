@@ -20,6 +20,7 @@ public class ErrorMessages {
     public static final String INVALID_CREDENTIALS_MESSAGE = "invalid_credentials";
     public static final String ACCESS_DENIED_MESSAGE = "access_denied";
     public static final String AUTHENTICATION_MESSAGE = "authentication_exception";
+    public static final String CERTIFICATE_ATTACHED_TO_AN_ORDER = "certificate_attached_to_order";
 
 
     private ErrorMessages() {
