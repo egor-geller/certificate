@@ -87,7 +87,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         Authentication authenticate = authenticationManager.authenticate(authenticationToken);
         org.springframework.security.core.userdetails.User userDetail =
                 (org.springframework.security.core.userdetails.User) authenticate.getPrincipal();
-        SecurityContextHolder.getContext().setAuthentication(authenticate);
         String accessToken = JWT.create()
                 .withSubject(userDetail.getUsername())
                 .withExpiresAt(new Date(System.currentTimeMillis() + 30 * 60 * 1000))
