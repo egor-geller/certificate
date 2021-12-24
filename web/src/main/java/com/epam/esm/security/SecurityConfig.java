@@ -1,6 +1,6 @@
 package com.epam.esm.security;
 
-import com.epam.esm.filter.CustomAuthorizationFilter;
+import com.epam.esm.filter.CustomAuthenticationFilter;
 import com.epam.esm.service.impl.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -25,15 +25,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final AuthenticationEntryPoint authenticationEntryPoint;
     private final CustomUserDetailsService customUserDetailsService;
-    private final CustomAuthorizationFilter customAuthorizationFilter;
+    private final CustomAuthenticationFilter customAuthenticationFilter;
 
     @Autowired
     public SecurityConfig(AuthenticationEntryPoint authenticationEntryPoint,
                           CustomUserDetailsService customUserDetailsService,
-                          CustomAuthorizationFilter customAuthorizationFilter) {
+                          CustomAuthenticationFilter customAuthenticationFilter) {
         this.authenticationEntryPoint = authenticationEntryPoint;
         this.customUserDetailsService = customUserDetailsService;
-        this.customAuthorizationFilter = customAuthorizationFilter;
+        this.customAuthenticationFilter = customAuthenticationFilter;
     }
 
     @Override
@@ -47,7 +47,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .httpBasic().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .addFilterBefore(customAuthorizationFilter, BasicAuthenticationFilter.class)
+                .addFilterBefore(customAuthenticationFilter, BasicAuthenticationFilter.class)
                 .exceptionHandling()
                 .authenticationEntryPoint(authenticationEntryPoint);
     }
