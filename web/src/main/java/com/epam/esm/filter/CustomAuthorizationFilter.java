@@ -20,8 +20,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 import static com.epam.esm.controller.ErrorCode.CODE_ERROR_401;
 import static java.util.Arrays.stream;
