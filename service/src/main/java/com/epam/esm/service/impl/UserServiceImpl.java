@@ -19,8 +19,10 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserServiceMapper userServiceMapper;
 
+
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, UserServiceMapper userServiceMapper) {
+    public UserServiceImpl(UserRepository userRepository,
+                           UserServiceMapper userServiceMapper) {
         this.userRepository = userRepository;
         this.userServiceMapper = userServiceMapper;
     }
@@ -41,7 +43,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Long count(){
+    public Long count() {
         return userRepository.count();
     }
 }
