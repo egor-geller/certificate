@@ -8,13 +8,9 @@ import com.epam.esm.dto.UserDto;
 import com.epam.esm.entity.User;
 import com.epam.esm.repository.PaginationContext;
 import com.epam.esm.service.UserService;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PostAuthorize;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,8 +27,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/users")
 public class UserController {
-
-    private static final Logger logger = LogManager.getLogger();
 
     private final UserService userService;
     private final PaginationContext paginationContext;
@@ -66,7 +60,6 @@ public class UserController {
      * @return JSON {@link ResponseEntity} object that contains list {@link ListHateoasModel} of {@link UserDto}
      */
     @GetMapping
-    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<ListHateoasModel<UserDto>> getAllUsers(@RequestParam(required = false) Integer page,
                                                                  @RequestParam(required = false) Integer pageSize) {
         List<UserDto> userDtoList = userService.findAllUsers(paginationContext.createPagination(page, pageSize));
@@ -84,7 +77,6 @@ public class UserController {
      * @return JSON {@link ResponseEntity} with {@link HateoasModel} object that contains {@link UserDto} object
      */
     @GetMapping("/{id}")
-    @PostAuthorize("hasAuthority('ADMIN') or (hasAuthority('USER') and authentication.name eq returnObject.body.data.username)")
     public ResponseEntity<HateoasModel<UserDto>> getUserById(@PathVariable("id") Long id) {
         UserDto userByIdService = userService.findUserByIdService(id);
         HateoasModel<UserDto> model = new HateoasModel<>(userByIdService);

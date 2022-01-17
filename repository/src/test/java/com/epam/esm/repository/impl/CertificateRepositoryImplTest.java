@@ -1,5 +1,6 @@
 package com.epam.esm.repository.impl;
 
+import com.epam.esm.config.DatabaseConfiguration;
 import com.epam.esm.entity.Certificate;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.repository.SearchCriteria;
@@ -23,6 +24,8 @@ import java.util.stream.Collectors;
 import static java.time.ZoneOffset.UTC;
 import static org.junit.jupiter.api.Assertions.*;
 
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = DatabaseConfiguration.class)
 @Transactional
 class CertificateRepositoryImplTest {
 
@@ -51,7 +54,7 @@ class CertificateRepositoryImplTest {
         giftCertificate.setLastUpdateDate(ZonedDateTime.now(UTC));
     }
 
-   /* @Test
+    @Test
     void findByTagNameParamTest() {
         searchCriteria.setTagName(tagName);
         List<Certificate> certificateList = certificate.find(searchCriteria);
@@ -252,5 +255,5 @@ class CertificateRepositoryImplTest {
         searchCriteria.setSortByNameOrCreationDate("name");
         searchCriteria.setOrderType(SortType.DESC);
         return searchCriteria;
-    }*/
+    }
 }

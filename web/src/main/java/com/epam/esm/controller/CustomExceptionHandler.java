@@ -1,7 +1,6 @@
 package com.epam.esm.controller;
 
 import com.epam.esm.exception.AttachedTagException;
-import com.epam.esm.exception.CertificateAttachedToOrder;
 import com.epam.esm.exception.DataException;
 import com.epam.esm.exception.EmptyOrderException;
 import com.epam.esm.exception.EntityAlreadyExistsException;
@@ -18,9 +17,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -33,15 +29,10 @@ import java.util.Locale;
 import java.util.Map;
 
 import static com.epam.esm.controller.ErrorCode.CODE_ERROR_400;
-import static com.epam.esm.controller.ErrorCode.CODE_ERROR_401;
-import static com.epam.esm.controller.ErrorCode.CODE_ERROR_403;
 import static com.epam.esm.controller.ErrorCode.CODE_ERROR_404;
 import static com.epam.esm.controller.ErrorCode.CODE_ERROR_415;
 import static com.epam.esm.controller.ErrorCode.CODE_ERROR_500;
-import static com.epam.esm.controller.ErrorMessages.ACCESS_DENIED_MESSAGE;
 import static com.epam.esm.controller.ErrorMessages.ATTACH_DETACH_ERROR_MESSAGE;
-import static com.epam.esm.controller.ErrorMessages.AUTHENTICATION_MESSAGE;
-import static com.epam.esm.controller.ErrorMessages.CERTIFICATE_ATTACHED_TO_AN_ORDER;
 import static com.epam.esm.controller.ErrorMessages.DELETE_ATTACHED_TAG_ERROR_MESSAGE;
 import static com.epam.esm.controller.ErrorMessages.EMPTY_ORDER_ERROR_MESSAGE;
 import static com.epam.esm.controller.ErrorMessages.ENTITY_ALREADY_EXISTS_MESSAGE;
@@ -49,7 +40,6 @@ import static com.epam.esm.controller.ErrorMessages.ENTITY_NOT_FOUND_MESSAGE;
 import static com.epam.esm.controller.ErrorMessages.ERROR_CODE;
 import static com.epam.esm.controller.ErrorMessages.ERROR_MESSAGE;
 import static com.epam.esm.controller.ErrorMessages.INTERNAL_SERVER_ERROR_MESSAGE;
-import static com.epam.esm.controller.ErrorMessages.INVALID_CREDENTIALS_MESSAGE;
 import static com.epam.esm.controller.ErrorMessages.INVALID_MESSAGE;
 import static com.epam.esm.controller.ErrorMessages.NOT_JSON_FORMAT_ERROR_MESSAGE;
 import static com.epam.esm.controller.ErrorMessages.PAGINATION_ERROR_MESSAGE;
@@ -157,30 +147,6 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<Object> paginationExceptionHandle(PaginationException e) {
         String errorMessage = String.format(getErrorMessage(PAGINATION_ERROR_MESSAGE),
                 e.getErrorType(), e.getInvalidValue());
-        return buildErrorResponseEntity(HttpStatus.BAD_REQUEST, errorMessage, CODE_ERROR_400);
-    }
-
-    @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<Object> badCredentialsExceptionHandle() {
-        String errorMessage = getErrorMessage(INVALID_CREDENTIALS_MESSAGE);
-        return buildErrorResponseEntity(HttpStatus.UNAUTHORIZED, errorMessage, CODE_ERROR_401);
-    }
-
-    @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<Object> accessDeniedExceptionHandle() {
-        String errorMessage = getErrorMessage(ACCESS_DENIED_MESSAGE);
-        return buildErrorResponseEntity(HttpStatus.FORBIDDEN, errorMessage, CODE_ERROR_403);
-    }
-
-    @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity<Object> authenticationExceptionHandle() {
-        String errorMessage = getErrorMessage(AUTHENTICATION_MESSAGE);
-        return buildErrorResponseEntity(HttpStatus.UNAUTHORIZED, errorMessage, CODE_ERROR_401);
-    }
-
-    @ExceptionHandler(CertificateAttachedToOrder.class)
-    public ResponseEntity<Object> certificateAttachedToOrderHandle() {
-        String errorMessage = getErrorMessage(CERTIFICATE_ATTACHED_TO_AN_ORDER);
         return buildErrorResponseEntity(HttpStatus.BAD_REQUEST, errorMessage, CODE_ERROR_400);
     }
 

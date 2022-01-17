@@ -1,6 +1,5 @@
 package com.epam.esm.controller;
 
-import com.epam.esm.GenerateData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
