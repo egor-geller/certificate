@@ -39,8 +39,6 @@ import java.util.List;
 @RequestMapping("/api/v1/certificates")
 public class CertificateController {
 
-    private static final Logger logger = LogManager.getLogger();
-
     private final CertificateService certificateService;
     private final PaginationContext paginationContext;
     private final HateoasProvider<CertificateDto> modelHateoasProvider;
@@ -80,7 +78,6 @@ public class CertificateController {
         List<CertificateDto> certificateDtoList = certificateService
                 .findCertificateByCriteria(paginationContext.createPagination(page, pageSize), searchCriteria);
         Long count = certificateService.countByCriteria(searchCriteria);
-        logger.info("CertificateController - certificateList size: {}", (long) certificateDtoList.size());
         return createListPagination(certificateDtoList, count);
     }
 

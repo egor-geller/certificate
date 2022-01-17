@@ -7,7 +7,6 @@ import java.util.Objects;
 
 public class UserDto extends IdDto {
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Long id;
     private String username;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)

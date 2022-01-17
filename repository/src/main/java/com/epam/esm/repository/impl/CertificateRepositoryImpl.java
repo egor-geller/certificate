@@ -8,6 +8,8 @@ import com.epam.esm.repository.builder.QueryBuilder;
 import com.epam.esm.repository.repositoryinterfaces.CertificateRepository;
 import com.epam.esm.repository.repositoryinterfaces.CreateRepository;
 import com.epam.esm.repository.repositoryinterfaces.DeleteRepository;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Repository;
@@ -25,6 +27,8 @@ import static com.epam.esm.repository.query.CertificateQueries.INSERT_TAG_TO_CER
 
 @Repository
 public class CertificateRepositoryImpl implements CertificateRepository, CreateRepository<Certificate>, DeleteRepository<Certificate> {
+
+    private static final Logger logger = LogManager.getLogger();
 
     @PersistenceContext
     private EntityManager entityManager;

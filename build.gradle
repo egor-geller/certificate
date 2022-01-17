@@ -32,5 +32,13 @@ allprojects {
     test {
         useJUnitPlatform()
     }
+
+    /*tasks.withType(JavaCompile).each {
+        it.options.compilerArgs.add('--enable-preview')
+    }
+
+    test {
+        jvmArgs(['--enable-preview'])
+    }*/
 }
 
