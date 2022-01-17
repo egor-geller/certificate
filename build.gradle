@@ -9,7 +9,6 @@ allprojects {
     }
 
     dependencies {
-        implementation group: 'com.auth0', name: 'java-jwt', version: auth0jwt
         implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: jacksonVersion
         implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: jacksonVersion
         implementation group: 'org.apache.commons', name: 'commons-lang3', version: apacheCommon
@@ -22,8 +21,6 @@ allprojects {
 
         implementation group: 'org.springframework.boot', name: 'spring-boot-starter', version: bootVersion
         implementation group: 'org.springframework.boot', name: 'spring-boot-starter-hateoas', version: bootVersion
-        implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: bootVersion
-        implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version: '2.6.1'
 
         testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: bootVersion
         testImplementation group: 'org.springframework.boot', name: 'spring-boot-test-autoconfigure', version: bootVersion

@@ -3,5 +3,4 @@ include 'model'
 include 'service'
 include 'web'
 include 'repository'
-include 'uat'
 

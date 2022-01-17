@@ -1,13 +1,11 @@
-package com.epam.esm;
+package com.epam.esm.controller;
 
 import com.epam.esm.entity.Certificate;
-import com.epam.esm.entity.Role;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.entity.User;
 import com.epam.esm.service.impl.CertificateServiceImpl;
 import com.github.javafaker.Faker;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,14 +27,12 @@ public class GenerateData {
 
     @PersistenceContext
     private EntityManager entityManager;
-    private final CertificateServiceImpl service;
-    private final PasswordEncoder encoder;
+    private final CertificateServiceImpl repository;
 
     @Autowired
-    public GenerateData(EntityManager entityManager, CertificateServiceImpl service, PasswordEncoder encoder) {
+    public GenerateData(EntityManager entityManager, CertificateServiceImpl repository) {
         this.entityManager = entityManager;
-        this.service = service;
-        this.encoder = encoder;
+        this.repository = repository;
     }
 
     @Transactional
@@ -44,10 +40,7 @@ public class GenerateData {
         List<String> fakeUserList = createFakeUserList();
         fakeUserList.forEach(name -> {
             User user = new User();
-            user.setUsername(name);
-            String password = encoder.encode(name);
-            user.setPassword(password);
-            user.setRole(Role.USER);
+            user.setName(name);
             entityManager.persist(user);
         });
     }
@@ -79,7 +72,7 @@ public class GenerateData {
             entityManager.persist(certificate);
             entityManager.flush();
             long tagNumber = (long) (Math.random() * (1038 - 39)) + 39;
-            service.attachTagToCertificate(certificate.getId(), tagNumber);
+            repository.attachTagToCertificate(certificate.getId(), tagNumber);
             count++;
             if ((count % 30) == 0) { //Done for greater performance
                 entityManager.flush();
