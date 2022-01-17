@@ -42,7 +42,7 @@ class TagServiceImplTest {
     @Spy
     private TagServiceMapper tagMapper;
 
-    @BeforeAll
+    /*@BeforeAll
     static void setUp() {
         MockitoAnnotations.openMocks(TagServiceImplTest.class);
     }
@@ -144,5 +144,5 @@ class TagServiceImplTest {
         tagDtoList.add(tagDto3);
 
         return tagDtoList;
-    }
+    }*/
 }

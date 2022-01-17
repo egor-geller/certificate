@@ -1,5 +1,6 @@
 package com.epam.esm.controller;
 
+import com.epam.esm.validator.PermissionValidator;
 import com.epam.esm.controller.hateoas.HateoasProvider;
 import com.epam.esm.controller.hateoas.ListHateoasProvider;
 import com.epam.esm.controller.hateoas.model.HateoasModel;
@@ -15,6 +16,8 @@ import com.epam.esm.service.SavedOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -37,6 +40,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/v1/orders")
 public class OrderController {
 
+    private final PermissionValidator permissionValidator;
     private final OrderService orderService;
     private final SavedOrderService savedOrderService;
     private final PaginationContext paginationContext;
@@ -53,6 +57,7 @@ public class OrderController {
      */
     @Autowired
     public OrderController(OrderService orderService,
+                           PermissionValidator permissionValidator,
                            SavedOrderService savedOrderService,
                            PaginationContext paginationContext,
                            HateoasProvider<OrderDto> modelHateoasProvider,
@@ -62,6 +67,7 @@ public class OrderController {
         this.paginationContext = paginationContext;
         this.modelHateoasProvider = modelHateoasProvider;
         this.listHateoasProvider = listHateoasProvider;
+        this.permissionValidator = permissionValidator;
     }
 
     /**
@@ -72,6 +78,7 @@ public class OrderController {
      * @return JSON {@link ResponseEntity} object that contains list {@link ListHateoasModel} of {@link OrderDto}
      */
     @GetMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<ListHateoasModel<OrderDto>> getAllOrders(@RequestParam(required = false) Integer page,
                                                                    @RequestParam(required = false) Integer pageSize) {
         List<OrderDto> orderDtoList = orderService.findAllOrdersService(paginationContext.createPagination(page, pageSize));
@@ -88,6 +95,7 @@ public class OrderController {
      * @return JSON {@link ResponseEntity} with {@link HateoasModel} object that contains {@link OrderDto} object
      */
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<HateoasModel<OrderDto>> getOrderById(@PathVariable("id") Long id) {
         OrderDto orderDto = orderService.findOrderByIdService(id);
         List<SavedOrderDto> savedOrderDtos = savedOrderService.findByOrderId(id);
@@ -108,6 +116,7 @@ public class OrderController {
      * @return JSON {@link ResponseEntity} object that contains list {@link ListHateoasModel} of {@link OrderDto}
      */
     @GetMapping("/user/{id}")
+    @PostAuthorize("hasAuthority('USER') and @permissionValidator.check(#id, returnObject.body.data)")
     public ResponseEntity<ListHateoasModel<OrderDto>> getOrdersOfUserByItsId(@RequestParam(required = false) Integer page,
                                                                              @RequestParam(required = false) Integer pageSize,
                                                                              @PathVariable("id") Long id) {
@@ -132,6 +141,7 @@ public class OrderController {
      * @return JSON {@link ResponseEntity} object with {@link HateoasModel} that contains created {@link OrderDto} object
      */
     @PostMapping
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
     public ResponseEntity<HateoasModel<OrderDto>> makeOrder(@RequestBody OrderDto orderDto) {
         OrderDto checkout = orderService.makeOrderService(orderDto);
         return createModelPagination(checkout, HttpStatus.CREATED);

@@ -4,6 +4,7 @@ import com.epam.esm.dto.CertificateDto;
 import com.epam.esm.dto.mapper.CertificateServiceMapper;
 import com.epam.esm.entity.Certificate;
 import com.epam.esm.entity.Tag;
+import com.epam.esm.exception.CertificateAttachedToOrder;
 import com.epam.esm.exception.EntityAlreadyExistsException;
 import com.epam.esm.exception.EntityNotFoundException;
 import com.epam.esm.exception.InvalidEntityException;
@@ -12,6 +13,7 @@ import com.epam.esm.repository.SearchCriteria;
 import com.epam.esm.repository.impl.CertificateRepositoryImpl;
 import com.epam.esm.repository.impl.TagRepositoryImpl;
 import com.epam.esm.service.CertificateService;
+import com.epam.esm.service.OrderService;
 import com.epam.esm.validator.CertificateValidator;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -27,12 +29,14 @@ public class CertificateServiceImpl implements CertificateService {
 
     private final CertificateRepositoryImpl certificateRepository;
     private final TagRepositoryImpl tagRepository;
+    private final OrderService orderService;
     private final CertificateServiceMapper certificateServiceMapper;
     private final CertificateValidator certificateValidator;
     private final PaginationContext newPaginationContext;
 
     public CertificateServiceImpl(CertificateRepositoryImpl certificateRepository,
                                   TagRepositoryImpl tagRepository,
+                                  OrderService orderService,
                                   CertificateServiceMapper certificateServiceMapper,
                                   CertificateValidator certificateValidator,
                                   PaginationContext newPaginationContext) {
@@ -41,6 +45,7 @@ public class CertificateServiceImpl implements CertificateService {
         this.certificateServiceMapper = certificateServiceMapper;
         this.certificateValidator = certificateValidator;
         this.newPaginationContext = newPaginationContext;
+        this.orderService = orderService;
     }
 
     @Override
@@ -186,6 +191,18 @@ public class CertificateServiceImpl implements CertificateService {
     @Override
     public void delete(Long id, PaginationContext paginationContext) {
         certificateValidator.validateId(id);
+
+        long orderedCertificate = orderService.findAllOrdersService(paginationContext)
+                .stream()
+                .filter(cert -> cert.getCertificateList()
+                        .stream()
+                        .allMatch(c -> c.getId() == id))
+                .count();
+
+        if (orderedCertificate != 0) {
+            throw new CertificateAttachedToOrder();
+        }
+
         Optional<Certificate> certificateById = certificateRepository.findById(id);
         if (certificateById.isEmpty()) {
             throw new EntityNotFoundException(String.valueOf(id));

@@ -23,10 +23,10 @@ public interface OrderService {
     List<OrderDto> findAllOrdersService(PaginationContext paginationContext);
 
     /**
-     * Find a user by its unique Id
+     * Find an order by its unique id
      *
-     * @param id id of a user
-     * @return {@link UserDto} entity.
+     * @param id id of an order
+     * @return {@link OrderDto} entity.
      */
     OrderDto findOrderByIdService(Long id);
 
