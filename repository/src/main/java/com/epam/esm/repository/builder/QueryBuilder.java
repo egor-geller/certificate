@@ -91,10 +91,6 @@ public final class QueryBuilder {
                           Root<Certificate> certificateRoot) {
         Order order = null;
         if (sortType != null) {
-            /*order = switch (sortType) {
-                case DESC -> criteriaBuilder.desc(certificateRoot.get(parameter));
-                default -> criteriaBuilder.asc(certificateRoot.get(parameter));
-            };*/
             if (sortType.name().equals(SortType.DESC.name())) {
                 order = criteriaBuilder.desc(certificateRoot.get(parameter));
             } else {
