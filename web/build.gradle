@@ -1,5 +1,6 @@
 plugins {
     id 'org.springframework.boot' version "${bootVersion}"
+    id 'org.sonarqube' version "3.3"
 }
 
 dependencies {
@@ -9,6 +10,10 @@ dependencies {
     implementation project(":uat")
 
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: bootVersion
+}
 
-
+sonarqube {
+    properties {
+        property "sonar.sourceEncoding", "UTF-8"
+    }
 }
