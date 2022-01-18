@@ -40,10 +40,6 @@ allprojects {
 subprojects {
     apply plugin: 'org.sonarqube'
 
-    sonarqube {
-        properties {
-            property "sonar.sources", "src"
-        }
-    }
+
 }
 
