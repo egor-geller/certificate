@@ -37,12 +37,6 @@ allprojects {
     }
 }
 
-sonarqube {
-    properties {
-        property "sonar.sourceEncoding", "UTF-8"
-    }
-}
-
 subprojects {
     apply plugin: 'org.sonarqube'
 
