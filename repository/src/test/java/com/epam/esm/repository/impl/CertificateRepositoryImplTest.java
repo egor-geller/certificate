@@ -69,7 +69,7 @@ class CertificateRepositoryImplTest {
         giftCertificate.setLastUpdateDate(ZonedDateTime.now(UTC));
     }
 
-    @Test
+    /*@Test
     void findByTagNameParamTest() {
         searchCriteria.setTagList(List.of(tagName));
         List<Certificate> certificateList = certificate.find(paginationContext.createPagination(1, 10), searchCriteria);
@@ -105,7 +105,7 @@ class CertificateRepositoryImplTest {
                         && certificate1.getDescription().equals(certificateDescription));
 
         assertTrue(allMatch && list.size() == 1);
-    }/*
+    }
 
     @Test
     void sortByNameAscTest() {
