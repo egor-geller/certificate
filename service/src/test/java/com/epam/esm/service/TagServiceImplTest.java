@@ -3,6 +3,7 @@ package com.epam.esm.service;
 import com.epam.esm.dto.TagDto;
 import com.epam.esm.dto.mapper.TagServiceMapper;
 import com.epam.esm.entity.Tag;
+import com.epam.esm.repository.PaginationContext;
 import com.epam.esm.repository.impl.TagRepositoryImpl;
 import com.epam.esm.service.impl.TagServiceImpl;
 import com.epam.esm.validator.CertificateValidator;
@@ -42,17 +43,20 @@ class TagServiceImplTest {
     @Spy
     private TagServiceMapper tagMapper;
 
-    /*@BeforeAll
+    @Mock
+    private PaginationContext paginationContext;
+
+    @BeforeAll
     static void setUp() {
         MockitoAnnotations.openMocks(TagServiceImplTest.class);
     }
 
     @Test
     void findAllTagsTest() {
-        when(tagRepository.findAll()).thenReturn(createTagList());
+        when(tagRepository.findAll(paginationContext.createPagination(1,10))).thenReturn(createTagList());
 
         List<TagDto> expectedTagDtoList = createTagDtoList();
-        List<TagDto> actualAllTagsService = tagService.findAllTags();
+        List<TagDto> actualAllTagsService = tagService.findAllTags(paginationContext.createPagination(1,10));
 
         assertEquals(expectedTagDtoList.toString(), actualAllTagsService.toString());
     }
@@ -77,17 +81,17 @@ class TagServiceImplTest {
         assertEquals(expectedTagDto.toString(), actualTagByNameService.toString());
     }
 
-    @Test
+    /*@Test
     void createTest() {
         Tag tag = createTag();
         TagDto tagDto = createTagDto();
         when(tagRepository.findByName(tagDto.getName())).thenReturn(Optional.empty());
 
-        tagService.create(tagDto);
+        tagService.create(paginationContext.createPagination(1,10),tagDto);
 
         verify(tagRepository).findByName(tag.getName());
         verify(tagRepository).create(tag);
-    }
+    }*/
     private Tag createTag() {
         Tag tag = new Tag();
         tag.setId(0);
@@ -144,5 +148,5 @@ class TagServiceImplTest {
         tagDtoList.add(tagDto3);
 
         return tagDtoList;
-    }*/
+    }
 }
