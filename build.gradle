@@ -1,5 +1,6 @@
 plugins {
     id 'org.sonarqube' version "3.3"
+    id 'jacoco'
 }
 allprojects {
     apply plugin: 'java'
@@ -34,6 +35,10 @@ allprojects {
 
     test {
         useJUnitPlatform()
+        finalizedBy jacocoTestReport
+    }
+    jacocoTestReport {
+        dependsOn test // tests are required to run before generating the report
     }
 }
 
