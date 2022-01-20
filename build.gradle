@@ -42,7 +42,9 @@ allprojects {
     }
 }
 
+
 subprojects {
     apply plugin: 'org.sonarqube'
+    apply plugin: 'jacoco'
 }
 
