@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.test.context.ContextConfiguration;
@@ -36,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = TestConfig.class)
-@Transactional
+@EntityScan(basePackages = "com.epam.esm")
 class CertificateRepositoryImplTest {
 
     private static final Logger logger = LogManager.getLogger();
@@ -104,7 +105,7 @@ class CertificateRepositoryImplTest {
                         && certificate1.getDescription().equals(certificateDescription));
 
         assertTrue(allMatch && list.size() == 1);
-    }
+    }/*
 
     @Test
     void sortByNameAscTest() {
@@ -188,6 +189,7 @@ class CertificateRepositoryImplTest {
     }
 
     @Test
+    @Transactional
     void detachTagTest() {
         certificate.detachTag(25, 6);
         List<Tag> tags = tag.findByCertificateId(25L);
@@ -195,6 +197,7 @@ class CertificateRepositoryImplTest {
     }
 
     @Test
+    @Transactional
     void attachTagTest() {
         certificate.attachTag(25, 14);
         List<Tag> tags = tag.findByCertificateId(25L);
@@ -207,6 +210,7 @@ class CertificateRepositoryImplTest {
     }
 
     @Test
+    @Transactional
     void createTest() {
         Optional<Certificate> certificateById = certificate.findById(0L);
 
@@ -220,6 +224,7 @@ class CertificateRepositoryImplTest {
     }
 
     @Test
+    @Transactional
     void updateTest() {
         Optional<Certificate> certificateById = certificate.findById(25L);
 
@@ -230,12 +235,12 @@ class CertificateRepositoryImplTest {
         assertEquals("Coca-Cola", update.getName());
     }
 
-    /*@Test
+    *//*@Test
     void deleteTest() {
         boolean result = certificate.delete(32L);
 
         assertTrue(result);
-    }*/
+    }*//*
 
     private SearchCriteria criteriaToSearchWithASC() {
         Map<String, String> map = new HashMap<>();
@@ -263,5 +268,5 @@ class CertificateRepositoryImplTest {
         searchCriteria.setSortByParameter("name");
         searchCriteria.setOrderType(SortType.DESC);
         return searchCriteria;
-    }
+    }*/
 }
