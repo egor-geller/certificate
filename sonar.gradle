@@ -1,0 +1,20 @@
+apply plugin: 'org.sonarqube'
+
+sonarqube {
+    properties {
+        property "sonar.forceAnalysis", "true"
+        property "sonar.java.coveragePlugin", "jacoco"
+    }
+}
+
+subprojects {
+    sonarqube {
+        properties {
+            property "sonar.jacoco.reportPaths",
+                    "$buildDir/reports/jacoco/allTests.exec"
+            property "sonar.junit.reportsPath", "$buildDir/test-results/test"
+        }
+    }
+}
+
+task sonar { dependsOn 'sonarqube' }
