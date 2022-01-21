@@ -38,35 +38,15 @@ allprojects {
         finalizedBy jacocoTestReport
     }
     jacocoTestReport {
-        //dependsOn test // tests are required to run before generating the report
-        additionalSourceDirs.from = files(sourceSets.main.allJava.srcDirs)
+        dependsOn test // tests are required to run before generating the report
         reports {
-            html.enabled true
             xml.enabled true
-            xml.required = true
-            csv.enabled false
-            html.destination file("build/reports/jacoco/html")
-            xml.destination file("${buildDir}/reports/jacoco.xml")
         }
-        executionData.from = files('build/jacoco/test.exec')
     }
-    test.finalizedBy jacocoTestReport
-
-}
-plugins.withType(JacocoPlugin) {
-    tasks["test"].finalizedBy 'jacocoTestReport'
 }
 
-tasks.named('sonarqube').configure {
-    dependsOn test
-}
-
-sonarqube {
-    properties {
-        property "sonar.java.coveragePlugin", "jacoco"
-        property "sonar.host.url", "http://localhost:9000"
-        property "sonar.coverage.jacoco.xmlReportPath", "${buildDir}/reports/jacoco.xml"
-    }
+jacoco {
+    version = "0.8.7"
 }
 
 subprojects {
