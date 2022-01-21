@@ -38,7 +38,7 @@ allprojects {
         finalizedBy jacocoTestReport
     }
     jacocoTestReport {
-        dependsOn test // tests are required to run before generating the report
+        //dependsOn test // tests are required to run before generating the report
         additionalSourceDirs.from = files(sourceSets.main.allJava.srcDirs)
         reports {
             html.enabled true
@@ -48,9 +48,12 @@ allprojects {
         }
         executionData.from = files('build/jacoco/test.exec')
     }
+    test.finalizedBy jacocoTestReport
 
 }
-
+tasks.named('sonarqube').configure {
+    dependsOn test
+}
 
 subprojects {
     apply plugin: 'org.sonarqube'
