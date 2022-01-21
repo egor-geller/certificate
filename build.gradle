@@ -35,20 +35,21 @@ allprojects {
 
     test {
         useJUnitPlatform()
-        jacocoTestReport {
-            reports {
-                xml.enabled true
-                csv.enabled false
-                html.enabled true
-            }
+
+    }
+    jacocoTestReport {
+        reports {
+            xml.enabled true
         }
     }
 
-    task coverage { dependsOn 'jacocoTestReport' }
-
-    check.dependsOn 'jacocoTestReport'
+    //task coverage { dependsOn 'jacocoTestReport' }
+    plugins.withType(JacocoPlugin) {
+        tasks["test"].finalizedBy 'jacocoTestReport'
+    }
+    //check.dependsOn 'jacocoTestReport'
 }
-apply from: 'sonar.gradle'
+//apply from: 'sonar.gradle'
 subprojects {
     apply plugin: 'org.sonarqube'
     apply plugin: 'jacoco'
