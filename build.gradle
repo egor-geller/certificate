@@ -59,7 +59,7 @@ allprojects {
         }
     }
 }
-//apply from: 'sonar.gradle'
+
 subprojects {
     apply plugin: 'org.sonarqube'
 
