@@ -35,6 +35,7 @@ allprojects {
 
     sonarqube {
         properties{
+            property 'sonar.projectName', 'Certificate'
             property 'sonar.tests', ["src/test/java"]
             property 'sonar.java.coveragePlugin', "jacoco"
             property 'sonar.coverage.exclusions', '**/*.html,**/*.css,**/*.png,**/*.jpg,**/*.JPG,**/io/ionic*,**/io/ionic**,**/io/ionic**/*.java,**/org/*,**/org/**,**/org/**/*.java,**/cordova/*,**/cordova/**,**/cordova/**/*.java,**/android/*,**/android/**,**/android/**/*.java,**/apache/commons/**'
