@@ -1,9 +1,10 @@
 plugins {
     id 'org.sonarqube' version "3.3"
-    id 'jacoco'
+
 }
 allprojects {
     apply plugin: 'java'
+    apply plugin: 'jacoco'
 
     group 'com.epam.esm'
     version '1.0'
@@ -33,26 +34,35 @@ allprojects {
         testImplementation group: 'org.springframework.boot', name: 'spring-boot-test-autoconfigure', version: bootVersion
     }
 
-    test {
-        useJUnitPlatform()
-
-    }
-    jacocoTestReport {
-        reports {
-            xml.enabled true
+    sonarqube {
+        properties{
+            property 'sonar.tests', ["src/test/java"]
+            property 'sonar.java.coveragePlugin', "jacoco"
+            property 'sonar.coverage.exclusions', '**/*.html,**/*.css,**/*.png,**/*.jpg,**/*.JPG,**/io/ionic*,**/io/ionic**,**/io/ionic**/*.java,**/org/*,**/org/**,**/org/**/*.java,**/cordova/*,**/cordova/**,**/cordova/**/*.java,**/android/*,**/android/**,**/android/**/*.java,**/apache/commons/**'
+            property 'sonar.coverage.jacoco.xmlReportPaths', "${buildDir}\\jacoco\\test.exec"
         }
     }
 
-    //task coverage { dependsOn 'jacocoTestReport' }
-    plugins.withType(JacocoPlugin) {
-        tasks["test"].finalizedBy 'jacocoTestReport'
+    jacoco {
+        toolVersion = "0.8.7"
     }
-    //check.dependsOn 'jacocoTestReport'
+
+    test {
+        useJUnitPlatform()
+    }
+
+    jacocoTestReport {
+        reports {
+            xml.enabled(true)
+            html.enabled(true)
+            csv.enabled(true)
+        }
+    }
 }
 //apply from: 'sonar.gradle'
 subprojects {
     apply plugin: 'org.sonarqube'
-    apply plugin: 'jacoco'
+
 
 }
 
