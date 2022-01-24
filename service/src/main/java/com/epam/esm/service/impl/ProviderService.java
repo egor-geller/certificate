@@ -29,10 +29,10 @@ import static java.util.Arrays.stream;
 @Service
 public class ProviderService implements AuthenticationProvider, LoginProvider {
 
-    @Value("${secret.key}")
-    private String secretKey;
-    @Value("${claim.role}")
-    private String userRole;
+    //@Value("${secret.key}")
+    private String secretKey = "secret";
+    //@Value("${claim.role}")
+    private String userRole = "role";
     private static final String BEARER_KEY = "Bearer ";
     private final AuthenticationManager authenticationManager;
     private static final Logger logger = LogManager.getLogger();
